@@ -1,0 +1,127 @@
+version: 2
+
+models:
+  - name: mart_neighbourhood_transition
+    description: >
+      Neighbourhood-level market movements between consecutive Inside Airbnb
+      snapshots. One row represents one country, city, neighbourhood and pair
+      of consecutive snapshots. Geographic movements are recorded only when a
+      listing is observed in both consecutive snapshots and changes
+      neighbourhood. Listings returning after an observation gap remain
+      classified as returned_after_gap because the timing of any geographic
+      movement during the unobserved period cannot be determined.
+
+    columns:
+      - name: source_country
+        data_tests:
+          - not_null
+
+      - name: source_city
+        data_tests:
+          - not_null
+
+      - name: neighbourhood
+        data_tests:
+          - not_null
+
+      - name: previous_snapshot_date
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        data_tests:
+          - not_null
+
+      - name: days_between_snapshots
+        data_tests:
+          - not_null
+
+      - name: previous_listing_count
+        data_tests:
+          - not_null
+
+      - name: current_listing_count
+        data_tests:
+          - not_null
+
+      - name: net_listing_change
+        data_tests:
+          - not_null
+
+      - name: net_listing_change_pct
+        data_tests:
+          - not_null
+
+      - name: retained_listing_count
+        description: >
+          Listings observed in both consecutive snapshots and remaining in the
+          same neighbourhood.
+        data_tests:
+          - not_null
+
+      - name: disappeared_listing_count
+        description: >
+          Listings present in the previous snapshot but absent from the current
+          snapshot. This does not prove permanent exit from Airbnb.
+        data_tests:
+          - not_null
+
+      - name: moved_out_listing_count
+        description: >
+          Listings observed in both consecutive snapshots whose neighbourhood
+          changed away from this neighbourhood.
+        data_tests:
+          - not_null
+
+      - name: moved_in_listing_count
+        description: >
+          Listings observed in both consecutive snapshots whose neighbourhood
+          changed into this neighbourhood.
+        data_tests:
+          - not_null
+
+      - name: newly_observed_listing_count
+        description: >
+          Listings observed for the first time in the available historical
+          window in this neighbourhood.
+        data_tests:
+          - not_null
+
+      - name: returned_after_gap_listing_count
+        description: >
+          Listings observed historically, absent from the immediately preceding
+          snapshot and observed again in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: retention_rate_pct
+        data_tests:
+          - not_null
+
+      - name: disappearance_rate_pct
+        data_tests:
+          - not_null
+
+      - name: moved_out_rate_pct
+        data_tests:
+          - not_null
+
+      - name: newly_observed_share_pct
+        data_tests:
+          - not_null
+
+      - name: returned_after_gap_share_pct
+        data_tests:
+          - not_null
+
+      - name: moved_in_share_pct
+        data_tests:
+          - not_null
+
+      - name: has_returned_listings
+        data_tests:
+          - not_null
+
+      - name: has_geographic_movement
+        data_tests:
+          - not_null

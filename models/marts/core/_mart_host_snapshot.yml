@@ -1,0 +1,182 @@
+version: 2
+
+models:
+  - name: mart_host_snapshot
+    description: >
+      Market-level host metrics for each Inside Airbnb snapshot.
+      The model has one row per country, city and snapshot date.
+      Host portfolios are based on listings actually observed in the
+      corresponding listing snapshot. Concentration indicators therefore
+      describe the observed Inside Airbnb listing population and must not
+      be interpreted as the complete short-term rental market.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb snapshot.
+        data_tests:
+          - not_null
+
+      - name: host_count
+        description: Number of distinct hosts observed in the snapshot.
+        data_tests:
+          - not_null
+
+      - name: listing_count
+        description: Number of listings controlled by observed hosts.
+        data_tests:
+          - not_null
+
+      - name: average_listings_per_host
+        description: Average number of observed listings per host.
+        data_tests:
+          - not_null
+
+      - name: median_listings_per_host
+        description: Median number of observed listings per host.
+        data_tests:
+          - not_null
+
+      - name: max_listings_per_host
+        description: Maximum number of observed listings controlled by one host.
+        data_tests:
+          - not_null
+
+      - name: single_listing_host_count
+        description: Number of hosts with exactly one observed listing.
+        data_tests:
+          - not_null
+
+      - name: host_count_2_to_5
+        description: Number of hosts with 2 to 5 observed listings.
+        data_tests:
+          - not_null
+
+      - name: host_count_6_to_10
+        description: Number of hosts with 6 to 10 observed listings.
+        data_tests:
+          - not_null
+
+      - name: host_count_11_to_20
+        description: Number of hosts with 11 to 20 observed listings.
+        data_tests:
+          - not_null
+
+      - name: host_count_21_plus
+        description: Number of hosts with at least 21 observed listings.
+        data_tests:
+          - not_null
+
+      - name: multi_listing_host_count
+        description: Number of hosts with more than one observed listing.
+        data_tests:
+          - not_null
+
+      - name: listings_controlled_by_single_listing_hosts
+        description: Number of listings controlled by single-listing hosts.
+        data_tests:
+          - not_null
+
+      - name: listings_controlled_by_multi_listing_hosts
+        description: Number of listings controlled by hosts with multiple observed listings.
+        data_tests:
+          - not_null
+
+      - name: superhost_count
+        description: Number of observed hosts classified as Superhosts.
+        data_tests:
+          - not_null
+
+      - name: identity_verified_host_count
+        description: Number of observed hosts whose identity is marked as verified.
+        data_tests:
+          - not_null
+
+      - name: listings_with_price
+        description: Number of observed listings for which a price is available.
+        data_tests:
+          - not_null
+
+      - name: listings_controlled_by_top_1_pct_hosts
+        description: >
+          Number of listings controlled by the highest-ranked 1 percent
+          of hosts by observed listing count. The host threshold is rounded
+          upward using CEIL.
+        data_tests:
+          - not_null
+
+      - name: listings_controlled_by_top_5_pct_hosts
+        description: >
+          Number of listings controlled by the highest-ranked 5 percent
+          of hosts by observed listing count.
+        data_tests:
+          - not_null
+
+      - name: listings_controlled_by_top_10_pct_hosts
+        description: >
+          Number of listings controlled by the highest-ranked 10 percent
+          of hosts by observed listing count.
+        data_tests:
+          - not_null
+
+      - name: host_hhi
+        description: >
+          Herfindahl-Hirschman Index calculated from each host's share of
+          observed listings. Shares are expressed from 0 to 100, therefore
+          the theoretical HHI range is 0 to 10000.
+        data_tests:
+          - not_null
+
+      - name: single_listing_host_share_pct
+        description: Percentage of observed hosts controlling exactly one listing.
+        data_tests:
+          - not_null
+
+      - name: multi_listing_host_share_pct
+        description: Percentage of observed hosts controlling more than one listing.
+        data_tests:
+          - not_null
+
+      - name: top_1_pct_listing_share_pct
+        description: Percentage of observed listings controlled by the top 1 percent of hosts.
+        data_tests:
+          - not_null
+
+      - name: top_5_pct_listing_share_pct
+        description: Percentage of observed listings controlled by the top 5 percent of hosts.
+        data_tests:
+          - not_null
+
+      - name: top_10_pct_listing_share_pct
+        description: Percentage of observed listings controlled by the top 10 percent of hosts.
+        data_tests:
+          - not_null
+
+      - name: single_listing_host_listing_share_pct
+        description: Percentage of listings controlled by single-listing hosts.
+        data_tests:
+          - not_null
+
+      - name: multi_listing_host_listing_share_pct
+        description: Percentage of listings controlled by multi-listing hosts.
+        data_tests:
+          - not_null
+
+      - name: superhost_share_pct
+        description: Percentage of observed hosts classified as Superhosts.
+        data_tests:
+          - not_null
+
+      - name: identity_verified_host_share_pct
+        description: Percentage of observed hosts whose identity is marked as verified.
+        data_tests:
+          - not_null

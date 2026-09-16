@@ -1,0 +1,109 @@
+version: 2
+
+models:
+  - name: mart_market_transition
+    description: >
+      Market-level transition metrics between consecutive Inside Airbnb
+      snapshots. One row represents one country, city and pair of consecutive
+      snapshots. A disappeared listing is a listing present in the previous
+      snapshot but absent from the current snapshot; this must not be
+      interpreted as a confirmed permanent exit from Airbnb. A returned listing
+      is a listing observed historically, absent from the immediately preceding
+      snapshot and present again in the current snapshot.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: previous_snapshot_date
+        description: Previous market snapshot used for the transition.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Current market snapshot used for the transition.
+        data_tests:
+          - not_null
+
+      - name: days_between_snapshots
+        description: Number of days between the previous and current snapshots.
+        data_tests:
+          - not_null
+
+      - name: previous_listing_count
+        description: Number of listings present in the previous snapshot.
+        data_tests:
+          - not_null
+
+      - name: current_listing_count
+        description: Number of listings present in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: net_listing_change
+        description: Current listing count minus previous listing count.
+        data_tests:
+          - not_null
+
+      - name: net_listing_change_pct
+        description: Percentage change in listing count relative to the previous snapshot.
+        data_tests:
+          - not_null
+
+      - name: retained_listing_count
+        description: Listings present in both consecutive snapshots.
+        data_tests:
+          - not_null
+
+      - name: disappeared_listing_count
+        description: >
+          Listings present in the previous snapshot but absent from the current
+          snapshot. This does not prove a permanent exit from Airbnb.
+        data_tests:
+          - not_null
+
+      - name: newly_observed_listing_count
+        description: >
+          Listings observed for the first time in the available historical
+          window at the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: returned_after_gap_listing_count
+        description: >
+          Listings observed before the previous snapshot, absent from the
+          previous snapshot and observed again in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: retention_rate_pct
+        description: Share of the previous population retained in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: disappearance_rate_pct
+        description: Share of the previous population absent from the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: newly_observed_share_pct
+        description: Share of the current population that is newly observed.
+        data_tests:
+          - not_null
+
+      - name: returned_after_gap_share_pct
+        description: Share of the current population returning after an observation gap.
+        data_tests:
+          - not_null
+
+      - name: has_returned_listings
+        description: Whether the transition contains at least one returned-after-gap listing.
+        data_tests:
+          - not_null

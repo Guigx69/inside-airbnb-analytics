@@ -1,0 +1,80 @@
+version: 2
+
+models:
+  - name: mart_price_distribution_snapshot
+    description: >
+      Price distribution mart at country, city, snapshot and price-band grain.
+      Listings are segmented into six priced bands plus a NO_PRICE category.
+      The model provides listing population, price coverage, price statistics
+      and reconstructed review activity for each price segment.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb snapshot.
+        data_tests:
+          - not_null
+
+      - name: price_band
+        description: >
+          Price segment assigned to the listing. NO_PRICE represents listings
+          without an exploitable price in the snapshot.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - '01_<50'
+                  - '02_50_99'
+                  - '03_100_149'
+                  - '04_150_199'
+                  - '05_200_299'
+                  - '06_300_PLUS'
+                  - 'NO_PRICE'
+
+      - name: listing_count
+        description: Number of listings in the price segment.
+        data_tests:
+          - not_null
+
+      - name: listings_with_price
+        description: Number of listings with a usable price.
+        data_tests:
+          - not_null
+
+      - name: market_listing_share_pct
+        description: >
+          Percentage of all listings in the market represented by the price
+          segment.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l30d
+        description: >
+          Number of reconstructed reviews in the 30-day window ending on the
+          snapshot date for listings in the segment.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l90d
+        description: >
+          Number of reconstructed reviews in the 90-day window ending on the
+          snapshot date for listings in the segment.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l365d
+        description: >
+          Number of reconstructed reviews in the 365-day window ending on the
+          snapshot date for listings in the segment.
+        data_tests:
+          - not_null

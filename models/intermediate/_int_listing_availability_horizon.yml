@@ -1,0 +1,129 @@
+version: 2
+
+models:
+  - name: int_listing_availability_horizon
+    description: >
+      Reconstructed listing-level availability metrics calculated directly
+      from the detailed Inside Airbnb calendar. One row represents one listing
+      for one country, city and snapshot. Availability horizons are anchored
+      on the first calendar date actually observed for each listing rather
+      than directly on snapshot_date, because the calendar window may start
+      several days after the snapshot date. These metrics represent calendar
+      availability and must not be interpreted as observed occupancy or
+      confirmed bookings.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Inside Airbnb snapshot date.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Inside Airbnb listing identifier.
+        data_tests:
+          - not_null
+
+      - name: availability_window_start_date
+        description: >
+          First calendar date actually observed for the listing in the
+          corresponding snapshot.
+        data_tests:
+          - not_null
+
+      - name: availability_window_end_date
+        description: >
+          Last calendar date actually observed for the listing in the
+          corresponding snapshot.
+        data_tests:
+          - not_null
+
+      - name: calendar_day_count
+        description: Number of calendar days represented for the listing.
+        data_tests:
+          - not_null
+
+      - name: represented_days_30d
+        description: Number of represented calendar days in the first 30-day horizon.
+        data_tests:
+          - not_null
+
+      - name: available_days_30d
+        description: >
+          Number of days marked available during the first 30 calendar days
+          actually observed.
+        data_tests:
+          - not_null
+
+      - name: represented_days_60d
+        description: Number of represented calendar days in the first 60-day horizon.
+        data_tests:
+          - not_null
+
+      - name: available_days_60d
+        description: >
+          Number of days marked available during the first 60 calendar days
+          actually observed.
+        data_tests:
+          - not_null
+
+      - name: represented_days_90d
+        description: Number of represented calendar days in the first 90-day horizon.
+        data_tests:
+          - not_null
+
+      - name: available_days_90d
+        description: >
+          Number of days marked available during the first 90 calendar days
+          actually observed.
+        data_tests:
+          - not_null
+
+      - name: represented_days_365d
+        description: Number of represented calendar days in the full 365-day horizon.
+        data_tests:
+          - not_null
+
+      - name: available_days_365d
+        description: >
+          Number of days marked available during the full 365-day calendar
+          window actually observed.
+        data_tests:
+          - not_null
+
+      - name: availability_rate_30d_pct
+        description: >
+          Percentage of represented days marked available within the first
+          30-day horizon.
+        data_tests:
+          - not_null
+
+      - name: availability_rate_60d_pct
+        description: >
+          Percentage of represented days marked available within the first
+          60-day horizon.
+        data_tests:
+          - not_null
+
+      - name: availability_rate_90d_pct
+        description: >
+          Percentage of represented days marked available within the first
+          90-day horizon.
+        data_tests:
+          - not_null
+
+      - name: availability_rate_365d_pct
+        description: >
+          Percentage of represented days marked available within the full
+          365-day horizon.
+        data_tests:
+          - not_null

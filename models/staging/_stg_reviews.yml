@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: stg_reviews
+    description: >
+      Cleaned and typed historical Airbnb review snapshots sourced from
+      Inside Airbnb. A review identifier is not assumed to be globally unique:
+      the observed technical grain is country, city, snapshot date,
+      listing identifier and review identifier.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb snapshot.
+        data_tests:
+          - not_null
+
+      - name: review_id
+        description: >
+          Review identifier provided by Inside Airbnb.
+          It must not be treated as globally unique independently
+          of the listing identifier.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Listing to which the review is associated.
+        data_tests:
+          - not_null
+
+      - name: review_date
+        description: Date on which the review was published.
+        data_tests:
+          - not_null
+
+      - name: reviewer_id
+        description: Identifier of the reviewer.
+        data_tests:
+          - not_null
+
+      - name: reviewer_name
+        description: Public reviewer name exposed by the source.
+
+      - name: comments
+        description: Public review text exposed by the source.
+        data_tests:
+          - not_null

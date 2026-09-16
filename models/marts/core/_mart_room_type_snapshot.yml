@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: mart_room_type_snapshot
+    description: >
+      Business mart aggregated at country, city, snapshot date and room type
+      grain. It provides the distribution of listings by room type together
+      with pricing, availability and reconstructed review activity metrics.
+      Aggregated listing and review populations reconcile with
+      mart_market_snapshot.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb snapshot.
+        data_tests:
+          - not_null
+
+      - name: room_type
+        description: Airbnb room type associated with the listings.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "Entire home/apt"
+                  - "Private room"
+                  - "Shared room"
+                  - "Hotel room"
+
+      - name: listing_count
+        description: Number of listings observed for the room type.
+        data_tests:
+          - not_null
+
+      - name: listing_share_pct
+        description: >
+          Percentage of the market listing population represented by the
+          room type. Values are rounded individually, therefore their sum
+          can differ slightly from exactly 100 percent.
+        data_tests:
+          - not_null
+
+      - name: listings_with_price
+        description: Number of listings with a non-null price.
+        data_tests:
+          - not_null
+
+      - name: average_price
+        description: >
+          Average listing price for listings with available price data.
+          Null when no listing in the room type has a price.
+
+      - name: median_price
+        description: >
+          Median listing price for listings with available price data.
+          Null when no listing in the room type has a price.
+
+      - name: average_availability_rate_pct
+        description: >
+          Average reconstructed calendar availability rate for listings
+          belonging to the room type.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l30d
+        description: >
+          Total number of reconstructed reviews during the 30-day window
+          ending on the snapshot date for listings in the room type.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l90d
+        description: >
+          Total number of reconstructed reviews during the 90-day window
+          ending on the snapshot date for listings in the room type.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l365d
+        description: >
+          Total number of reconstructed reviews during the 365-day window
+          ending on the snapshot date for listings in the room type.
+        data_tests:
+          - not_null

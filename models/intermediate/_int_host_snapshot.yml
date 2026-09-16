@@ -1,0 +1,89 @@
+version: 2
+
+models:
+  - name: int_host_snapshot
+    description: >
+      Host-level snapshot derived from listing observations. One row represents
+      one host for one country, city and Inside Airbnb snapshot. The observed
+      listing portfolio is reconstructed directly from listing-level data.
+      Inside Airbnb's calculated_host_listings_count is retained separately
+      for lineage and reconciliation.
+
+    columns:
+      - name: source_country
+        data_tests:
+          - not_null
+
+      - name: source_city
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        data_tests:
+          - not_null
+
+      - name: host_id
+        data_tests:
+          - not_null
+
+      - name: observed_listing_count
+        description: >
+          Number of listings belonging to the host and directly observed in
+          this city and snapshot.
+        data_tests:
+          - not_null
+
+      - name: observed_entire_home_listing_count
+        data_tests:
+          - not_null
+
+      - name: observed_private_room_listing_count
+        data_tests:
+          - not_null
+
+      - name: observed_shared_room_listing_count
+        data_tests:
+          - not_null
+
+      - name: listings_with_price
+        data_tests:
+          - not_null
+
+      - name: observed_host_segment
+        description: >
+          Host portfolio segment derived from observed_listing_count:
+          1, 2-5, 6-10, 11-20 or 21+.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['1', '2-5', '6-10', '11-20', '21+']
+
+      - name: is_observed_multi_listing_host
+        description: >
+          True when more than one listing is observed for the host in the
+          snapshot.
+        data_tests:
+          - not_null
+
+      - name: is_superhost
+        data_tests:
+          - not_null
+
+      - name: is_host_identity_verified
+        data_tests:
+          - not_null
+
+      - name: inside_airbnb_calculated_host_listings_count
+        description: >
+          Host listing count supplied by Inside Airbnb. Retained separately
+          from the reconstructed observed listing count.
+        data_tests:
+          - not_null
+
+      - name: calculated_vs_observed_listing_difference
+        description: >
+          Difference between Inside Airbnb's supplied host listing count and
+          the portfolio reconstructed from listing-level observations.
+        data_tests:
+          - not_null

@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: stg_listings
+    description: >
+      Cleaned and typed historical Airbnb listing snapshots sourced from
+      Inside Airbnb. The model preserves one record per listing, city,
+      country and snapshot date.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb snapshot.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Airbnb listing identifier.
+        data_tests:
+          - not_null
+
+      - name: host_id
+        description: Airbnb host identifier.
+        data_tests:
+          - not_null
+
+      - name: latitude
+        description: Listing latitude.
+
+      - name: longitude
+        description: Listing longitude.
+
+      - name: price
+        description: >
+          Listing price exposed by Inside Airbnb when available.
+          Availability of this field varies materially between snapshots.
+
+      - name: is_superhost
+        description: Indicates whether the host is identified as a superhost.
+
+      - name: has_availability
+        description: Indicates whether availability information is exposed.
+
+      - name: is_instant_bookable
+        description: Indicates whether the listing can be booked instantly.
+
+      - name: estimated_occupancy_l365d
+        description: >
+          Inside Airbnb estimate of occupancy over the last 365 days.
+          This is an estimate and must not be interpreted as observed occupancy.
+
+      - name: estimated_revenue_l365d
+        description: >
+          Inside Airbnb estimate of revenue over the last 365 days.
+          This is an estimate and must not be interpreted as observed revenue.

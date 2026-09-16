@@ -1,0 +1,140 @@
+version: 2
+
+models:
+  - name: mart_calendar_month_snapshot
+    description: >
+      Market-level monthly calendar availability mart derived from the
+      detailed Inside Airbnb calendar. One row represents one country,
+      city, snapshot and calendar month. Partial months are intentionally
+      preserved and accompanied by explicit coverage indicators.
+      Availability describes dates marked available in the source calendar
+      and must not be interpreted as observed occupancy or confirmed bookings.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Inside Airbnb snapshot date from which the calendar was extracted.
+        data_tests:
+          - not_null
+
+      - name: calendar_month
+        description: First day of the calendar month represented by the row.
+        data_tests:
+          - not_null
+
+      - name: days_in_calendar_month
+        description: Total number of calendar days in the corresponding month.
+        data_tests:
+          - not_null
+
+      - name: listing_count
+        description: Number of listings represented at least once during the month.
+        data_tests:
+          - not_null
+
+      - name: first_observed_date
+        description: Earliest calendar date represented in the month across all listings.
+        data_tests:
+          - not_null
+
+      - name: last_observed_date
+        description: Latest calendar date represented in the month across all listings.
+        data_tests:
+          - not_null
+
+      - name: min_days_per_listing
+        description: Minimum number of represented days for an individual listing during the month.
+        data_tests:
+          - not_null
+
+      - name: max_days_per_listing
+        description: Maximum number of represented days for an individual listing during the month.
+        data_tests:
+          - not_null
+
+      - name: full_month_listing_count
+        description: Number of listings represented on every calendar day of the month.
+        data_tests:
+          - not_null
+
+      - name: partial_month_listing_count
+        description: Number of listings represented for only part of the calendar month.
+        data_tests:
+          - not_null
+
+      - name: represented_listing_days
+        description: Total number of listing-days actually represented in the source calendar.
+        data_tests:
+          - not_null
+
+      - name: expected_listing_days_for_present_listings
+        description: >
+          Theoretical number of listing-days if every listing present during
+          the month were represented on every calendar day.
+        data_tests:
+          - not_null
+
+      - name: available_day_count
+        description: Total represented listing-days marked available.
+        data_tests:
+          - not_null
+
+      - name: unavailable_day_count
+        description: Total represented listing-days marked unavailable.
+        data_tests:
+          - not_null
+
+      - name: average_listing_availability_rate_pct
+        description: >
+          Unweighted average of individual listing availability rates.
+          Each listing receives the same weight regardless of the number
+          of represented days.
+        data_tests:
+          - not_null
+
+      - name: median_listing_availability_rate_pct
+        description: Median individual listing availability rate for the month.
+        data_tests:
+          - not_null
+
+      - name: listing_day_coverage_pct
+        description: >
+          Percentage of expected listing-days actually represented.
+          Values below 100 indicate partial calendar coverage.
+        data_tests:
+          - not_null
+
+      - name: full_month_listing_share_pct
+        description: Percentage of represented listings having complete monthly coverage.
+        data_tests:
+          - not_null
+
+      - name: is_full_month_coverage
+        description: >
+          True only when all expected listing-days for the represented
+          population are present.
+        data_tests:
+          - not_null
+
+      - name: market_availability_rate_pct
+        description: >
+          Percentage of represented listing-days marked available.
+          This is weighted by represented listing-days and is not an occupancy rate.
+        data_tests:
+          - not_null
+
+      - name: market_unavailability_rate_pct
+        description: >
+          Percentage of represented listing-days marked unavailable.
+          Unavailability must not be interpreted directly as a confirmed booking.
+        data_tests:
+          - not_null

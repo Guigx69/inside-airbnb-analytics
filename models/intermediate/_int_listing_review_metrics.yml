@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: int_listing_review_metrics
+    description: >
+      Review metrics reconstructed from deduplicated review-level data for each
+      listing snapshot. The model has one row per country, city, snapshot and
+      listing. Metrics are calculated using reviews whose review_date is less
+      than or equal to the snapshot date. These reconstructed metrics are kept
+      distinct from the review counters published directly in the Inside Airbnb
+      listings dataset and are not expected to match them exactly.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb listing snapshot.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Identifier of the Airbnb listing.
+        data_tests:
+          - not_null
+
+      - name: review_count_to_snapshot
+        description: >
+          Number of deduplicated reviews whose review date is less than or
+          equal to the snapshot date.
+        data_tests:
+          - not_null
+
+      - name: review_count_l30d
+        description: >
+          Number of deduplicated reviews in the inclusive 30-day period ending
+          on the snapshot date.
+        data_tests:
+          - not_null
+
+      - name: review_count_l90d
+        description: >
+          Number of deduplicated reviews in the inclusive 90-day period ending
+          on the snapshot date.
+        data_tests:
+          - not_null
+
+      - name: review_count_l365d
+        description: >
+          Number of deduplicated reviews in the inclusive 365-day period ending
+          on the snapshot date.
+        data_tests:
+          - not_null
+
+      - name: first_review_date_to_snapshot
+        description: >
+          Earliest review date observed for the listing up to the snapshot date.
+
+      - name: last_review_date_to_snapshot
+        description: >
+          Most recent review date observed for the listing up to the snapshot
+          date.
+
+      - name: days_since_last_review
+        description: >
+          Number of days between the most recent reconstructed review and the
+          snapshot date. Null when no review exists up to the snapshot.
+
+      - name: has_reviews_to_snapshot
+        description: Whether at least one reconstructed review exists.
+        data_tests:
+          - not_null
+
+      - name: has_review_l30d
+        description: Whether at least one reconstructed review exists in L30D.
+        data_tests:
+          - not_null
+
+      - name: has_review_l90d
+        description: Whether at least one reconstructed review exists in L90D.
+        data_tests:
+          - not_null
+
+      - name: has_review_l365d
+        description: Whether at least one reconstructed review exists in L365D.
+        data_tests:
+          - not_null

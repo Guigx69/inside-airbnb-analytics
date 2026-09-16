@@ -1,0 +1,78 @@
+version: 2
+
+models:
+  - name: int_listing_snapshot_movement
+    description: >
+      Classifies each observed listing at each market snapshot according
+      to its presence in the immediately preceding market snapshot.
+      One row represents one country, city, snapshot and listing.
+      The first market snapshot is classified as baseline because no
+      previous market snapshot exists.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Current Inside Airbnb snapshot date.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Identifier of the listing observed in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: snapshot_sequence
+        description: Chronological sequence number of the market snapshot.
+        data_tests:
+          - not_null
+
+      - name: market_previous_snapshot_date
+        description: >
+          Immediately preceding market snapshot date. Null for the first
+          snapshot because no transition can be inferred.
+
+      - name: first_seen_snapshot
+        description: First snapshot in which the listing is observed.
+        data_tests:
+          - not_null
+
+      - name: snapshot_count
+        description: Number of snapshots in which the listing is observed.
+        data_tests:
+          - not_null
+
+      - name: has_observation_gap
+        description: >
+          Indicates whether the current listing observation follows a gap
+          in its observed snapshot history. Null may occur on the first
+          observation according to the upstream historical model.
+
+      - name: was_present_previous_snapshot
+        description: >
+          True when the listing was also observed in the immediately
+          preceding market snapshot.
+        data_tests:
+          - not_null
+
+      - name: movement_status
+        description: >
+          Listing movement classification: baseline, retained,
+          newly_observed or returned_after_gap.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - baseline
+                  - retained
+                  - newly_observed
+                  - returned_after_gap

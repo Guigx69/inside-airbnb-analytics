@@ -1,0 +1,103 @@
+version: 2
+
+models:
+  - name: int_neighbourhood_snapshot_transition
+    description: >
+      Neighbourhood-level transition metrics between consecutive Inside
+      Airbnb snapshots. The model distinguishes retained listings,
+      disappearances, movements between neighbourhoods, newly observed
+      listings and listings returning after an observation gap.
+      Only neighbourhoods represented in both sides of a transition are
+      returned by the final inner join.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: previous_snapshot_date
+        description: Immediately preceding market snapshot date.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Current market snapshot date.
+        data_tests:
+          - not_null
+
+      - name: neighbourhood
+        description: Neighbourhood used as the aggregation grain.
+
+      - name: previous_listing_count
+        description: Listings in the neighbourhood in the previous snapshot.
+        data_tests:
+          - not_null
+
+      - name: current_listing_count
+        description: Listings in the neighbourhood in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: retained_listing_count
+        description: Listings remaining in the same neighbourhood.
+        data_tests:
+          - not_null
+
+      - name: disappeared_listing_count
+        description: Listings no longer observed in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: moved_out_listing_count
+        description: >
+          Listings still observed in the current snapshot but assigned
+          to another neighbourhood.
+        data_tests:
+          - not_null
+
+      - name: newly_observed_listing_count
+        description: Listings observed for the first time in the historical window.
+        data_tests:
+          - not_null
+
+      - name: returned_after_gap_listing_count
+        description: >
+          Listings absent from the previous snapshot but observed in an
+          earlier historical snapshot.
+        data_tests:
+          - not_null
+
+      - name: moved_in_listing_count
+        description: >
+          Listings already present in the previous snapshot but assigned
+          to another neighbourhood at that time.
+        data_tests:
+          - not_null
+
+      - name: net_listing_change
+        description: Current neighbourhood listing count minus previous listing count.
+        data_tests:
+          - not_null
+
+      - name: net_listing_change_pct
+        description: >
+          Net listing change expressed as a percentage of the previous
+          neighbourhood population.
+        data_tests:
+          - not_null
+
+      - name: retention_rate_pct
+        description: Percentage of previous listings retained in the same neighbourhood.
+        data_tests:
+          - not_null
+
+      - name: disappearance_rate_pct
+        description: Percentage of previous listings no longer observed.
+        data_tests:
+          - not_null

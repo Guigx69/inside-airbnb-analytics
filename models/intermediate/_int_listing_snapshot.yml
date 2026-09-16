@@ -1,0 +1,128 @@
+version: 2
+
+models:
+  - name: int_listing_snapshot
+    description: >
+      Historical listing observations across Inside Airbnb snapshots.
+      The model preserves one row per country, city, snapshot and listing,
+      and enriches each observation with listing-level history, previous
+      observations, snapshot continuity and attribute changes.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb source snapshot.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Airbnb listing identifier.
+        data_tests:
+          - not_null
+
+      - name: snapshot_sequence
+        description: >
+          Chronological position of the snapshot within the available
+          snapshot history for the city.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4]
+                quote: false
+
+      - name: first_seen_snapshot
+        description: >
+          First snapshot in this dataset in which the listing was observed.
+          This is not necessarily the creation date of the Airbnb listing.
+        data_tests:
+          - not_null
+
+      - name: last_seen_snapshot
+        description: >
+          Most recent snapshot in this dataset in which the listing was observed.
+        data_tests:
+          - not_null
+
+      - name: snapshot_count
+        description: Number of source snapshots in which the listing was observed.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4]
+                quote: false
+
+      - name: previous_snapshot_date
+        description: >
+          Previous snapshot in which this listing was observed.
+          Null for the first observation.
+
+      - name: previous_snapshot_sequence
+        description: >
+          Sequence number of the previous snapshot in which this listing
+          was observed. Null for the first observation.
+
+      - name: is_first_observation
+        description: >
+          True when this row represents the first observed snapshot
+          for the listing.
+        data_tests:
+          - not_null
+
+      - name: is_last_observation
+        description: >
+          True when this row represents the most recent observed snapshot
+          for the listing.
+        data_tests:
+          - not_null
+
+      - name: has_observation_gap
+        description: >
+          Indicates whether one or more expected source snapshots are missing
+          between this observation and the previous observation.
+          Null for the first observation.
+
+      - name: missing_snapshot_count
+        description: >
+          Number of expected source snapshots missing since the previous
+          observation. Null for the first observation.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1, 2]
+                quote: false
+
+      - name: price_change
+        description: >
+          Absolute price difference compared with the previous observed
+          snapshot when both prices are available.
+
+      - name: price_change_pct
+        description: >
+          Percentage price difference compared with the previous observed
+          snapshot when both prices are available and the previous price
+          is non-zero.
+
+      - name: has_host_changed
+        description: >
+          True when the host identifier differs from the previous observed
+          snapshot for the listing.
+        data_tests:
+          - not_null
+
+      - name: has_room_type_changed
+        description: >
+          True when the room type differs from the previous observed
+          snapshot for the listing.
+        data_tests:
+          - not_null

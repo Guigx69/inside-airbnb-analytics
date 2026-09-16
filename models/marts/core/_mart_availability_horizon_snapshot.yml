@@ -1,0 +1,150 @@
+version: 2
+
+models:
+  - name: mart_availability_horizon_snapshot
+    description: >
+      Market-level reconstructed availability indicators derived from the
+      detailed Inside Airbnb calendar. One row represents one country, city
+      and snapshot. Availability is calculated over 30, 60, 90 and 365-day
+      horizons anchored on the first calendar date actually observed for each
+      listing. These indicators describe calendar availability and must not be
+      interpreted as observed occupancy or confirmed bookings.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Inside Airbnb snapshot date.
+        data_tests:
+          - not_null
+
+      - name: listing_count
+        description: Number of listings represented in the detailed calendar.
+        data_tests:
+          - not_null
+
+      - name: earliest_availability_window_start_date
+        description: Earliest calendar-window start date among listings in the snapshot.
+        data_tests:
+          - not_null
+
+      - name: latest_availability_window_start_date
+        description: Latest calendar-window start date among listings in the snapshot.
+        data_tests:
+          - not_null
+
+      - name: represented_days_30d
+        description: Total represented listing-days across the 30-day horizon.
+        data_tests:
+          - not_null
+
+      - name: available_days_30d
+        description: Total days marked available across the 30-day horizon.
+        data_tests:
+          - not_null
+
+      - name: market_availability_rate_30d_pct
+        description: >
+          Share of represented listing-days marked available across the
+          30-day horizon.
+        data_tests:
+          - not_null
+
+      - name: average_listing_availability_rate_30d_pct
+        description: Average of individual listing availability rates over 30 days.
+        data_tests:
+          - not_null
+
+      - name: median_listing_availability_rate_30d_pct
+        description: Median of individual listing availability rates over 30 days.
+        data_tests:
+          - not_null
+
+      - name: represented_days_60d
+        description: Total represented listing-days across the 60-day horizon.
+        data_tests:
+          - not_null
+
+      - name: available_days_60d
+        description: Total days marked available across the 60-day horizon.
+        data_tests:
+          - not_null
+
+      - name: market_availability_rate_60d_pct
+        description: >
+          Share of represented listing-days marked available across the
+          60-day horizon.
+        data_tests:
+          - not_null
+
+      - name: average_listing_availability_rate_60d_pct
+        description: Average of individual listing availability rates over 60 days.
+        data_tests:
+          - not_null
+
+      - name: median_listing_availability_rate_60d_pct
+        description: Median of individual listing availability rates over 60 days.
+        data_tests:
+          - not_null
+
+      - name: represented_days_90d
+        description: Total represented listing-days across the 90-day horizon.
+        data_tests:
+          - not_null
+
+      - name: available_days_90d
+        description: Total days marked available across the 90-day horizon.
+        data_tests:
+          - not_null
+
+      - name: market_availability_rate_90d_pct
+        description: >
+          Share of represented listing-days marked available across the
+          90-day horizon.
+        data_tests:
+          - not_null
+
+      - name: average_listing_availability_rate_90d_pct
+        description: Average of individual listing availability rates over 90 days.
+        data_tests:
+          - not_null
+
+      - name: median_listing_availability_rate_90d_pct
+        description: Median of individual listing availability rates over 90 days.
+        data_tests:
+          - not_null
+
+      - name: represented_days_365d
+        description: Total represented listing-days across the 365-day horizon.
+        data_tests:
+          - not_null
+
+      - name: available_days_365d
+        description: Total days marked available across the 365-day horizon.
+        data_tests:
+          - not_null
+
+      - name: market_availability_rate_365d_pct
+        description: >
+          Share of represented listing-days marked available across the
+          complete 365-day horizon.
+        data_tests:
+          - not_null
+
+      - name: average_listing_availability_rate_365d_pct
+        description: Average of individual listing availability rates over 365 days.
+        data_tests:
+          - not_null
+
+      - name: median_listing_availability_rate_365d_pct
+        description: Median of individual listing availability rates over 365 days.
+        data_tests:
+          - not_null

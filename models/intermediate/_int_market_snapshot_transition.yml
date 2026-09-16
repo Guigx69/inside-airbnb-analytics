@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: int_market_snapshot_transition
+    description: >
+      Market-level transition metrics between consecutive Inside Airbnb
+      snapshots. Baseline snapshots are excluded because no previous
+      snapshot exists. One row represents one country, city, previous
+      snapshot and current snapshot transition.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: previous_snapshot_date
+        description: Immediately preceding market snapshot date.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Current market snapshot date.
+        data_tests:
+          - not_null
+
+      - name: previous_listing_count
+        description: Number of listings observed in the previous snapshot.
+        data_tests:
+          - not_null
+
+      - name: current_listing_count
+        description: Number of listings observed in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: retained_listing_count
+        description: Listings observed in both consecutive snapshots.
+        data_tests:
+          - not_null
+
+      - name: disappeared_listing_count
+        description: >
+          Listings observed in the previous snapshot but absent from
+          the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: newly_observed_listing_count
+        description: >
+          Listings observed for the first time in the historical window
+          in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: returned_after_gap_listing_count
+        description: >
+          Listings present in the current snapshot, absent from the
+          immediately preceding snapshot, but observed in an earlier snapshot.
+        data_tests:
+          - not_null
+
+      - name: net_listing_change
+        description: Current listing count minus previous listing count.
+        data_tests:
+          - not_null
+
+      - name: retention_rate_pct
+        description: Percentage of previous listings retained in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: disappearance_rate_pct
+        description: Percentage of previous listings absent from the current snapshot.
+        data_tests:
+          - not_null

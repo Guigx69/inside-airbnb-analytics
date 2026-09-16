@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: int_calendar_monthly_metrics
+    description: >
+      Listing-level monthly calendar metrics derived from the detailed
+      Inside Airbnb calendar. One row represents one country, city,
+      snapshot, calendar month and listing. The model preserves partial
+      months and explicitly measures their calendar coverage. Availability
+      describes dates marked available in the source calendar and must not
+      be interpreted as observed occupancy or confirmed bookings.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Inside Airbnb snapshot date.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Identifier of the Airbnb listing.
+        data_tests:
+          - not_null
+
+      - name: calendar_month
+        description: First day of the calendar month represented by the row.
+        data_tests:
+          - not_null
+
+      - name: days_in_calendar_month
+        description: Total number of calendar days in the corresponding month.
+        data_tests:
+          - not_null
+
+      - name: first_observed_date
+        description: First calendar date observed for the listing within the month.
+        data_tests:
+          - not_null
+
+      - name: last_observed_date
+        description: Last calendar date observed for the listing within the month.
+        data_tests:
+          - not_null
+
+      - name: represented_day_count
+        description: Number of calendar days actually represented for the listing and month.
+        data_tests:
+          - not_null
+
+      - name: available_day_count
+        description: Number of represented days marked available.
+        data_tests:
+          - not_null
+
+      - name: unavailable_day_count
+        description: Number of represented days marked unavailable.
+        data_tests:
+          - not_null
+
+      - name: has_full_month_coverage
+        description: >
+          True when the listing is represented for every calendar day
+          of the month.
+        data_tests:
+          - not_null
+
+      - name: calendar_month_coverage_pct
+        description: >
+          Percentage of calendar days in the month represented for the listing.
+        data_tests:
+          - not_null
+
+      - name: availability_rate_pct
+        description: >
+          Percentage of represented days marked available. This is a
+          calendar availability metric, not an occupancy rate.
+        data_tests:
+          - not_null
+
+      - name: unavailability_rate_pct
+        description: >
+          Percentage of represented days marked unavailable. Unavailability
+          must not be interpreted directly as a confirmed booking.
+        data_tests:
+          - not_null

@@ -1,0 +1,146 @@
+version: 2
+
+models:
+  - name: mart_price_transition
+    description: >
+      Market-level analysis of listing price changes between two observed
+      Inside Airbnb snapshots. One row represents one observed snapshot
+      transition for a country and city. Transitions may be consecutive or
+      occur after one or more missing observations. Price-change metrics are
+      calculated only for listings having both a previous and a current price.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: previous_snapshot_date
+        description: Previous observed snapshot date.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Current observed snapshot date.
+        data_tests:
+          - not_null
+
+      - name: transition_type
+        description: >
+          Type of transition between observations. CONSECUTIVE means no
+          expected snapshot is missing; AFTER_GAP means one or more expected
+          snapshots are missing between observations.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - CONSECUTIVE
+                  - AFTER_GAP
+
+      - name: missing_snapshot_count
+        description: Number of expected snapshots missing between observations.
+        data_tests:
+          - not_null
+
+      - name: days_between_observations
+        description: Number of calendar days between the two observations.
+        data_tests:
+          - not_null
+
+      - name: listing_observation_count
+        description: Number of listing observations represented by the transition.
+        data_tests:
+          - not_null
+
+      - name: listings_with_previous_price
+        description: Number of observations having a price in the previous snapshot.
+        data_tests:
+          - not_null
+
+      - name: listings_with_current_price
+        description: Number of observations having a price in the current snapshot.
+        data_tests:
+          - not_null
+
+      - name: comparable_listing_count
+        description: >
+          Number of listings having both previous and current prices and
+          therefore usable for price-change analysis.
+        data_tests:
+          - not_null
+
+      - name: price_increase_count
+        description: Number of comparable listings whose price increased.
+        data_tests:
+          - not_null
+
+      - name: price_decrease_count
+        description: Number of comparable listings whose price decreased.
+        data_tests:
+          - not_null
+
+      - name: unchanged_price_count
+        description: Number of comparable listings whose price remained unchanged.
+        data_tests:
+          - not_null
+
+      - name: comparable_price_coverage_pct
+        description: >
+          Percentage of listing observations having comparable previous and
+          current prices.
+        data_tests:
+          - not_null
+
+      - name: price_increase_share_pct
+        description: >
+          Percentage of comparable listings whose price increased. Null when
+          no comparable listing exists.
+
+      - name: price_decrease_share_pct
+        description: >
+          Percentage of comparable listings whose price decreased. Null when
+          no comparable listing exists.
+
+      - name: unchanged_price_share_pct
+        description: >
+          Percentage of comparable listings whose price remained unchanged.
+          Null when no comparable listing exists.
+
+      - name: average_previous_price
+        description: Average previous price among comparable listings.
+
+      - name: average_current_price
+        description: Average current price among comparable listings.
+
+      - name: median_previous_price
+        description: Median previous price among comparable listings.
+
+      - name: median_current_price
+        description: Median current price among comparable listings.
+
+      - name: average_price_change
+        description: >
+          Average absolute price change at listing level among comparable
+          listings.
+
+      - name: median_price_change
+        description: >
+          Median absolute price change at listing level among comparable
+          listings.
+
+      - name: average_price_change_pct
+        description: >
+          Average listing-level percentage price change. This is the average
+          of individual percentage changes and is not the percentage change
+          between the aggregate average prices.
+
+      - name: median_price_change_pct
+        description: >
+          Median listing-level percentage price change among comparable
+          listings.

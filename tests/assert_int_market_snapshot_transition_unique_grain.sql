@@ -1,0 +1,16 @@
+select
+    source_country,
+    source_city,
+    previous_snapshot_date,
+    snapshot_date,
+    count(*) as occurrences
+
+from {{ ref('int_market_snapshot_transition') }}
+
+group by
+    source_country,
+    source_city,
+    previous_snapshot_date,
+    snapshot_date
+
+having count(*) > 1

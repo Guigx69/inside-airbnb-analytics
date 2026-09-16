@@ -1,0 +1,75 @@
+version: 2
+
+models:
+  - name: int_reviews
+    description: >
+      Deduplicated business-level Airbnb reviews across historical Inside Airbnb
+      snapshots. The model contains one row per country, city, listing and review.
+      Snapshot metadata records when each review was first and last observed in
+      the source datasets.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Identifier of the listing associated with the review.
+        data_tests:
+          - not_null
+
+      - name: review_id
+        description: >
+          Review identifier provided by Inside Airbnb. It is not assumed to be
+          globally unique independently of listing_id.
+        data_tests:
+          - not_null
+
+      - name: review_date
+        description: Date on which the review was published.
+        data_tests:
+          - not_null
+
+      - name: reviewer_id
+        description: Identifier of the reviewer.
+        data_tests:
+          - not_null
+
+      - name: reviewer_name
+        description: >
+          Most recently observed public reviewer name across the available
+          snapshots.
+
+      - name: comments
+        description: Public review text.
+        data_tests:
+          - not_null
+
+      - name: first_seen_snapshot
+        description: >
+          First Inside Airbnb snapshot in this dataset in which the review
+          was observed. This is not necessarily the creation date of the review.
+        data_tests:
+          - not_null
+
+      - name: last_seen_snapshot
+        description: >
+          Most recent Inside Airbnb snapshot in this dataset in which the review
+          was observed.
+        data_tests:
+          - not_null
+
+      - name: snapshot_count
+        description: Number of source snapshots in which the review was observed.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4]
+                quote: false

@@ -1,0 +1,52 @@
+# =============================================================================
+# Inside Airbnb Analytics Platform
+# dbt Core + Snowflake
+#
+# Roadmap:
+#   V1 - Lyon
+#   V2 - France
+#   V3 - Europe
+#   V4 - World
+# =============================================================================
+
+name: 'inside_airbnb'
+version: '1.0.0'
+config-version: 2
+
+profile: 'inside_airbnb'
+
+# -----------------------------------------------------------------------------
+# Project paths
+# -----------------------------------------------------------------------------
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# -----------------------------------------------------------------------------
+# Models
+# -----------------------------------------------------------------------------
+
+models:
+  inside_airbnb:
+
+    staging:
+      +materialized: view
+      +schema: staging
+
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+
+    marts:
+      +materialized: table
+      +schema: marts

@@ -1,0 +1,97 @@
+version: 2
+
+models:
+  - name: fct_listing_snapshot
+    description: >
+      Core analytical fact table containing one row per Airbnb listing
+      observation and Inside Airbnb snapshot. It exposes listing, host,
+      geography, property, pricing, availability and review attributes,
+      together with historical observation and change indicators.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb source snapshot.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Airbnb listing identifier.
+        data_tests:
+          - not_null
+
+      - name: host_id
+        description: Airbnb host identifier.
+        data_tests:
+          - not_null
+
+      - name: snapshot_sequence
+        description: Chronological sequence of the source snapshot for the city.
+        data_tests:
+          - not_null
+
+      - name: first_seen_snapshot
+        description: >
+          First snapshot in this dataset in which the listing was observed.
+        data_tests:
+          - not_null
+
+      - name: last_seen_snapshot
+        description: >
+          Most recent snapshot in this dataset in which the listing was observed.
+        data_tests:
+          - not_null
+
+      - name: snapshot_count
+        description: Number of snapshots in which the listing was observed.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4]
+                quote: false
+
+      - name: is_first_observation
+        description: True for the first observed snapshot of the listing.
+        data_tests:
+          - not_null
+
+      - name: is_last_observation
+        description: True for the most recent observed snapshot of the listing.
+        data_tests:
+          - not_null
+
+      - name: has_observation_gap
+        description: >
+          Indicates whether one or more expected snapshots are missing
+          between this observation and the previous observation.
+
+      - name: missing_snapshot_count
+        description: >
+          Number of expected snapshots missing since the previous observation.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1, 2]
+                quote: false
+
+      - name: has_host_changed
+        description: >
+          True when the host differs from the previous observed snapshot.
+        data_tests:
+          - not_null
+
+      - name: has_room_type_changed
+        description: >
+          True when the room type differs from the previous observed snapshot.
+        data_tests:
+          - not_null

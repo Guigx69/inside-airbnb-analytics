@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: stg_calendar
+    description: >
+      Cleaned and typed historical availability calendar snapshots from
+      Inside Airbnb. Each record represents the public availability state
+      of one listing for one calendar date at a given snapshot date.
+      Unavailability must not be interpreted as confirmed occupancy.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb snapshot.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Airbnb listing identifier.
+        data_tests:
+          - not_null
+
+      - name: calendar_date
+        description: Calendar date whose public availability is represented.
+        data_tests:
+          - not_null
+
+      - name: is_available
+        description: >
+          Public availability status reported by Inside Airbnb.
+          False does not necessarily mean that the property was booked.
+        data_tests:
+          - not_null
+
+      - name: price
+        description: >
+          Calendar price when provided by the source.
+          This field is currently null across the four Lyon V1 snapshots.
+
+      - name: adjusted_price
+        description: >
+          Adjusted calendar price when provided by the source.
+          This field is currently null across the four Lyon V1 snapshots.
+
+      - name: minimum_nights
+        description: Minimum stay requirement applicable to the calendar date.
+
+      - name: maximum_nights
+        description: Maximum stay requirement applicable to the calendar date.

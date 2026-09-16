@@ -1,0 +1,136 @@
+version: 2
+
+models:
+  - name: mart_neighbourhood_snapshot
+    description: >
+      Neighbourhood-level analytical snapshot derived from listing-level
+      observations. One row represents one country, city, snapshot and
+      neighbourhood. In the Lyon V1 dataset, neighbourhood corresponds to
+      one of the nine Lyon arrondissements. Pricing metrics remain null when
+      the source snapshot does not provide listing prices. Availability
+      represents publicly observed Airbnb availability and must not be
+      interpreted as observed vacancy or inverse occupancy.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb snapshot.
+        data_tests:
+          - not_null
+
+      - name: neighbourhood
+        description: >
+          Neighbourhood associated with the listing. For Lyon V1, values
+          correspond to the nine Lyon arrondissements.
+        data_tests:
+          - not_null
+
+      - name: listing_count
+        description: Number of listings observed in the neighbourhood.
+        data_tests:
+          - not_null
+
+      - name: entire_home_listing_count
+        description: Number of Entire home/apt listings.
+        data_tests:
+          - not_null
+
+      - name: private_room_listing_count
+        description: Number of Private room listings.
+        data_tests:
+          - not_null
+
+      - name: shared_room_listing_count
+        description: Number of Shared room listings.
+        data_tests:
+          - not_null
+
+      - name: host_count
+        description: Number of distinct hosts represented.
+        data_tests:
+          - not_null
+
+      - name: superhost_listing_count
+        description: Number of listings whose host is identified as a Superhost.
+        data_tests:
+          - not_null
+
+      - name: listings_with_price
+        description: Number of listings for which a price is available.
+        data_tests:
+          - not_null
+
+      - name: average_price
+        description: >
+          Average listing price when price data is available. Null when the
+          source snapshot contains no usable price.
+
+      - name: median_price
+        description: >
+          Median listing price when price data is available. Null when the
+          source snapshot contains no usable price.
+
+      - name: average_availability_rate_pct
+        description: >
+          Average share of calendar days publicly available across listings.
+          This is not an observed occupancy or vacancy rate.
+        data_tests:
+          - not_null
+
+      - name: average_availability_30
+        description: Average native Inside Airbnb availability_30 value.
+        data_tests:
+          - not_null
+
+      - name: average_availability_365
+        description: Average native Inside Airbnb availability_365 value.
+        data_tests:
+          - not_null
+
+      - name: native_review_count_total
+        description: Sum of Inside Airbnb native review counters.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_total
+        description: Sum of review counts reconstructed from deduplicated review-level data.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l30d
+        description: Reconstructed review count over the 30-day window ending at the snapshot.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l90d
+        description: Reconstructed review count over the 90-day window ending at the snapshot.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l365d
+        description: Reconstructed review count over the 365-day window ending at the snapshot.
+        data_tests:
+          - not_null
+
+      - name: average_listing_latitude
+        description: >
+          Average latitude of observed listings. This is not the official
+          geographical centroid of the neighbourhood.
+        data_tests:
+          - not_null
+
+      - name: average_listing_longitude
+        description: >
+          Average longitude of observed listings. This is not the official
+          geographical centroid of the neighbourhood.
+        data_tests:
+          - not_null

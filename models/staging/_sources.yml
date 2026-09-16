@@ -1,0 +1,112 @@
+version: 2
+
+sources:
+  - name: inside_airbnb
+    description: >
+      Raw Inside Airbnb datasets ingested into Snowflake.
+      Each dataset contains historical snapshots identified by country,
+      city and snapshot date.
+
+    database: AIRBNB
+    schema: RAW
+
+    tables:
+      - name: listings
+        identifier: RAW_LISTINGS
+        description: >
+          Historical snapshots of Airbnb listings.
+          One source record represents one listing for one snapshot date.
+
+        columns:
+          - name: SOURCE_COUNTRY
+            description: Country associated with the source dataset.
+            data_tests:
+              - not_null
+
+          - name: SOURCE_CITY
+            description: City associated with the source dataset.
+            data_tests:
+              - not_null
+
+          - name: SNAPSHOT_DATE
+            description: Date of the Inside Airbnb snapshot.
+            data_tests:
+              - not_null
+
+          - name: SOURCE_FILE
+            description: Original Inside Airbnb source filename.
+            data_tests:
+              - not_null
+
+          - name: LOADED_AT
+            description: Timestamp at which the record was loaded into Snowflake.
+            data_tests:
+              - not_null
+
+          - name: RAW_DATA
+            description: Original source record stored as a Snowflake VARIANT.
+            data_tests:
+              - not_null
+
+      - name: calendar
+        identifier: RAW_CALENDAR
+        description: >
+          Historical availability calendar snapshots for Airbnb listings.
+          One source record represents one listing and calendar date
+          for one snapshot date.
+
+        columns:
+          - name: SOURCE_COUNTRY
+            data_tests:
+              - not_null
+
+          - name: SOURCE_CITY
+            data_tests:
+              - not_null
+
+          - name: SNAPSHOT_DATE
+            data_tests:
+              - not_null
+
+          - name: SOURCE_FILE
+            data_tests:
+              - not_null
+
+          - name: LOADED_AT
+            data_tests:
+              - not_null
+
+          - name: RAW_DATA
+            data_tests:
+              - not_null
+
+      - name: reviews
+        identifier: RAW_REVIEWS
+        description: >
+          Historical review snapshots from Inside Airbnb.
+          The same review may appear in several snapshots.
+
+        columns:
+          - name: SOURCE_COUNTRY
+            data_tests:
+              - not_null
+
+          - name: SOURCE_CITY
+            data_tests:
+              - not_null
+
+          - name: SNAPSHOT_DATE
+            data_tests:
+              - not_null
+
+          - name: SOURCE_FILE
+            data_tests:
+              - not_null
+
+          - name: LOADED_AT
+            data_tests:
+              - not_null
+
+          - name: RAW_DATA
+            data_tests:
+              - not_null

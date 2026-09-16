@@ -1,0 +1,76 @@
+version: 2
+
+models:
+  - name: int_listing_calendar_metrics
+    description: >
+      Aggregated Inside Airbnb calendar metrics at listing and snapshot grain.
+      Each row represents one listing observed in one source calendar snapshot.
+      Availability metrics describe public calendar availability and must not
+      be interpreted as observed occupancy or bookings.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb source snapshot.
+        data_tests:
+          - not_null
+
+      - name: listing_id
+        description: Airbnb listing identifier.
+        data_tests:
+          - not_null
+
+      - name: calendar_row_count
+        description: Number of calendar source rows aggregated for the listing.
+        data_tests:
+          - not_null
+
+      - name: calendar_day_count
+        description: Number of distinct calendar dates available for the listing.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [365]
+                quote: false
+
+      - name: first_calendar_date
+        description: First calendar date available in the source snapshot.
+        data_tests:
+          - not_null
+
+      - name: last_calendar_date
+        description: Last calendar date available in the source snapshot.
+        data_tests:
+          - not_null
+
+      - name: available_day_count
+        description: Number of calendar dates marked as available.
+        data_tests:
+          - not_null
+
+      - name: unavailable_day_count
+        description: >
+          Number of calendar dates marked as unavailable. This does not
+          necessarily represent booked nights.
+        data_tests:
+          - not_null
+
+      - name: availability_rate_pct
+        description: Percentage of calendar rows marked as available.
+        data_tests:
+          - not_null
+
+      - name: unavailability_rate_pct
+        description: Percentage of calendar rows marked as unavailable.
+        data_tests:
+          - not_null

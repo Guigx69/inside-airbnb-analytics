@@ -1,0 +1,156 @@
+version: 2
+
+models:
+  - name: mart_availability_snapshot
+    description: >
+      Market-level availability indicators derived from Inside Airbnb calendar
+      data. One row represents one country, city and snapshot. Availability
+      describes the state exposed by the calendar and must not be interpreted
+      as observed occupancy or confirmed bookings.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Inside Airbnb snapshot date.
+        data_tests:
+          - not_null
+
+      - name: listing_count
+        description: Number of listings represented in calendar data.
+        data_tests:
+          - not_null
+
+      - name: calendar_row_count
+        description: Total number of calendar rows represented.
+        data_tests:
+          - not_null
+
+      - name: calendar_day_count
+        description: Total number of represented listing-calendar days.
+        data_tests:
+          - not_null
+
+      - name: available_day_count
+        description: Number of calendar days marked as available.
+        data_tests:
+          - not_null
+
+      - name: unavailable_day_count
+        description: >
+          Number of calendar days marked as unavailable. This must not be
+          interpreted directly as booked nights.
+        data_tests:
+          - not_null
+
+      - name: market_availability_rate_pct
+        description: >
+          Percentage of represented calendar days marked as available across
+          the market.
+        data_tests:
+          - not_null
+
+      - name: market_unavailability_rate_pct
+        description: >
+          Percentage of represented calendar days marked as unavailable across
+          the market.
+        data_tests:
+          - not_null
+
+      - name: average_listing_availability_rate_pct
+        description: Average listing-level availability rate.
+        data_tests:
+          - not_null
+
+      - name: p10_listing_availability_rate_pct
+        description: 10th percentile of listing-level availability rates.
+        data_tests:
+          - not_null
+
+      - name: p25_listing_availability_rate_pct
+        description: 25th percentile of listing-level availability rates.
+        data_tests:
+          - not_null
+
+      - name: median_listing_availability_rate_pct
+        description: Median listing-level availability rate.
+        data_tests:
+          - not_null
+
+      - name: p75_listing_availability_rate_pct
+        description: 75th percentile of listing-level availability rates.
+        data_tests:
+          - not_null
+
+      - name: p90_listing_availability_rate_pct
+        description: 90th percentile of listing-level availability rates.
+        data_tests:
+          - not_null
+
+      - name: fully_unavailable_listing_count
+        description: Listings with zero available calendar days.
+        data_tests:
+          - not_null
+
+      - name: low_availability_listing_count
+        description: Listings with availability greater than 0% and at most 25%.
+        data_tests:
+          - not_null
+
+      - name: medium_low_availability_listing_count
+        description: Listings with availability greater than 25% and at most 50%.
+        data_tests:
+          - not_null
+
+      - name: medium_high_availability_listing_count
+        description: Listings with availability greater than 50% and at most 75%.
+        data_tests:
+          - not_null
+
+      - name: high_availability_listing_count
+        description: Listings with availability greater than 75% and below 100%.
+        data_tests:
+          - not_null
+
+      - name: fully_available_listing_count
+        description: Listings with all represented calendar days available.
+        data_tests:
+          - not_null
+
+      - name: fully_unavailable_listing_share_pct
+        description: Share of listings with zero availability.
+        data_tests:
+          - not_null
+
+      - name: low_availability_listing_share_pct
+        description: Share of listings in the greater-than-0%-to-25% band.
+        data_tests:
+          - not_null
+
+      - name: medium_low_availability_listing_share_pct
+        description: Share of listings in the greater-than-25%-to-50% band.
+        data_tests:
+          - not_null
+
+      - name: medium_high_availability_listing_share_pct
+        description: Share of listings in the greater-than-50%-to-75% band.
+        data_tests:
+          - not_null
+
+      - name: high_availability_listing_share_pct
+        description: Share of listings in the greater-than-75%-to-below-100% band.
+        data_tests:
+          - not_null
+
+      - name: fully_available_listing_share_pct
+        description: Share of listings with 100% availability.
+        data_tests:
+          - not_null
