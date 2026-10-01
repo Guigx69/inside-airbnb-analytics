@@ -1,0 +1,12 @@
+# Inside Airbnb Analytics - validated local environment
+# Python: 3.13.14
+#
+# Install:
+#   python -m pip install -r requirements-dbt.txt
+
+dbt-core==1.12.4
+dbt-snowflake==1.12.0
+snowflake-connector-python==4.7.3
+
+requests
+beautifulsoup4

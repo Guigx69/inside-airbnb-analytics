@@ -1,4 +1,4 @@
-﻿inside_airbnb:
+inside_airbnb:
   target: dev
 
   outputs:

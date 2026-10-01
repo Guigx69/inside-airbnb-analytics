@@ -68,7 +68,6 @@ class Dataset:
     def manifest_path(self) -> str:
         return self.local_path.relative_to(PROJECT_ROOT).as_posix()
 
-
 def slugify(value: str) -> str:
     value = unicodedata.normalize("NFKD", value)
     value = "".join(
