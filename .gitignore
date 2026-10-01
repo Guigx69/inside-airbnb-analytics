@@ -12,6 +12,8 @@ logs/
 # ============================================================
 data/
 *.csv
+# Keep reproducibility manifest in Git
+!data_manifest.csv
 *.csv.gz
 *.parquet
 
