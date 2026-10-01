@@ -1,5 +1,4 @@
 from pathlib import Path
-from datetime import datetime
 import csv
 import gzip
 import json
@@ -11,12 +10,14 @@ import snowflake.connector
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_ROOT = PROJECT_ROOT / "data" / "raw"
 
-SNOWFLAKE_ACCOUNT = "JILNWYB-MO57208"
-SNOWFLAKE_USER = "GGILLET"
-SNOWFLAKE_ROLE = "INGESTION_ROLE"
-SNOWFLAKE_WAREHOUSE = "DBT_WH"
-SNOWFLAKE_DATABASE = "AIRBNB"
-SNOWFLAKE_SCHEMA = "RAW"
+SNOWFLAKE_ACCOUNT = os.getenv("SNOWFLAKE_ACCOUNT")
+SNOWFLAKE_USER = os.getenv("SNOWFLAKE_USER")
+SNOWFLAKE_PASSWORD = os.getenv("DBT_SNOWFLAKE_PASSWORD")
+
+SNOWFLAKE_ROLE = os.getenv("SNOWFLAKE_ROLE", "INGESTION_ROLE")
+SNOWFLAKE_WAREHOUSE = os.getenv("SNOWFLAKE_WAREHOUSE", "DBT_WH")
+SNOWFLAKE_DATABASE = os.getenv("SNOWFLAKE_DATABASE", "AIRBNB")
+SNOWFLAKE_SCHEMA = os.getenv("SNOWFLAKE_SCHEMA", "RAW")
 
 FILE_TO_TABLE = {
     "listings.csv.gz": "RAW_LISTINGS",
@@ -25,22 +26,54 @@ FILE_TO_TABLE = {
 }
 
 
-def get_connection():
-    password = os.getenv("DBT_SNOWFLAKE_PASSWORD")
+def validate_environment():
+    required = {
+        "SNOWFLAKE_ACCOUNT": SNOWFLAKE_ACCOUNT,
+        "SNOWFLAKE_USER": SNOWFLAKE_USER,
+        "DBT_SNOWFLAKE_PASSWORD": SNOWFLAKE_PASSWORD,
+    }
 
-    if not password:
+    missing = [
+        name
+        for name, value in required.items()
+        if not value
+    ]
+
+    if missing:
         raise RuntimeError(
-            "La variable DBT_SNOWFLAKE_PASSWORD est absente."
+            "Variables d'environnement Snowflake manquantes : "
+            + ", ".join(missing)
         )
+
+
+def get_connection():
+    validate_environment()
 
     return snowflake.connector.connect(
         account=SNOWFLAKE_ACCOUNT,
         user=SNOWFLAKE_USER,
-        password=password,
+        password=SNOWFLAKE_PASSWORD,
         role=SNOWFLAKE_ROLE,
         warehouse=SNOWFLAKE_WAREHOUSE,
         database=SNOWFLAKE_DATABASE,
         schema=SNOWFLAKE_SCHEMA,
+    )
+
+
+def qualified_table(table_name):
+    return (
+        f"{SNOWFLAKE_DATABASE}."
+        f"{SNOWFLAKE_SCHEMA}."
+        f"{table_name}"
+    )
+
+
+def stage_path(country, city, snapshot_date):
+    return (
+        f"@{SNOWFLAKE_DATABASE}."
+        f"{SNOWFLAKE_SCHEMA}."
+        f"INSIDE_AIRBNB_STAGE/"
+        f"{country}/{city}/{snapshot_date}"
     )
 
 
@@ -101,7 +134,6 @@ def csv_gz_to_json_gz(source_path, destination_path):
             encoding="utf-8",
             newline="\n",
         ) as destination:
-
             for row in reader:
                 destination.write(
                     json.dumps(
@@ -123,6 +155,10 @@ def load_file(cursor, item):
     filename = item["filename"]
     target_table = item["target_table"]
     source_path = item["path"]
+
+    target = qualified_table(target_table)
+    ingestion_log = qualified_table("INGESTION_LOG")
+    stage = stage_path(country, city, snapshot_date)
 
     print("\n" + "=" * 100)
     print(
@@ -150,16 +186,11 @@ def load_file(cursor, item):
 
     print(f"      {expected_rows:,} lignes converties")
 
-    stage_path = (
-        f"@AIRBNB.RAW.INSIDE_AIRBNB_STAGE/"
-        f"{country}/{city}/{snapshot_date}"
-    )
-
     print("[2/5] Upload vers le stage Snowflake")
 
     put_sql = (
         f"PUT 'file://{json_path.as_posix()}' "
-        f"{stage_path} "
+        f"{stage} "
         f"AUTO_COMPRESS=FALSE "
         f"OVERWRITE=TRUE"
     )
@@ -170,7 +201,7 @@ def load_file(cursor, item):
 
     cursor.execute(
         f"""
-        DELETE FROM AIRBNB.RAW.{target_table}
+        DELETE FROM {target}
         WHERE SOURCE_COUNTRY = %s
           AND SOURCE_CITY = %s
           AND SNAPSHOT_DATE = %s
@@ -187,7 +218,7 @@ def load_file(cursor, item):
     print("[4/5] Chargement dans la table RAW")
 
     copy_sql = f"""
-        COPY INTO AIRBNB.RAW.{target_table}
+        COPY INTO {target}
         (
             SOURCE_COUNTRY,
             SOURCE_CITY,
@@ -204,7 +235,7 @@ def load_file(cursor, item):
                 '{filename}',
                 CURRENT_TIMESTAMP(),
                 $1
-            FROM {stage_path}/{json_filename}
+            FROM {stage}/{json_filename}
         )
         FILE_FORMAT = (
             TYPE = JSON
@@ -218,7 +249,7 @@ def load_file(cursor, item):
     cursor.execute(
         f"""
         SELECT COUNT(*)
-        FROM AIRBNB.RAW.{target_table}
+        FROM {target}
         WHERE SOURCE_COUNTRY = %s
           AND SOURCE_CITY = %s
           AND SNAPSHOT_DATE = %s
@@ -246,8 +277,8 @@ def load_file(cursor, item):
         )
 
     cursor.execute(
-        """
-        DELETE FROM AIRBNB.RAW.INGESTION_LOG
+        f"""
+        DELETE FROM {ingestion_log}
         WHERE SOURCE_COUNTRY = %s
           AND SOURCE_CITY = %s
           AND SNAPSHOT_DATE = %s
@@ -264,8 +295,8 @@ def load_file(cursor, item):
     )
 
     cursor.execute(
-        """
-        INSERT INTO AIRBNB.RAW.INGESTION_LOG
+        f"""
+        INSERT INTO {ingestion_log}
         (
             SOURCE_COUNTRY,
             SOURCE_CITY,
@@ -293,11 +324,20 @@ def load_file(cursor, item):
 
 
 def main():
+    validate_environment()
+
     files = discover_files()
 
     print("=" * 100)
     print("INSIDE AIRBNB -> SNOWFLAKE RAW")
     print("=" * 100)
+
+    print(
+        f"Snowflake : "
+        f"{SNOWFLAKE_ACCOUNT} / "
+        f"{SNOWFLAKE_DATABASE}.{SNOWFLAKE_SCHEMA}"
+    )
+
     print(f"Fichiers détectés : {len(files)}")
 
     for item in files:
@@ -335,6 +375,7 @@ def main():
     print("\n" + "=" * 100)
     print("INGESTION TERMINEE")
     print("=" * 100)
+
 
 if __name__ == "__main__":
     main()
