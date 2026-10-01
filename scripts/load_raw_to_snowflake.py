@@ -258,8 +258,13 @@ def ingestion_key(item):
         item["target_table"],
     )
 
-
 def get_raw_row_count(cursor, item):
+    """
+    Contrôle ciblé utilisé après le chargement d'un nouveau fichier.
+
+    On conserve volontairement ce COUNT(*) unitaire :
+    il valide le lot qui vient d'être chargé avant son COMMIT.
+    """
     target = qualified_table(item["target_table"])
 
     cursor.execute(
@@ -282,12 +287,142 @@ def get_raw_row_count(cursor, item):
     return int(cursor.fetchone()[0])
 
 
+def get_raw_inventory(cursor):
+    """
+    Construit l'inventaire des lots présents dans RAW.
+
+    Une seule agrégation est exécutée par table RAW :
+      - RAW_LISTINGS
+      - RAW_CALENDAR
+      - RAW_REVIEWS
+
+    La clé retournée est identique à ingestion_key():
+      (
+          country,
+          location,
+          snapshot_date,
+          source_file,
+          target_table,
+      )
+    """
+    inventory = {}
+
+    for target_table in sorted(set(FILE_TO_TABLE.values())):
+        target = qualified_table(target_table)
+
+        print(f"  [RAW] Inventaire groupé de {target_table}...")
+
+        cursor.execute(
+            f"""
+            SELECT
+                SOURCE_COUNTRY,
+                SOURCE_CITY,
+                TO_CHAR(SNAPSHOT_DATE, 'YYYY-MM-DD'),
+                SOURCE_FILE,
+                COUNT(*)
+            FROM {target}
+            GROUP BY
+                SOURCE_COUNTRY,
+                SOURCE_CITY,
+                SNAPSHOT_DATE,
+                SOURCE_FILE
+            """
+        )
+
+        for (
+            country,
+            location,
+            snapshot_date,
+            source_file,
+            row_count,
+        ) in cursor.fetchall():
+            key = (
+                country,
+                location,
+                snapshot_date,
+                source_file,
+                target_table,
+            )
+
+            if key in inventory:
+                raise RuntimeError(
+                    "Doublon logique détecté dans l'inventaire RAW : "
+                    + " / ".join(str(value) for value in key)
+                )
+
+            inventory[key] = int(row_count)
+
+    return inventory
+
+
 def classify_files(cursor, files, ingestion_log):
     pending = []
     skipped = []
 
     print("\nContrôle des fichiers déjà chargés...")
+    print("Construction de l'inventaire RAW groupé...")
 
+    raw_inventory = get_raw_inventory(cursor)
+
+    manifest_keys = {
+        ingestion_key(item)
+        for item in files
+    }
+
+    #
+    # Sécurité 1 :
+    # tout lot journalisé doit réellement exister dans RAW
+    # avec exactement le nombre de lignes journalisé.
+    #
+    for key, logged_rows in ingestion_log.items():
+        actual_rows = raw_inventory.get(key)
+
+        if actual_rows is None:
+            raise RuntimeError(
+                "\nIncohérence RAW / INGESTION_LOG :\n"
+                f"lot journalisé absent de RAW : "
+                f"{' / '.join(str(value) for value in key)}"
+            )
+
+        if actual_rows != logged_rows:
+            raise RuntimeError(
+                "\nIncohérence RAW / INGESTION_LOG :\n"
+                f"{' / '.join(str(value) for value in key)}\n"
+                f"INGESTION_LOG : {logged_rows:,} lignes\n"
+                f"RAW           : {actual_rows:,} lignes\n"
+                "Chargement interrompu pour éviter une "
+                "modification automatique des données."
+            )
+
+    #
+    # Sécurité 2 :
+    # si RAW contient un lot correspondant au manifest mais que
+    # INGESTION_LOG ne le connaît pas, on ne le considère pas
+    # silencieusement comme NEW.
+    #
+    orphan_raw_keys = (
+        set(raw_inventory)
+        & manifest_keys
+        - set(ingestion_log)
+    )
+
+    if orphan_raw_keys:
+        details = "\n".join(
+            "  - " + " / ".join(str(value) for value in key)
+            for key in sorted(orphan_raw_keys)
+        )
+
+        raise RuntimeError(
+            "\nLots présents dans RAW mais absents de "
+            "INGESTION_LOG :\n"
+            f"{details}\n"
+            "Chargement interrompu pour éviter d'écraser "
+            "silencieusement des données existantes."
+        )
+
+    #
+    # Classification du manifest.
+    #
     for item in files:
         key = ingestion_key(item)
 
@@ -296,25 +431,11 @@ def classify_files(cursor, files, ingestion_log):
             pending.append(item)
             continue
 
-        logged_rows = ingestion_log[key]
-        actual_rows = get_raw_row_count(cursor, item)
-
-        if actual_rows != logged_rows:
-            raise RuntimeError(
-                "\nIncohérence RAW / INGESTION_LOG pour "
-                f"{item['relative_path']}\n"
-                f"INGESTION_LOG : {logged_rows:,} lignes\n"
-                f"RAW           : {actual_rows:,} lignes\n"
-                "Chargement interrompu pour éviter une "
-                "modification automatique des données."
-            )
-
         item["status"] = "LOADED"
-        item["row_count"] = logged_rows
+        item["row_count"] = ingestion_log[key]
         skipped.append(item)
 
     return pending, skipped
-
 
 def csv_gz_to_json_gz(source_path, destination_path):
     row_count = 0
@@ -528,6 +649,18 @@ def load_file(connection, cursor, item):
         connection.commit()
 
         print("      COMMIT OK")
+
+        try:
+            print("      Nettoyage du stage...")
+            cursor.execute(
+                f"REMOVE {stage}/{json_filename}"
+            )
+            print("      STAGE CLEAN OK")
+        except Exception as cleanup_error:
+            print(
+                "      [WARN] Impossible de nettoyer le stage : "
+                f"{cleanup_error}"
+            )
 
     except Exception:
         connection.rollback()
