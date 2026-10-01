@@ -1,14 +1,17 @@
 from pathlib import Path
 import csv
 import gzip
+import argparse
 import json
 import os
+import hashlib
 
 import snowflake.connector
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_ROOT = PROJECT_ROOT / "data" / "raw"
+MANIFEST_PATH = PROJECT_ROOT / "data_manifest.csv"
 
 SNOWFLAKE_ACCOUNT = os.getenv("SNOWFLAKE_ACCOUNT")
 SNOWFLAKE_USER = os.getenv("SNOWFLAKE_USER")
@@ -68,53 +71,249 @@ def qualified_table(table_name):
     )
 
 
-def stage_path(country, city, snapshot_date):
+def stage_path(country, location, snapshot_date):
     return (
         f"@{SNOWFLAKE_DATABASE}."
         f"{SNOWFLAKE_SCHEMA}."
         f"INSIDE_AIRBNB_STAGE/"
-        f"{country}/{city}/{snapshot_date}"
+        f"{country}/{location}/{snapshot_date}"
     )
 
+def sha256_file(path):
+    digest = hashlib.sha256()
 
-def discover_files():
-    files = []
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
 
-    for file_path in RAW_ROOT.rglob("*.csv.gz"):
-        relative = file_path.relative_to(RAW_ROOT)
+    return digest.hexdigest()
 
-        # Structure attendue :
-        # country / city / snapshot_date / filename
-        if len(relative.parts) != 4:
-            print(f"[SKIP] Structure inattendue : {relative}")
-            continue
-
-        country, city, snapshot_date, filename = relative.parts
-
-        if filename not in FILE_TO_TABLE:
-            print(f"[SKIP] Fichier non géré : {relative}")
-            continue
-
-        files.append(
-            {
-                "path": file_path,
-                "country": country,
-                "city": city,
-                "snapshot_date": snapshot_date,
-                "filename": filename,
-                "target_table": FILE_TO_TABLE[filename],
-            }
+def load_manifest():
+    if not MANIFEST_PATH.exists():
+        raise RuntimeError(
+            f"Manifest introuvable : {MANIFEST_PATH}"
         )
 
+    items = []
+
+    with MANIFEST_PATH.open(
+        "r",
+        encoding="utf-8",
+        newline="",
+    ) as handle:
+        reader = csv.DictReader(handle)
+
+        required_columns = {
+            "path",
+            "size",
+            "sha256",
+        }
+
+        if not reader.fieldnames:
+            raise RuntimeError("Manifest vide ou invalide.")
+
+        missing_columns = required_columns - set(reader.fieldnames)
+
+        if missing_columns:
+            raise RuntimeError(
+                "Colonnes manquantes dans le manifest : "
+                + ", ".join(sorted(missing_columns))
+            )
+
+        for row in reader:
+            relative_path = Path(row["path"])
+
+            # Structure attendue :
+            # data/raw/country/location/snapshot_date/filename
+            parts = relative_path.parts
+
+            if len(parts) != 6:
+                raise RuntimeError(
+                    f"Chemin inattendu dans le manifest : "
+                    f"{relative_path}"
+                )
+
+            data_dir, raw_dir, country, location, snapshot_date, filename = parts
+
+            if data_dir != "data" or raw_dir != "raw":
+                raise RuntimeError(
+                    f"Chemin hors data/raw dans le manifest : "
+                    f"{relative_path}"
+                )
+
+            if filename not in FILE_TO_TABLE:
+                continue
+
+            source_path = PROJECT_ROOT / relative_path
+
+            if not source_path.exists():
+                raise RuntimeError(
+                    f"Fichier du manifest absent localement : "
+                    f"{relative_path}"
+                )
+
+            actual_size = source_path.stat().st_size
+            expected_size = int(row["size"])
+
+            if actual_size != expected_size:
+                raise RuntimeError(
+                    f"Taille incohérente pour {relative_path}: "
+                    f"{expected_size} attendus, "
+                    f"{actual_size} trouvés."
+                )
+
+            expected_sha256 = row["sha256"].strip().lower()
+
+            if len(expected_sha256) != 64:
+                raise RuntimeError(
+                    f"SHA-256 invalide dans le manifest pour "
+                    f"{relative_path}: {expected_sha256}"
+                )
+
+            actual_sha256 = sha256_file(source_path)
+
+            if actual_sha256 != expected_sha256:
+                raise RuntimeError(
+                    f"SHA-256 incohérent pour {relative_path}:\n"
+                    f"manifest : {expected_sha256}\n"
+                    f"fichier  : {actual_sha256}"
+                )
+
+            items.append(
+                {
+                    "path": source_path,
+                    "relative_path": relative_path.as_posix(),
+                    "country": country,
+                    "location": location,
+                    "snapshot_date": snapshot_date,
+                    "filename": filename,
+                    "target_table": FILE_TO_TABLE[filename],
+                    "size": expected_size,
+                    "sha256": expected_sha256,
+                }
+            )
+
     return sorted(
-        files,
+        items,
         key=lambda x: (
             x["country"],
-            x["city"],
+            x["location"],
             x["snapshot_date"],
             x["filename"],
         ),
     )
+
+
+def get_ingestion_log(cursor):
+    ingestion_log = qualified_table("INGESTION_LOG")
+
+    cursor.execute(
+        f"""
+        SELECT
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
+            TO_CHAR(SNAPSHOT_DATE, 'YYYY-MM-DD'),
+            SOURCE_FILE,
+            TARGET_TABLE,
+            ROW_COUNT
+        FROM {ingestion_log}
+        """
+    )
+
+    loaded = {}
+
+    for (
+        country,
+        location,
+        snapshot_date,
+        source_file,
+        target_table,
+        row_count,
+    ) in cursor.fetchall():
+        key = (
+            country,
+            location,
+            snapshot_date,
+            source_file,
+            target_table,
+        )
+
+        if key in loaded:
+            raise RuntimeError(
+                "Doublon détecté dans INGESTION_LOG : "
+                + " / ".join(str(value) for value in key)
+            )
+
+        loaded[key] = int(row_count)
+
+    return loaded
+
+
+def ingestion_key(item):
+    return (
+        item["country"],
+        item["location"],
+        item["snapshot_date"],
+        item["filename"],
+        item["target_table"],
+    )
+
+
+def get_raw_row_count(cursor, item):
+    target = qualified_table(item["target_table"])
+
+    cursor.execute(
+        f"""
+        SELECT COUNT(*)
+        FROM {target}
+        WHERE SOURCE_COUNTRY = %s
+          AND SOURCE_CITY = %s
+          AND SNAPSHOT_DATE = %s
+          AND SOURCE_FILE = %s
+        """,
+        (
+            item["country"],
+            item["location"],
+            item["snapshot_date"],
+            item["filename"],
+        ),
+    )
+
+    return int(cursor.fetchone()[0])
+
+
+def classify_files(cursor, files, ingestion_log):
+    pending = []
+    skipped = []
+
+    print("\nContrôle des fichiers déjà chargés...")
+
+    for item in files:
+        key = ingestion_key(item)
+
+        if key not in ingestion_log:
+            item["status"] = "NEW"
+            pending.append(item)
+            continue
+
+        logged_rows = ingestion_log[key]
+        actual_rows = get_raw_row_count(cursor, item)
+
+        if actual_rows != logged_rows:
+            raise RuntimeError(
+                "\nIncohérence RAW / INGESTION_LOG pour "
+                f"{item['relative_path']}\n"
+                f"INGESTION_LOG : {logged_rows:,} lignes\n"
+                f"RAW           : {actual_rows:,} lignes\n"
+                "Chargement interrompu pour éviter une "
+                "modification automatique des données."
+            )
+
+        item["status"] = "LOADED"
+        item["row_count"] = logged_rows
+        skipped.append(item)
+
+    return pending, skipped
 
 
 def csv_gz_to_json_gz(source_path, destination_path):
@@ -127,6 +326,11 @@ def csv_gz_to_json_gz(source_path, destination_path):
         newline="",
     ) as source:
         reader = csv.DictReader(source)
+
+        if reader.fieldnames is None:
+            raise RuntimeError(
+                f"CSV sans en-tête : {source_path}"
+            )
 
         with gzip.open(
             destination_path,
@@ -148,9 +352,9 @@ def csv_gz_to_json_gz(source_path, destination_path):
     return row_count
 
 
-def load_file(cursor, item):
+def load_file(connection, cursor, item):
     country = item["country"]
-    city = item["city"]
+    location = item["location"]
     snapshot_date = item["snapshot_date"]
     filename = item["filename"]
     target_table = item["target_table"]
@@ -158,11 +362,11 @@ def load_file(cursor, item):
 
     target = qualified_table(target_table)
     ingestion_log = qualified_table("INGESTION_LOG")
-    stage = stage_path(country, city, snapshot_date)
+    stage = stage_path(country, location, snapshot_date)
 
     print("\n" + "=" * 100)
     print(
-        f"{country} / {city} / {snapshot_date} / "
+        f"{country} / {location} / {snapshot_date} / "
         f"{filename} -> {target_table}"
     )
     print("=" * 100)
@@ -171,162 +375,185 @@ def load_file(cursor, item):
     work_dir.mkdir(parents=True, exist_ok=True)
 
     json_filename = (
-        f"{country}_{city}_{snapshot_date}_"
+        f"{country}_{location}_{snapshot_date}_"
         f"{filename.replace('.csv.gz', '.json.gz')}"
     )
 
     json_path = work_dir / json_filename
 
-    print("[1/5] Conversion CSV.GZ -> JSON.GZ")
+    try:
+        print("[1/5] Conversion CSV.GZ -> JSON.GZ")
 
-    expected_rows = csv_gz_to_json_gz(
-        source_path,
-        json_path,
-    )
-
-    print(f"      {expected_rows:,} lignes converties")
-
-    print("[2/5] Upload vers le stage Snowflake")
-
-    put_sql = (
-        f"PUT 'file://{json_path.as_posix()}' "
-        f"{stage} "
-        f"AUTO_COMPRESS=FALSE "
-        f"OVERWRITE=TRUE"
-    )
-
-    cursor.execute(put_sql)
-
-    print("[3/5] Suppression du lot existant éventuel")
-
-    cursor.execute(
-        f"""
-        DELETE FROM {target}
-        WHERE SOURCE_COUNTRY = %s
-          AND SOURCE_CITY = %s
-          AND SNAPSHOT_DATE = %s
-          AND SOURCE_FILE = %s
-        """,
-        (
-            country,
-            city,
-            snapshot_date,
-            filename,
-        ),
-    )
-
-    print("[4/5] Chargement dans la table RAW")
-
-    copy_sql = f"""
-        COPY INTO {target}
-        (
-            SOURCE_COUNTRY,
-            SOURCE_CITY,
-            SNAPSHOT_DATE,
-            SOURCE_FILE,
-            LOADED_AT,
-            RAW_DATA
-        )
-        FROM (
-            SELECT
-                '{country}',
-                '{city}',
-                TO_DATE('{snapshot_date}'),
-                '{filename}',
-                CURRENT_TIMESTAMP(),
-                $1
-            FROM {stage}/{json_filename}
-        )
-        FILE_FORMAT = (
-            TYPE = JSON
-            COMPRESSION = GZIP
-        )
-        FORCE = TRUE
-    """
-
-    cursor.execute(copy_sql)
-
-    cursor.execute(
-        f"""
-        SELECT COUNT(*)
-        FROM {target}
-        WHERE SOURCE_COUNTRY = %s
-          AND SOURCE_CITY = %s
-          AND SNAPSHOT_DATE = %s
-          AND SOURCE_FILE = %s
-        """,
-        (
-            country,
-            city,
-            snapshot_date,
-            filename,
-        ),
-    )
-
-    loaded_rows = cursor.fetchone()[0]
-
-    print("[5/5] Contrôle et journalisation")
-    print(f"      attendu : {expected_rows:,}")
-    print(f"      chargé  : {loaded_rows:,}")
-
-    if loaded_rows != expected_rows:
-        raise RuntimeError(
-            f"Nombre de lignes incohérent pour {filename}: "
-            f"{expected_rows:,} attendues, "
-            f"{loaded_rows:,} chargées."
+        expected_rows = csv_gz_to_json_gz(
+            source_path,
+            json_path,
         )
 
-    cursor.execute(
-        f"""
-        DELETE FROM {ingestion_log}
-        WHERE SOURCE_COUNTRY = %s
-          AND SOURCE_CITY = %s
-          AND SNAPSHOT_DATE = %s
-          AND SOURCE_FILE = %s
-          AND TARGET_TABLE = %s
-        """,
-        (
-            country,
-            city,
-            snapshot_date,
-            filename,
-            target_table,
-        ),
-    )
+        print(f"      {expected_rows:,} lignes converties")
 
-    cursor.execute(
-        f"""
-        INSERT INTO {ingestion_log}
-        (
-            SOURCE_COUNTRY,
-            SOURCE_CITY,
-            SNAPSHOT_DATE,
-            SOURCE_FILE,
-            TARGET_TABLE,
-            ROW_COUNT,
-            LOADED_AT
+        print("[2/5] Upload vers le stage Snowflake")
+
+        put_sql = (
+            f"PUT 'file://{json_path.as_posix()}' "
+            f"{stage} "
+            f"AUTO_COMPRESS=FALSE "
+            f"OVERWRITE=TRUE"
         )
-        VALUES (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP())
-        """,
-        (
-            country,
-            city,
-            snapshot_date,
-            filename,
-            target_table,
-            loaded_rows,
-        ),
+
+        cursor.execute(put_sql)
+
+        print("[3/5] Nettoyage préventif du lot cible")
+
+        cursor.execute(
+            f"""
+            DELETE FROM {target}
+            WHERE SOURCE_COUNTRY = %s
+              AND SOURCE_CITY = %s
+              AND SNAPSHOT_DATE = %s
+              AND SOURCE_FILE = %s
+            """,
+            (
+                country,
+                location,
+                snapshot_date,
+                filename,
+            ),
+        )
+
+        print("[4/5] Chargement dans la table RAW")
+
+        copy_sql = f"""
+            COPY INTO {target}
+            (
+                SOURCE_COUNTRY,
+                SOURCE_CITY,
+                SNAPSHOT_DATE,
+                SOURCE_FILE,
+                LOADED_AT,
+                RAW_DATA
+            )
+            FROM (
+                SELECT
+                    %s,
+                    %s,
+                    TO_DATE(%s),
+                    %s,
+                    CURRENT_TIMESTAMP(),
+                    $1
+                FROM {stage}/{json_filename}
+            )
+            FILE_FORMAT = (
+                TYPE = JSON
+                COMPRESSION = GZIP
+            )
+            FORCE = TRUE
+        """
+
+        cursor.execute(
+            copy_sql,
+            (
+                country,
+                location,
+                snapshot_date,
+                filename,
+            ),
+        )
+
+        loaded_rows = get_raw_row_count(cursor, item)
+
+        print("[5/5] Contrôle et journalisation")
+        print(f"      attendu : {expected_rows:,}")
+        print(f"      chargé  : {loaded_rows:,}")
+
+        if loaded_rows != expected_rows:
+            raise RuntimeError(
+                f"Nombre de lignes incohérent pour "
+                f"{item['relative_path']}: "
+                f"{expected_rows:,} attendues, "
+                f"{loaded_rows:,} chargées."
+            )
+
+        cursor.execute(
+            f"""
+            DELETE FROM {ingestion_log}
+            WHERE SOURCE_COUNTRY = %s
+              AND SOURCE_CITY = %s
+              AND SNAPSHOT_DATE = %s
+              AND SOURCE_FILE = %s
+              AND TARGET_TABLE = %s
+            """,
+            (
+                country,
+                location,
+                snapshot_date,
+                filename,
+                target_table,
+            ),
+        )
+
+        cursor.execute(
+            f"""
+            INSERT INTO {ingestion_log}
+            (
+                SOURCE_COUNTRY,
+                SOURCE_CITY,
+                SNAPSHOT_DATE,
+                SOURCE_FILE,
+                TARGET_TABLE,
+                ROW_COUNT,
+                LOADED_AT
+            )
+            VALUES (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                CURRENT_TIMESTAMP()
+            )
+            """,
+            (
+                country,
+                location,
+                snapshot_date,
+                filename,
+                target_table,
+                loaded_rows,
+            ),
+        )
+
+        # Un fichier validé devient immédiatement un checkpoint
+        # d'ingestion indépendant.
+        connection.commit()
+
+        print("      COMMIT OK")
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        json_path.unlink(missing_ok=True)
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Load verified Inside Airbnb RAW files into Snowflake."
     )
 
-    json_path.unlink(missing_ok=True)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Display the ingestion plan without loading data.",
+    )
 
-    print("      OK")
-
+    return parser.parse_args()
 
 def main():
+    args = parse_args()
     validate_environment()
 
-    files = discover_files()
+    files = load_manifest()
 
     print("=" * 100)
     print("INSIDE AIRBNB -> SNOWFLAKE RAW")
@@ -338,18 +565,13 @@ def main():
         f"{SNOWFLAKE_DATABASE}.{SNOWFLAKE_SCHEMA}"
     )
 
-    print(f"Fichiers détectés : {len(files)}")
-
-    for item in files:
-        print(
-            f"  {item['country']}/"
-            f"{item['city']}/"
-            f"{item['snapshot_date']}/"
-            f"{item['filename']}"
-        )
+    print(f"Manifest  : {MANIFEST_PATH}")
+    print(f"Fichiers  : {len(files)}")
 
     if not files:
-        raise RuntimeError("Aucun fichier source détecté.")
+        raise RuntimeError(
+            "Aucun fichier exploitable dans le manifest."
+        )
 
     connection = get_connection()
 
@@ -357,23 +579,73 @@ def main():
         cursor = connection.cursor()
 
         try:
-            for item in files:
-                load_file(cursor, item)
+            ingestion_log = get_ingestion_log(cursor)
 
-            connection.commit()
+            pending, skipped = classify_files(
+                cursor,
+                files,
+                ingestion_log,
+            )
+
+            print("\n" + "-" * 100)
+            print("PLAN D'INGESTION")
+            print("-" * 100)
+
+            print(f"Manifest       : {len(files)}")
+            print(f"Déjà chargés   : {len(skipped)}")
+            print(f"À charger      : {len(pending)}")
+
+            if skipped:
+                print("\nSKIP :")
+                for item in skipped:
+                    print(
+                        f"  [SKIP] "
+                        f"{item['relative_path']} "
+                        f"({item['row_count']:,} lignes)"
+                    )
+
+            if pending:
+                print("\nLOAD :")
+                for item in pending:
+                    print(
+                        f"  [LOAD] {item['relative_path']}"
+                    )
+
+            if args.dry_run:
+                print(
+                    "\n[DRY-RUN] Aucun fichier ne sera chargé."
+                )
+                return
+
+            if not pending:
+                print(
+                    "\nAucun nouveau fichier à charger."
+                )
+                return
+
+            for index, item in enumerate(
+                pending,
+                start=1,
+            ):
+                print(
+                    f"\nFichier {index}/{len(pending)}"
+                )
+
+                load_file(
+                    connection,
+                    cursor,
+                    item,
+                )
 
         finally:
             cursor.close()
-
-    except Exception:
-        connection.rollback()
-        raise
 
     finally:
         connection.close()
 
     print("\n" + "=" * 100)
-    print("INGESTION TERMINEE")
+    print("INGESTION TERMINÉE")
+    print(f"Nouveaux fichiers chargés : {len(pending)}")
     print("=" * 100)
 
 
