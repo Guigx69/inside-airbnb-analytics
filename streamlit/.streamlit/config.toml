@@ -1,0 +1,24 @@
+[theme]
+base = "light"
+primaryColor = "#FF5A5F"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F7F7F7"
+textColor = "#222222"
+linkColor = "#006CE4"
+borderColor = "#E5E7EB"
+showWidgetBorder = true
+baseRadius = "0.65rem"
+buttonRadius = "0.65rem"
+font = "sans-serif"
+headingFont = "sans-serif"
+codeFont = "monospace"
+
+[theme.sidebar]
+backgroundColor = "#F7F7F7"
+secondaryBackgroundColor = "#FFFFFF"
+
+[client]
+showErrorDetails = "stacktrace"
+
+[runner]
+fastReruns = true
