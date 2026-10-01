@@ -13,10 +13,8 @@ from pathlib import Path
 import requests
 
 
-CATALOG_URL = (
-    "https://insideairbnb.com/"
-    "page-data/sq/d/3176684073.json"
-)
+BASE_URL = "https://insideairbnb.com"
+PAGE_DATA_URL = f"{BASE_URL}/page-data/get-the-data/page-data.json"
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_ROOT = PROJECT_ROOT / "data" / "raw"
@@ -89,12 +87,108 @@ def slugify(value: str) -> str:
 
     return value.strip("-")
 
+def discover_catalog_url(session: requests.Session) -> str:
+    """
+    Discover dynamically the Gatsby static query containing
+    the Inside Airbnb dataset catalog.
+
+    Gatsby exposes the static query hashes required by the page
+    through /page-data/get-the-data/page-data.json.
+    """
+
+    print("[INFO] Discovering Inside Airbnb catalog")
+
+    try:
+        response = session.get(
+            PAGE_DATA_URL,
+            timeout=30,
+        )
+        response.raise_for_status()
+        page_data = response.json()
+
+    except (requests.RequestException, ValueError) as exc:
+        raise RuntimeError(
+            "Unable to read Inside Airbnb Gatsby page-data."
+        ) from exc
+
+    query_hashes = page_data.get("staticQueryHashes", [])
+
+    if not query_hashes:
+        raise RuntimeError(
+            "No Gatsby static query hashes found "
+            "for the Inside Airbnb data page."
+        )
+
+    print(
+        f"[INFO] Gatsby static queries discovered: "
+        f"{len(query_hashes)}"
+    )
+
+    for query_hash in query_hashes:
+
+        catalog_url = (
+            f"{BASE_URL}/page-data/sq/d/"
+            f"{query_hash}.json"
+        )
+
+        try:
+            response = session.get(
+                catalog_url,
+                timeout=30,
+            )
+            response.raise_for_status()
+            payload = response.json()
+
+        except (
+            requests.RequestException,
+            ValueError,
+        ):
+            continue
+
+        datasets = (
+            payload
+            .get("data", {})
+            .get("allData", {})
+            .get("datasets")
+        )
+
+        if isinstance(datasets, list) and datasets:
+
+            print("[INFO] Dataset catalog discovered")
+            print(f"       {catalog_url}")
+            print(
+                f"[INFO] Catalog records: "
+                f"{len(datasets)}"
+            )
+
+            return catalog_url
+
+    raise RuntimeError(
+        "None of the Gatsby static queries contains "
+        "data.allData.datasets."
+    )
 
 def get_catalog() -> list[dict]:
-    print("[INFO] Reading Inside Airbnb catalog")
-    print(f"       {CATALOG_URL}")
+    session = requests.Session()
 
-    response = SESSION.get(CATALOG_URL, timeout=60)
+    session.headers.update(
+        {
+            "User-Agent": (
+                "inside-airbnb-analytics/1.0 "
+                "(dataset synchronization)"
+            )
+        }
+    )
+
+    catalog_url = discover_catalog_url(session)
+
+    print("[INFO] Reading Inside Airbnb catalog")
+    print(f"       {catalog_url}")
+
+    response = session.get(
+        catalog_url,
+        timeout=60,
+    )
     response.raise_for_status()
 
     payload = response.json()
@@ -108,11 +202,15 @@ def get_catalog() -> list[dict]:
 
     if not isinstance(datasets, list):
         raise RuntimeError(
-            "Inside Airbnb catalog datasets is not a list."
+            "Inside Airbnb catalog does not contain a dataset list."
+        )
+
+    if not datasets:
+        raise RuntimeError(
+            "Inside Airbnb catalog is empty."
         )
 
     return datasets
-
 
 def build_inventory(catalog: list[dict]) -> list[Dataset]:
     inventory: list[Dataset] = []
