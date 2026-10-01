@@ -1,4 +1,7 @@
 path,size,sha256
+data/raw/belgium/brussels/2026-06-27/calendar.csv.gz,4438777,7690ccd2ccf97d9de0d63508d182fcb322d2648df2b966e44124a6bcaf8a29c2
+data/raw/belgium/brussels/2026-06-27/listings.csv.gz,2816546,bfc168a85820fad3f3cd03c16bc0146dfe9c333260b692634b246bb1b4cfc2d8
+data/raw/belgium/brussels/2026-06-27/reviews.csv.gz,38661319,0fa7288e0e4fa61a838345c66c5811ec58d991072aebb97ae9347bdadf3dfbeb
 data/raw/france/bordeaux/2025-09-18/calendar.csv.gz,10331253,29e3d93c4d5df26cb5dfea868d5990ad680d33ffb676eff2791c06f25b34f9fc
 data/raw/france/bordeaux/2025-09-18/listings.csv.gz,6100165,66b7741d14aff88700174a437dc16b6df8debac82fdbab1f3186bdab623c2ff6
 data/raw/france/bordeaux/2025-09-18/reviews.csv.gz,45657490,9d325e70dfa51ec9b06e9534d996404e0d95915ee209c7d9749bf884b92c87ea
