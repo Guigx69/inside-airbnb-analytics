@@ -16,23 +16,29 @@ st.header("Périmètre de l'analyse")
 
 st.markdown(
     """
-    Cette application analyse l'évolution de l'offre Airbnb à **Lyon**
-    à partir de plusieurs extractions historiques publiées par
+    Cette application analyse l'évolution de l'offre Airbnb sur plusieurs
+    territoires à partir d'extractions historiques publiées par
     **Inside Airbnb**.
 
-    Le POC couvre actuellement **quatre dates d'observation** :
+    Le périmètre actuel couvre :
 
-    - **18/09/2025**
-    - **22/12/2025**
-    - **25/03/2026**
-    - **22/06/2026**
+    - **Lyon** ;
+    - **Paris** ;
+    - **Bordeaux** ;
+    - **Pays Basque** ;
+    - **Bruxelles**.
+
+    Chaque territoire dispose de plusieurs **snapshots historiques**.
+    Le nombre de dates et leur calendrier peuvent différer selon la
+    destination.
 
     Chaque date constitue un **snapshot indépendant** du marché tel qu'il
     était observable dans les données Inside Airbnb à cette date.
 
     L'objectif n'est donc pas de reconstituer des transactions Airbnb,
     mais d'analyser l'évolution de l'**offre observable**, des prix,
-    de la disponibilité déclarée et de la structure des hôtes.
+    de la disponibilité déclarée, de la structure géographique et
+    de la structure des hôtes.
     """
 )
 
@@ -95,9 +101,11 @@ st.markdown(
 
     Cette distinction est essentielle.
 
-    Une hausse de **4 914 annonces** entre deux snapshots, par exemple,
-    représente une **variation nette de la population observée**.
-    Elle ne signifie pas que 4 914 nouvelles annonces Airbnb ont été créées.
+    Une hausse du nombre d'annonces entre deux snapshots représente une
+    **variation nette de la population observée**.
+
+    Elle ne signifie pas nécessairement qu'un nombre équivalent de nouvelles
+    annonces Airbnb a été créé.
     """
 )
 
@@ -133,8 +141,9 @@ st.markdown(
 )
 
 st.warning(
-    "Le snapshot du 22/12/2025 ne contient aucune information tarifaire. "
-    "Il ne doit donc pas être utilisé pour mesurer une évolution de prix."
+    "La couverture tarifaire peut varier selon le territoire et le snapshot. "
+    "Une observation sans information tarifaire exploitable ne doit pas être "
+    "utilisée pour mesurer une évolution de prix."
 )
 
 st.markdown(
@@ -227,10 +236,15 @@ st.header("Géographie")
 
 st.markdown(
     """
-    L'analyse géographique repose sur les arrondissements associés aux
-    annonces Inside Airbnb.
+    L'analyse géographique s'appuie sur le champ **NEIGHBOURHOOD**
+    fourni dans les données Inside Airbnb et sur un référentiel
+    géographique dédié.
 
-    Pour chaque arrondissement, l'application mesure notamment :
+    Le niveau géographique dépend du territoire étudié. Il peut
+    correspondre notamment à un **arrondissement**, une **commune**,
+    un **quartier** ou un autre découpage disponible dans la source.
+
+    Pour chaque zone, l'application mesure notamment :
 
     - le nombre d'annonces ;
     - le nombre d'hôtes ;
@@ -240,11 +254,13 @@ st.markdown(
     - la part du marché ;
     - les mouvements d'annonces entre observations.
 
-    La carte représente la **position moyenne des annonces** de chaque
-    arrondissement.
+    La cartographie s'appuie sur le référentiel
+    **REF_GEOGRAPHIC_AREAS**, qui associe les zones analytiques
+    à leurs géométries lorsqu'un référentiel compatible est disponible.
 
-    Elle permet de situer les différentes zones du marché mais ne constitue
-    pas une représentation des limites administratives des arrondissements.
+    Les limites représentées correspondent donc au référentiel
+    géographique chargé pour le territoire concerné. Leur niveau
+    administratif ou analytique peut varier d'une destination à l'autre.
     """
 )
 
@@ -356,17 +372,18 @@ st.markdown(
 
     Le build dbt complet du POC comporte :
 
-    **25 modèles · 445 tests · 470 éléments exécutés**
+    **25 modèles · 464 tests · 489 éléments exécutés**
 
-    **469 succès · 1 avertissement connu · 0 erreur**
+    **488 succès · 1 avertissement connu · 0 erreur**
     """
 )
 
 st.info(
-    "L'avertissement connu concerne 38 identifiants d'annonces présents "
-    "dans le calendrier du snapshot du 22/06/2026 mais absents de la "
-    "population listings correspondante. Cette différence est conservée "
-    "explicitement plutôt que masquée dans les transformations."
+    "L'avertissement connu concerne le contrôle de cohérence entre "
+    "les annonces présentes dans les calendriers et la population "
+    "listings correspondante. Ce contrôle reste volontairement non "
+    "bloquant afin de conserver explicitement les écarts observés "
+    "dans les données sources."
 )
 
 st.divider()
@@ -392,5 +409,5 @@ with col4:
     st.metric("Source", "Inside Airbnb")
 
 st.caption(
-    "Inside Airbnb Analytics · POC analytique historique · Lyon"
+    "Inside Airbnb Analytics · POC analytique historique multi-territoires"
 )

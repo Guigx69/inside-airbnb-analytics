@@ -17,7 +17,7 @@ from ui.formatters import (
     format_percent,
 )
 from ui.config import MARTS, get_session
-from ui.sidebar import render_sidebar
+from ui.sidebar import format_location_name, render_sidebar
 from ui.styles import apply_global_styles
 
 
@@ -127,9 +127,10 @@ def load_horizon() -> pd.DataFrame:
         f"""
         SELECT *
         FROM {HORIZON_TABLE}
-        WHERE LOWER(SOURCE_COUNTRY) = 'france'
-          AND LOWER(SOURCE_CITY) = 'lyon'
-        ORDER BY SNAPSHOT_DATE
+        ORDER BY
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
+            SNAPSHOT_DATE
         """
     ).to_pandas()
 
@@ -142,9 +143,9 @@ def load_monthly() -> pd.DataFrame:
         f"""
         SELECT *
         FROM {MONTHLY_TABLE}
-        WHERE LOWER(SOURCE_COUNTRY) = 'france'
-          AND LOWER(SOURCE_CITY) = 'lyon'
         ORDER BY
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
             SNAPSHOT_DATE,
             CALENDAR_MONTH
         """
@@ -152,21 +153,83 @@ def load_monthly() -> pd.DataFrame:
 
     return normalize_dataframe(df)
 
-
 horizon = load_horizon()
 monthly = load_monthly()
 
 
+# ============================================================
+# Global context
+# ============================================================
+
+(
+    selected_country,
+    selected_city,
+    selected_snapshot,
+) = render_sidebar()
+
+selected_snapshot = pd.to_datetime(
+    selected_snapshot
+)
+
+country_key = str(
+    selected_country
+).strip().lower()
+
+city_key = str(
+    selected_city
+).strip().lower()
+
+
+horizon = horizon.loc[
+    horizon["source_country"]
+    .astype(str)
+    .str.strip()
+    .str.lower()
+    .eq(country_key)
+    &
+    horizon["source_city"]
+    .astype(str)
+    .str.strip()
+    .str.lower()
+    .eq(city_key)
+].copy()
+
+
+monthly = monthly.loc[
+    monthly["source_country"]
+    .astype(str)
+    .str.strip()
+    .str.lower()
+    .eq(country_key)
+    &
+    monthly["source_city"]
+    .astype(str)
+    .str.strip()
+    .str.lower()
+    .eq(city_key)
+].copy()
+
+
+city_label = format_location_name(
+    selected_city
+)
+
+country_label = format_location_name(
+    selected_country
+)
+
+location_label = (
+    f"{city_label}, {country_label}"
+)
+
+
 if horizon.empty:
     st.error(
-        "Aucune donnée de disponibilité disponible pour Lyon."
+        "Aucune donnée de disponibilité disponible "
+        f"pour {location_label}."
     )
     st.stop()
 
-
-# ============================================================
-# Global snapshot
-# ============================================================
 
 snapshot_dates = (
     horizon["snapshot_date"]
@@ -176,23 +239,21 @@ snapshot_dates = (
     .tolist()
 )
 
-selected_snapshot = pd.to_datetime(
-    render_sidebar(snapshot_dates)
-)
+current_rows = horizon.loc[
+    horizon["snapshot_date"]
+    == selected_snapshot
+].copy()
 
-current_rows = horizon[
-    horizon["snapshot_date"] == selected_snapshot
-]
 
 if current_rows.empty:
     st.error(
         "Le snapshot sélectionné est absent de "
-        "MART_AVAILABILITY_HORIZON_SNAPSHOT."
+        "MART_AVAILABILITY_HORIZON_SNAPSHOT "
+        f"pour {location_label}."
     )
     st.stop()
 
 current = current_rows.iloc[0]
-
 
 # ============================================================
 # Header
@@ -202,19 +263,18 @@ page_header(
     title="Disponibilité",
     subtitle=(
         "Analyse de la disponibilité déclarée des annonces Airbnb "
-        "à Lyon et de la saisonnalité du calendrier futur."
+        f"à {city_label} et de la saisonnalité du calendrier futur."
     ),
     icon="🗓️",
     badges=[
-        "🇫🇷 Lyon, France",
+        f"📍 {location_label}",
         f"🗓️ {format_date_fr(selected_snapshot)}",
         (
             f"📁 {format_integer(len(snapshot_dates))} "
-            "observations historiques"
+            "snapshots disponibles"
         ),
     ],
 )
-
 
 # ============================================================
 # Situation actuelle

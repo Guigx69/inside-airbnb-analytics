@@ -17,7 +17,7 @@ from ui.formatters import (
     format_percent,
 )
 from ui.config import MARTS, get_session
-from ui.sidebar import render_sidebar
+from ui.sidebar import format_location_name, render_sidebar
 from ui.styles import apply_global_styles
 
 
@@ -136,27 +136,71 @@ def load_hosts() -> pd.DataFrame:
         f"""
         SELECT *
         FROM {HOST_TABLE}
-        WHERE LOWER(SOURCE_COUNTRY) = 'france'
-          AND LOWER(SOURCE_CITY) = 'lyon'
-        ORDER BY SNAPSHOT_DATE
+        ORDER BY
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
+            SNAPSHOT_DATE
         """
     ).to_pandas()
 
     return normalize_dataframe(df)
 
-
 hosts = load_hosts()
+
+# ============================================================
+# Global context
+# ============================================================
+
+(
+    selected_country,
+    selected_city,
+    selected_snapshot,
+) = render_sidebar()
+
+selected_snapshot = pd.to_datetime(
+    selected_snapshot
+)
+
+country_key = str(
+    selected_country
+).strip().lower()
+
+city_key = str(
+    selected_city
+).strip().lower()
+
+hosts = hosts.loc[
+    hosts["source_country"]
+    .astype(str)
+    .str.strip()
+    .str.lower()
+    .eq(country_key)
+    &
+    hosts["source_city"]
+    .astype(str)
+    .str.strip()
+    .str.lower()
+    .eq(city_key)
+].copy()
+
+city_label = format_location_name(
+    selected_city
+)
+
+country_label = format_location_name(
+    selected_country
+)
+
+location_label = (
+    f"{city_label}, {country_label}"
+)
 
 if hosts.empty:
     st.error(
-        "Aucune donnée relative aux hôtes n'est disponible pour Lyon."
+        "Aucune donnée relative aux hôtes "
+        f"n'est disponible pour {location_label}."
     )
     st.stop()
-
-
-# ============================================================
-# Global snapshot
-# ============================================================
 
 snapshot_dates = (
     hosts["snapshot_date"]
@@ -166,22 +210,20 @@ snapshot_dates = (
     .tolist()
 )
 
-selected_snapshot = pd.to_datetime(
-    render_sidebar(snapshot_dates)
-)
-
-current_rows = hosts[
-    hosts["snapshot_date"] == selected_snapshot
-]
+current_rows = hosts.loc[
+    hosts["snapshot_date"]
+    == selected_snapshot
+].copy()
 
 if current_rows.empty:
     st.error(
-        "Le snapshot sélectionné est absent de MART_HOST_SNAPSHOT."
+        "Le snapshot sélectionné est absent de "
+        "MART_HOST_SNAPSHOT "
+        f"pour {location_label}."
     )
     st.stop()
 
 current = current_rows.iloc[0]
-
 
 # ============================================================
 # Header
@@ -190,21 +232,20 @@ current = current_rows.iloc[0]
 page_header(
     title="Hôtes",
     subtitle=(
-        "Analyse de la structure des hôtes Airbnb à Lyon, "
-        "de leurs portefeuilles d'annonces et de la "
-        "concentration de l'offre."
+        "Analyse de la structure des hôtes Airbnb "
+        f"à {city_label}, de leurs portefeuilles d'annonces "
+        "et de la concentration de l'offre."
     ),
     icon="👥",
     badges=[
-        "🇫🇷 Lyon, France",
+        f"📍 {location_label}",
         f"🗓️ {format_date_fr(selected_snapshot)}",
         (
             f"📁 {format_integer(len(snapshot_dates))} "
-            "observations historiques"
+            "snapshots disponibles"
         ),
     ],
 )
-
 
 # ============================================================
 # Market structure
@@ -591,15 +632,7 @@ note(
     "le Top 10 %."
 )
 
-note(
-    "Les indicateurs Top 1 %, Top 5 % et Top 10 % sont cumulatifs : "
-    "le Top 1 % est inclus dans le Top 5 %, lui-même inclus dans "
-    "le Top 10 %."
-)
-
-
 st.divider()
-
 
 # ============================================================
 # Host profile

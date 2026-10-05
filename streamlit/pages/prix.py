@@ -19,7 +19,7 @@ from ui.formatters import (
     format_signed_percent,
 )
 from ui.config import MARTS, get_session
-from ui.sidebar import render_sidebar
+from ui.sidebar import format_location_name, render_sidebar
 from ui.styles import apply_global_styles
 
 
@@ -156,8 +156,6 @@ def load_market() -> pd.DataFrame:
             AVERAGE_PRICE,
             MEDIAN_PRICE
         FROM {MARKET_TABLE}
-        WHERE LOWER(SOURCE_COUNTRY) = 'france'
-          AND LOWER(SOURCE_CITY) = 'lyon'
         ORDER BY SNAPSHOT_DATE
         """
     ).to_pandas()
@@ -184,8 +182,6 @@ def load_price_distribution() -> pd.DataFrame:
             MARKET_LISTING_SHARE_PCT,
             PRICED_LISTING_SHARE_PCT
         FROM {PRICE_DISTRIBUTION_TABLE}
-        WHERE LOWER(SOURCE_COUNTRY) = 'france'
-          AND LOWER(SOURCE_CITY) = 'lyon'
         ORDER BY
             SNAPSHOT_DATE,
             PRICE_BAND_ORDER
@@ -227,9 +223,7 @@ def load_price_transitions() -> pd.DataFrame:
             PRICE_DECREASE_SHARE_PCT,
             UNCHANGED_PRICE_SHARE_PCT
         FROM {PRICE_TRANSITION_TABLE}
-        WHERE LOWER(SOURCE_COUNTRY) = 'france'
-          AND LOWER(SOURCE_CITY) = 'lyon'
-          AND UPPER(TRANSITION_TYPE) = 'CONSECUTIVE'
+        WHERE UPPER(TRANSITION_TYPE) = 'CONSECUTIVE'
         ORDER BY SNAPSHOT_DATE
         """
     ).to_pandas()
@@ -240,13 +234,49 @@ market = load_market()
 distribution = load_price_distribution()
 transitions = load_price_transitions()
 
-if market.empty:
-    st.error("Aucune donnée marché disponible pour Lyon.")
-    st.stop()
 
 # =============================================================================
-# Global snapshot
+# Global geographic context
 # =============================================================================
+
+(
+    selected_country,
+    selected_city,
+    selected_snapshot,
+) = render_sidebar()
+
+selected_snapshot = pd.Timestamp(
+    selected_snapshot
+)
+
+
+# =============================================================================
+# Geographic filtering
+# =============================================================================
+
+market = market[
+    (market["source_country"] == selected_country)
+    & (market["source_city"] == selected_city)
+].copy()
+
+distribution = distribution[
+    (distribution["source_country"] == selected_country)
+    & (distribution["source_city"] == selected_city)
+].copy()
+
+transitions = transitions[
+    (transitions["source_country"] == selected_country)
+    & (transitions["source_city"] == selected_city)
+].copy()
+
+
+if market.empty:
+    st.error(
+        "Aucune donnée de prix n'est disponible "
+        "pour la localisation sélectionnée."
+    )
+    st.stop()
+
 
 snapshot_dates = (
     market["snapshot_date"]
@@ -256,19 +286,19 @@ snapshot_dates = (
     .tolist()
 )
 
-selected_snapshot = pd.to_datetime(
-    render_sidebar(snapshot_dates)
-)
 
 current_rows = market[
     market["snapshot_date"] == selected_snapshot
 ]
 
+
 if current_rows.empty:
     st.error(
-        "Le snapshot sélectionné est absent de MART_MARKET_SNAPSHOT."
+        "Le snapshot sélectionné est absent des données "
+        "de prix pour cette localisation."
     )
     st.stop()
+
 
 current = current_rows.iloc[0]
 
@@ -291,14 +321,22 @@ median_price = current["median_price"]
 page_header(
     title="Prix",
     subtitle=(
-        "Niveaux de prix observés à Lyon, distribution tarifaire "
-        "et évolution à annonces comparables."
+        "Niveaux de prix observés à "
+        f"{format_location_name(selected_city)}, "
+        "distribution tarifaire et évolution "
+        "à annonces comparables."
     ),
     icon="💶",
     badges=[
-        "🇫🇷 Lyon, France",
+        (
+            f"📍 {format_location_name(selected_city)}, "
+            f"{format_location_name(selected_country)}"
+        ),
         f"🗓️ {format_date_fr(selected_snapshot)}",
-        f"📁 {format_integer(len(snapshot_dates))} observations historiques",
+        (
+            f"📁 {format_integer(len(snapshot_dates))} "
+            "observations historiques"
+        ),
     ],
 )
 
@@ -770,10 +808,10 @@ st.altair_chart(
 )
 
 note(
-    "Les évolutions de prix doivent être lues conjointement avec "
-    "la couverture tarifaire. L'observation du 22/12/2025 ne "
-    "contient aucune information de prix : l'absence de valeur "
-    "ne correspond donc pas à un prix de 0 €."
+    "Les évolutions de prix doivent être lues conjointement "
+    "avec la couverture tarifaire. Une observation sans "
+    "information tarifaire exploitable ne correspond pas "
+    "à un prix de 0 €."
 )
 
 

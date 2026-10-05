@@ -1,4 +1,4 @@
-"""Comparateur temporel V2.1 — Inside Airbnb Analytics (Lyon)."""
+"""Comparateur temporel — Inside Airbnb Analytics."""
 
 import altair as alt
 import pandas as pd
@@ -7,6 +7,7 @@ import streamlit as st
 from ui.config import MARTS, get_session
 from ui.components import page_header, section_header
 from ui.formatters import format_date_fr
+from ui.sidebar import format_location_name, render_sidebar
 from ui.styles import apply_global_styles
 
 
@@ -36,6 +37,15 @@ INDICATORS = {
 # ============================================================
 # Helpers
 # ============================================================
+
+def location_slug(value) -> str:
+    return (
+        str(value)
+        .strip()
+        .lower()
+        .replace(" ", "-")
+        .replace("_", "-")
+    )
 
 def is_valid(value):
     """Return True when a scalar is available."""
@@ -125,7 +135,7 @@ def grouped_chart(frame, category, value, order=None, horizontal=False, height=3
         tooltip=tooltips,
     )
     if horizontal:
-        # A single selected arrondissement should not occupy a huge blank chart.
+        # A single selected zone should not occupy a huge blank chart.
         base = base.encode(
             y=alt.Y(f"{category}:N", sort=order, title=None,
                     axis=alt.Axis(labelLimit=210, labelPadding=12, labelFontSize=12)),
@@ -153,8 +163,11 @@ def grouped_chart(frame, category, value, order=None, horizontal=False, height=3
 def load_data():
     session = get_session()
 
-    market = session.sql(f"""
+    market = session.sql(
+        f"""
         SELECT
+            m.SOURCE_COUNTRY,
+            m.SOURCE_CITY,
             m.SNAPSHOT_DATE,
             m.LISTING_COUNT,
             m.LISTINGS_WITH_PRICE,
@@ -168,41 +181,88 @@ def load_data():
             ON m.SOURCE_COUNTRY = h.SOURCE_COUNTRY
            AND m.SOURCE_CITY = h.SOURCE_CITY
            AND m.SNAPSHOT_DATE = h.SNAPSHOT_DATE
-        WHERE m.SOURCE_COUNTRY = 'france'
-          AND m.SOURCE_CITY = 'lyon'
-        ORDER BY m.SNAPSHOT_DATE
-    """).to_pandas()
+        ORDER BY
+            m.SOURCE_COUNTRY,
+            m.SOURCE_CITY,
+            m.SNAPSHOT_DATE
+        """
+    ).to_pandas()
 
-    availability = session.sql(f"""
+    availability = session.sql(
+        f"""
         SELECT
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
             SNAPSHOT_DATE,
             {', '.join(HORIZONS.values())}
         FROM {MARTS}.MART_AVAILABILITY_HORIZON_SNAPSHOT
-        WHERE SOURCE_COUNTRY = 'france'
-          AND SOURCE_CITY = 'lyon'
-        ORDER BY SNAPSHOT_DATE
-    """).to_pandas()
+        ORDER BY
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
+            SNAPSHOT_DATE
+        """
+    ).to_pandas()
 
-    neighbourhoods = session.sql(f"""
+    neighbourhoods = session.sql(
+        f"""
         SELECT
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
             SNAPSHOT_DATE,
             NEIGHBOURHOOD,
             LISTING_COUNT,
             LISTINGS_WITH_PRICE,
             MEDIAN_PRICE
         FROM {MARTS}.MART_NEIGHBOURHOOD_SNAPSHOT
-        WHERE SOURCE_COUNTRY = 'france'
-          AND SOURCE_CITY = 'lyon'
-          AND NEIGHBOURHOOD IS NOT NULL
-        ORDER BY SNAPSHOT_DATE, NEIGHBOURHOOD
-    """).to_pandas()
+        WHERE NEIGHBOURHOOD IS NOT NULL
+        ORDER BY
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
+            SNAPSHOT_DATE,
+            NEIGHBOURHOOD
+        """
+    ).to_pandas()
 
-    return tuple(map(normalize_dates, (market, availability, neighbourhoods)))
-
+    return tuple(
+        map(
+            normalize_dates,
+            (
+                market,
+                availability,
+                neighbourhoods,
+            ),
+        )
+    )
 
 # ============================================================
 # Page header and periods
 # ============================================================
+
+(
+    selected_country,
+    selected_city,
+    _,
+) = render_sidebar()
+
+country_key = str(
+    selected_country
+).strip().lower()
+
+city_key = str(
+    selected_city
+).strip().lower()
+
+city_label = format_location_name(
+    selected_city
+)
+
+country_label = format_location_name(
+    selected_country
+)
+
+location_label = (
+    f"{city_label}, {country_label}"
+)
 
 try:
     market, availability, neighbourhoods = load_data()
@@ -210,8 +270,34 @@ except Exception as error:
     st.error(f"Impossible de charger les données : {error}")
     st.stop()
 
+def filter_location(frame: pd.DataFrame) -> pd.DataFrame:
+    if frame.empty:
+        return frame
+
+    return frame.loc[
+        frame["SOURCE_COUNTRY"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        .eq(country_key)
+        &
+        frame["SOURCE_CITY"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        .eq(city_key)
+    ].copy()
+
+
+market = filter_location(market)
+availability = filter_location(availability)
+neighbourhoods = filter_location(neighbourhoods)
+
 if len(market) < 2:
-    st.warning("Au moins deux observations historiques sont nécessaires.")
+    st.warning(
+        "Au moins deux observations historiques sont nécessaires "
+        f"pour comparer {location_label}."
+    )
     st.stop()
 
 dates = sorted(market["SNAPSHOT_DATE"].dropna().unique())
@@ -220,15 +306,21 @@ page_header(
     title="Comparateur temporel",
     subtitle=(
         "Analyse comparative des observations historiques du marché "
-        "de la location courte durée à Lyon."
+        f"de la location courte durée à {city_label}."
     ),
     icon="🔄",
-    badges=["🇫🇷 Lyon, France", f"🗓️ {len(dates)} observations historiques"],
+    badges=[
+        f"📍 {location_label}",
+        f"🗓️ {len(dates)} observations historiques",
+    ],
 )
 
 section_header(
-    "Périodes à comparer",
-    "Sélectionnez deux observations pour analyser leurs différences.",
+    "Comparaison des zones",
+    (
+        "Comparez le volume d'annonces, le prix médian "
+        "et la couverture tarifaire par zone géographique."
+    ),
 )
 
 left, right = st.columns(2)
@@ -385,7 +477,7 @@ else:
 st.divider()
 section_header(
     "Comparaison des quartiers",
-    "Comparez le volume d'annonces, le prix médian et la couverture tarifaire par arrondissement.",
+    "Comparez le volume d'annonces, le prix médian et la couverture tarifaire par zone.",
 )
 
 neighbourhood_a = neighbourhoods.loc[
@@ -398,11 +490,11 @@ neighbourhood_b = neighbourhoods.loc[
 common = sorted(set(neighbourhood_a.index) & set(neighbourhood_b.index))
 
 if not common:
-    st.info("Aucun quartier commun aux deux observations.")
+    st.info("Aucune zone commune aux deux observations.")
 else:
     st.caption("Ce filtre concerne uniquement les graphiques et tableaux de cette section.")
     selected = st.multiselect(
-        "Quartiers à comparer",
+        "Zones à comparer",
         options=common,
         default=common,
         key="comparison_neighbourhoods",
@@ -418,7 +510,7 @@ else:
     with filter_right:
         sort_by = st.selectbox(
             "Classement",
-            ["Écart absolu décroissant", "Écart absolu croissant", "Nom du quartier"],
+            ["Écart absolu décroissant", "Écart absolu croissant", "Nom de la zone"],
         )
 
     indicator_column, suffix, decimals = INDICATORS[indicator]
@@ -475,7 +567,7 @@ else:
     if details.empty:
         st.info("Sélectionnez au moins un quartier.")
     else:
-        if sort_by == "Nom du quartier":
+        if sort_by == "Nom de la zone":
             details = details.sort_values("Quartier")
         else:
             details = details.assign(amplitude=details["Écart"].abs())
@@ -507,7 +599,7 @@ else:
 
         delta_suffix = " pt" if indicator_column == "COVERAGE" else suffix
         view = pd.DataFrame({
-            "Quartier": details["Quartier"],
+            "Zone": details["Quartier"],
             format_date_fr(date_a): details["Référence"].map(
                 lambda value: format_value(value, suffix, decimals)
             ),
@@ -533,7 +625,7 @@ else:
                 lambda value: format_value(value, " %", 1)
             ),
         })
-        st.markdown("**Détail des quartiers sélectionnés**")
+        st.markdown("**Détail des zones sélectionnées**")
         st.dataframe(view, hide_index=True, use_container_width=True)
 
         export = details.copy()
@@ -541,13 +633,18 @@ else:
         export.insert(2, "Date comparée", str(date_b))
         export.insert(3, "Indicateur", indicator)
         st.download_button(
-            "Exporter les quartiers (CSV)",
+            "Exporter les zones (CSV)",
             data=export.to_csv(index=False, sep=";", decimal=",").encode("utf-8-sig"),
-            file_name=f"comparaison_quartiers_lyon_{date_a}_{date_b}.csv",
+            file_name=(
+                f"comparaison_zones_"
+                f"{location_slug(selected_country)}_"
+                f"{location_slug(selected_city)}_"
+                f"{date_a}_{date_b}.csv"
+            ),
             mime="text/csv",
         )
         st.caption(
-            "Seuls les quartiers présents aux deux dates sont comparés. "
+            "Seuls les zones présentes aux deux dates sont comparés. "
             "Les prix médians concernent uniquement les annonces avec prix exploitable."
         )
 
@@ -578,7 +675,9 @@ if listing_change_pct is not None and abs(listing_change_pct) >= 25:
     )
 
 st.caption(
-    "Source : Inside Airbnb · Lyon. Ces résultats décrivent les observations "
-    "disponibles et ne constituent pas une mesure exhaustive du marché. "
-    "Les calendriers indiquent une disponibilité déclarée, pas des réservations."
+    f"Source : Inside Airbnb · {location_label}. "
+    "Ces résultats décrivent les observations disponibles "
+    "et ne constituent pas une mesure exhaustive du marché. "
+    "Les calendriers indiquent une disponibilité déclarée, "
+    "pas des réservations."
 )

@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "locations": {
+    "france/lyon": {
+      "area_levels": ["arrondissement"],
+      "expected_areas": 9,
+      "strategy": "existing"
+    },
+    "france/paris": {
+      "area_levels": ["arrondissement"],
+      "expected_areas": 20,
+      "strategy": "paris_arrondissements"
+    },
+    "belgium/brussels": {
+      "area_levels": ["municipality"],
+      "expected_areas": 19,
+      "strategy": "brussels_municipalities"
+    },
+    "france/pays-basque": {
+      "area_levels": ["municipality"],
+      "strategy": "france_communes"
+    },
+    "france/bordeaux": {
+      "area_levels": ["municipality", "neighbourhood"],
+      "strategy": "bordeaux_hybrid"
+    }
+  }
+}

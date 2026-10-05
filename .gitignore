@@ -52,3 +52,6 @@ Thumbs.db
 *.tmp
 *.temp
 *.log
+
+# Geographic reference loader cache
+snowflake/reference/.geo_cache/

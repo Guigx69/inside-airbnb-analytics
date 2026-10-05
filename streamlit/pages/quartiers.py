@@ -1,4 +1,3 @@
-
 import altair as alt
 import pandas as pd
 import streamlit as st
@@ -9,16 +8,15 @@ from ui.components import (
     note,
     page_header,
     section_header,
-    transition_grid,
 )
+from ui.config import MARTS, get_session
 from ui.formatters import (
     format_currency,
     format_date_fr,
     format_integer,
     format_percent,
 )
-from ui.config import MARTS, get_session
-from ui.sidebar import render_sidebar
+from ui.sidebar import format_location_name, render_sidebar
 from ui.styles import apply_global_styles
 
 
@@ -37,173 +35,415 @@ session = get_session()
 
 
 # ============================================================
+# Configuration
+# ============================================================
+
+NEIGHBOURHOOD_SNAPSHOT_TABLE = (
+    f"{MARTS}.MART_NEIGHBOURHOOD_SNAPSHOT"
+)
+
+NEIGHBOURHOOD_TRANSITION_TABLE = (
+    f"{MARTS}.MART_NEIGHBOURHOOD_TRANSITION"
+)
+
+CHART_BLUE = "#356DCC"
+CHART_LIGHT_BLUE = "#79B8F3"
+CHART_GREEN = "#2E8B57"
+CHART_RED = "#D95C5C"
+CHART_GREY = "#8A94A6"
+
+
+# ============================================================
+# Helpers
+# ============================================================
+
+def normalize_dataframe(
+    dataframe: pd.DataFrame,
+) -> pd.DataFrame:
+    """Normalize Snowflake column names and date columns."""
+
+    if dataframe.empty:
+        return dataframe
+
+    result = dataframe.copy()
+    result.columns = result.columns.str.lower()
+
+    for column in (
+        "snapshot_date",
+        "previous_snapshot_date",
+    ):
+        if column in result.columns:
+            result[column] = pd.to_datetime(
+                result[column]
+            )
+
+    return result
+
+
+def safe_divide(
+    numerator,
+    denominator,
+    multiplier=1.0,
+):
+    """Return a safe division result."""
+
+    if (
+        denominator is None
+        or pd.isna(denominator)
+        or denominator == 0
+    ):
+        return 0.0
+
+    if numerator is None or pd.isna(numerator):
+        return 0.0
+
+    return (
+        float(numerator)
+        / float(denominator)
+        * multiplier
+    )
+
+
+def format_optional_currency(value):
+    """Format an optional monetary value."""
+
+    if value is None or pd.isna(value):
+        return "N/D"
+
+    return format_currency(value)
+
+
+def format_optional_percent(value):
+    """Format an optional percentage value."""
+
+    if value is None or pd.isna(value):
+        return "N/D"
+
+    return format_percent(value)
+
+
+def format_neighbourhood(value):
+    """Return a readable neighbourhood label."""
+
+    if value is None or pd.isna(value):
+        return "Non renseigné"
+
+    value = str(value).strip()
+
+    if not value:
+        return "Non renseigné"
+
+    return value
+
+
+# ============================================================
 # Data loading
 # ============================================================
 
-@st.cache_data(ttl=3600)
-def load_price_data():
+@st.cache_data(ttl=3600, show_spinner=False)
+def load_neighbourhood_data():
+    """Load neighbourhood snapshots and transitions."""
 
-    market = session.sql(f"""
+    snapshots = session.sql(
+        f"""
         SELECT
             SOURCE_COUNTRY,
             SOURCE_CITY,
             SNAPSHOT_DATE,
-            LISTING_COUNT,
-            LISTINGS_WITH_PRICE,
-            AVERAGE_PRICE,
-            MEDIAN_PRICE
-        FROM {MARTS}.MART_MARKET_SNAPSHOT
-        WHERE LOWER(SOURCE_COUNTRY) = 'france'
-          AND LOWER(SOURCE_CITY) = 'lyon'
-        ORDER BY SNAPSHOT_DATE
-    """).to_pandas()
+            NEIGHBOURHOOD,
 
-    distribution = session.sql(f"""
-        SELECT
-            SOURCE_COUNTRY,
-            SOURCE_CITY,
-            SNAPSHOT_DATE,
-            PRICE_BAND,
-            PRICE_BAND_ORDER,
             LISTING_COUNT,
+            ENTIRE_HOME_LISTING_COUNT,
+            PRIVATE_ROOM_LISTING_COUNT,
+            SHARED_ROOM_LISTING_COUNT,
+
+            HOST_COUNT,
+            SUPERHOST_LISTING_COUNT,
+
             LISTINGS_WITH_PRICE,
             AVERAGE_PRICE,
             MEDIAN_PRICE,
-            MIN_PRICE,
-            MAX_PRICE,
-            MARKET_LISTING_SHARE_PCT,
-            PRICED_LISTING_SHARE_PCT
-        FROM {MARTS}.MART_PRICE_DISTRIBUTION_SNAPSHOT
-        WHERE LOWER(SOURCE_COUNTRY) = 'france'
-          AND LOWER(SOURCE_CITY) = 'lyon'
-        ORDER BY
-            SNAPSHOT_DATE,
-            PRICE_BAND_ORDER
-    """).to_pandas()
 
-    transitions = session.sql(f"""
+            AVERAGE_AVAILABILITY_RATE_PCT,
+            AVERAGE_AVAILABILITY_30,
+            AVERAGE_AVAILABILITY_365,
+
+            NATIVE_REVIEW_COUNT_TOTAL,
+            RECONSTRUCTED_REVIEW_COUNT_TOTAL,
+            RECONSTRUCTED_REVIEW_COUNT_L30D,
+            RECONSTRUCTED_REVIEW_COUNT_L90D,
+            RECONSTRUCTED_REVIEW_COUNT_L365D,
+
+            AVERAGE_LISTING_LATITUDE,
+            AVERAGE_LISTING_LONGITUDE
+
+        FROM {NEIGHBOURHOOD_SNAPSHOT_TABLE}
+
+        ORDER BY
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
+            SNAPSHOT_DATE,
+            LISTING_COUNT DESC,
+            NEIGHBOURHOOD
+        """
+    ).to_pandas()
+
+    transitions = session.sql(
+        f"""
         SELECT
             SOURCE_COUNTRY,
             SOURCE_CITY,
+            NEIGHBOURHOOD,
+
             PREVIOUS_SNAPSHOT_DATE,
             SNAPSHOT_DATE,
-            DAYS_BETWEEN_OBSERVATIONS,
-            TRANSITION_TYPE,
-            MISSING_SNAPSHOT_COUNT,
-            LISTING_OBSERVATION_COUNT,
-            LISTINGS_WITH_PREVIOUS_PRICE,
-            LISTINGS_WITH_CURRENT_PRICE,
-            COMPARABLE_LISTING_COUNT,
-            PRICE_INCREASE_COUNT,
-            PRICE_DECREASE_COUNT,
-            UNCHANGED_PRICE_COUNT,
-            AVERAGE_PREVIOUS_PRICE,
-            AVERAGE_CURRENT_PRICE,
-            MEDIAN_PREVIOUS_PRICE,
-            MEDIAN_CURRENT_PRICE,
-            AVERAGE_PRICE_CHANGE,
-            MEDIAN_PRICE_CHANGE,
-            AVERAGE_PRICE_CHANGE_PCT,
-            MEDIAN_PRICE_CHANGE_PCT,
-            COMPARABLE_PRICE_COVERAGE_PCT,
-            PRICE_INCREASE_SHARE_PCT,
-            PRICE_DECREASE_SHARE_PCT,
-            UNCHANGED_PRICE_SHARE_PCT
-        FROM {MARTS}.MART_PRICE_TRANSITION
-        WHERE LOWER(SOURCE_COUNTRY) = 'france'
-          AND LOWER(SOURCE_CITY) = 'lyon'
+            DAYS_BETWEEN_SNAPSHOTS,
+
+            PREVIOUS_LISTING_COUNT,
+            CURRENT_LISTING_COUNT,
+
+            NET_LISTING_CHANGE,
+            NET_LISTING_CHANGE_PCT,
+
+            RETAINED_LISTING_COUNT,
+            DISAPPEARED_LISTING_COUNT,
+
+            MOVED_OUT_LISTING_COUNT,
+            MOVED_IN_LISTING_COUNT,
+
+            NEWLY_OBSERVED_LISTING_COUNT,
+            RETURNED_AFTER_GAP_LISTING_COUNT,
+
+            RETENTION_RATE_PCT,
+            DISAPPEARANCE_RATE_PCT,
+            MOVED_OUT_RATE_PCT,
+
+            NEWLY_OBSERVED_SHARE_PCT,
+            RETURNED_AFTER_GAP_SHARE_PCT,
+            MOVED_IN_SHARE_PCT,
+
+            HAS_RETURNED_LISTINGS,
+            HAS_GEOGRAPHIC_MOVEMENT
+
+        FROM {NEIGHBOURHOOD_TRANSITION_TABLE}
+
         ORDER BY
+            SOURCE_COUNTRY,
+            SOURCE_CITY,
             SNAPSHOT_DATE,
-            PREVIOUS_SNAPSHOT_DATE
-    """).to_pandas()
+            NEIGHBOURHOOD
+        """
+    ).to_pandas()
 
-    for dataframe in [
-        market,
-        distribution,
-        transitions,
-    ]:
-        dataframe.columns = dataframe.columns.str.lower()
-
-    market["snapshot_date"] = pd.to_datetime(
-        market["snapshot_date"]
+    return (
+        normalize_dataframe(snapshots),
+        normalize_dataframe(transitions),
     )
 
-    distribution["snapshot_date"] = pd.to_datetime(
-        distribution["snapshot_date"]
-    )
 
-    transitions["snapshot_date"] = pd.to_datetime(
-        transitions["snapshot_date"]
-    )
-
-    transitions["previous_snapshot_date"] = pd.to_datetime(
-        transitions["previous_snapshot_date"]
-    )
-
-    return market, distribution, transitions
-
-
-market, distribution, transitions = load_price_data()
+snapshots, transitions = load_neighbourhood_data()
 
 
 # ============================================================
-# Snapshot / sidebar
+# Geographic context
 # ============================================================
 
-snapshot_dates = sorted(
-    market["snapshot_date"].unique().tolist()
+(
+    selected_country,
+    selected_city,
+    selected_snapshot,
+) = render_sidebar()
+
+selected_snapshot = pd.Timestamp(
+    selected_snapshot
 )
 
-selected_snapshot = render_sidebar(
-    snapshot_dates=snapshot_dates,
-)
 
-selected_snapshot = pd.Timestamp(selected_snapshot)
+# ============================================================
+# Geographic filtering
+# ============================================================
 
-current = market[
-    market["snapshot_date"] == selected_snapshot
+snapshots = snapshots[
+    (
+        snapshots["source_country"]
+        == selected_country
+    )
+    & (
+        snapshots["source_city"]
+        == selected_city
+    )
 ].copy()
 
-current_distribution = distribution[
-    distribution["snapshot_date"] == selected_snapshot
+transitions = transitions[
+    (
+        transitions["source_country"]
+        == selected_country
+    )
+    & (
+        transitions["source_city"]
+        == selected_city
+    )
+].copy()
+
+
+if snapshots.empty:
+    st.error(
+        "Aucune donnée par quartier n'est disponible "
+        "pour la localisation sélectionnée."
+    )
+    st.stop()
+
+
+snapshot_dates = sorted(
+    snapshots["snapshot_date"]
+    .dropna()
+    .unique()
+    .tolist()
+)
+
+
+# ============================================================
+# Selected observation
+# ============================================================
+
+current = snapshots[
+    snapshots["snapshot_date"]
+    == selected_snapshot
 ].copy()
 
 
 if current.empty:
-
     st.error(
-        "Aucune donnée marché n'est disponible "
+        "Aucune donnée par quartier n'est disponible "
         "pour l'observation sélectionnée."
     )
-
     st.stop()
 
 
-current = current.iloc[0]
+current["neighbourhood_label"] = (
+    current["neighbourhood"]
+    .apply(format_neighbourhood)
+)
+
+current = current.sort_values(
+    [
+        "listing_count",
+        "neighbourhood_label",
+    ],
+    ascending=[False, True],
+).reset_index(drop=True)
 
 
 # ============================================================
 # Derived indicators
 # ============================================================
 
-listing_count = int(current["listing_count"])
-listings_with_price = int(current["listings_with_price"])
-
-price_coverage_pct = (
-    100.0
-    * listings_with_price
-    / listing_count
-    if listing_count > 0
-    else 0.0
+neighbourhood_count = int(
+    current["neighbourhood"]
+    .nunique()
 )
 
-average_price = current["average_price"]
-median_price = current["median_price"]
+total_listings = int(
+    current["listing_count"].sum()
+)
 
-has_price_data = (
-    listings_with_price > 0
-    and pd.notna(average_price)
-    and pd.notna(median_price)
+total_hosts = int(
+    current["host_count"].sum()
+)
+
+total_priced_listings = int(
+    current["listings_with_price"].sum()
+)
+
+
+current["market_share_pct"] = (
+    current["listing_count"]
+    .apply(
+        lambda value: safe_divide(
+            value,
+            total_listings,
+            multiplier=100.0,
+        )
+    )
+)
+
+
+current["entire_home_share_pct"] = (
+    current.apply(
+        lambda row: safe_divide(
+            row["entire_home_listing_count"],
+            row["listing_count"],
+            multiplier=100.0,
+        ),
+        axis=1,
+    )
+)
+
+
+current["private_room_share_pct"] = (
+    current.apply(
+        lambda row: safe_divide(
+            row["private_room_listing_count"],
+            row["listing_count"],
+            multiplier=100.0,
+        ),
+        axis=1,
+    )
+)
+
+
+current["shared_room_share_pct"] = (
+    current.apply(
+        lambda row: safe_divide(
+            row["shared_room_listing_count"],
+            row["listing_count"],
+            multiplier=100.0,
+        ),
+        axis=1,
+    )
+)
+
+
+current["superhost_listing_share_pct"] = (
+    current.apply(
+        lambda row: safe_divide(
+            row["superhost_listing_count"],
+            row["listing_count"],
+            multiplier=100.0,
+        ),
+        axis=1,
+    )
+)
+
+
+current["price_coverage_pct"] = (
+    current.apply(
+        lambda row: safe_divide(
+            row["listings_with_price"],
+            row["listing_count"],
+            multiplier=100.0,
+        ),
+        axis=1,
+    )
+)
+
+
+largest_neighbourhood = current.iloc[0]
+
+largest_neighbourhood_name = (
+    largest_neighbourhood[
+        "neighbourhood_label"
+    ]
+)
+
+largest_neighbourhood_listings = int(
+    largest_neighbourhood["listing_count"]
+)
+
+largest_neighbourhood_share = float(
+    largest_neighbourhood[
+        "market_share_pct"
+    ]
 )
 
 
@@ -212,28 +452,40 @@ has_price_data = (
 # ============================================================
 
 page_header(
-    title="Prix",
+    title="Quartiers",
     subtitle=(
-        "Niveaux de prix observés à Lyon, distribution tarifaire "
-        "et évolution à annonces comparables."
+        "Lecture territoriale de l'offre Airbnb à "
+        f"{format_location_name(selected_city)} : "
+        "volume, structure, prix, disponibilité "
+        "et évolution des quartiers."
     ),
-    icon="💶",
+    icon="🏘️",
     badges=[
-        "🇫🇷 Lyon, France",
-        f"🗓️ {format_date_fr(selected_snapshot)}",
-        f"📁 {format_integer(len(snapshot_dates))} observations historiques",
+        (
+            f"📍 {format_location_name(selected_city)}, "
+            f"{format_location_name(selected_country)}"
+        ),
+        (
+            f"🗓️ "
+            f"{format_date_fr(selected_snapshot)}"
+        ),
+        (
+            f"📁 "
+            f"{format_integer(len(snapshot_dates))} "
+            "observations historiques"
+        ),
     ],
 )
 
 
 # ============================================================
-# Price overview
+# Market structure
 # ============================================================
 
 section_header(
-    "Niveau des prix",
+    "Structure territoriale",
     (
-        f"Situation tarifaire du marché observé "
+        "Répartition de l'offre entre les quartiers "
         f"au {format_date_fr(selected_snapshot)}."
     ),
 )
@@ -242,45 +494,41 @@ section_header(
 kpi_grid(
     [
         {
-            "label": "Prix médian",
-            "value": (
-                format_currency(median_price)
-                if has_price_data
-                else "N/D"
+            "label": "Quartiers observés",
+            "value": format_integer(
+                neighbourhood_count
             ),
             "detail": (
-                "Parmi les annonces disposant d'un prix"
-                if has_price_data
-                else "Aucune information tarifaire"
+                "Territoires représentés "
+                "dans cette observation"
             ),
         },
         {
-            "label": "Prix moyen",
-            "value": (
-                format_currency(average_price)
-                if has_price_data
-                else "N/D"
+            "label": "Annonces observées",
+            "value": format_integer(
+                total_listings
             ),
             "detail": (
-                "Parmi les annonces disposant d'un prix"
-                if has_price_data
-                else "Aucune information tarifaire"
+                "Somme des annonces "
+                "des quartiers observés"
             ),
         },
         {
-            "label": "Annonces avec prix",
-            "value": format_integer(listings_with_price),
+            "label": "Quartier principal",
+            "value": largest_neighbourhood_name,
             "detail": (
-                f"sur {format_integer(listing_count)} "
-                f"annonces observées"
+                f"{format_integer(largest_neighbourhood_listings)} "
+                "annonces"
             ),
         },
         {
-            "label": "Couverture tarifaire",
-            "value": format_percent(price_coverage_pct),
+            "label": "Poids du quartier principal",
+            "value": format_percent(
+                largest_neighbourhood_share
+            ),
             "detail": (
-                "Part du marché disposant "
-                "d'un prix exploitable"
+                "Part des annonces de "
+                f"{largest_neighbourhood_name}"
             ),
         },
     ],
@@ -288,142 +536,217 @@ kpi_grid(
 )
 
 
-if has_price_data:
-
-    insight_box(
-        (
-            f"Couverture tarifaire · "
-            f"{format_percent(price_coverage_pct)}"
-        ),
-        (
-            f"Les statistiques de prix portent sur "
-            f"{format_integer(listings_with_price)} annonces parmi "
-            f"les {format_integer(listing_count)} observées. "
-            f"Les niveaux tarifaires doivent donc être interprétés "
-            f"en tenant compte de cette couverture."
-        ),
-    )
-
-else:
-
-    insight_box(
-        "Aucune donnée tarifaire exploitable",
-        (
-            f"L'observation du {format_date_fr(selected_snapshot)} "
-            f"contient {format_integer(listing_count)} annonces, "
-            f"mais aucune information de prix exploitable. "
-            f"L'absence de prix ne correspond pas à un prix de 0 €."
-        ),
-    )
+insight_box(
+    (
+        f"Concentration territoriale · "
+        f"{largest_neighbourhood_name}"
+    ),
+    (
+        f"Le quartier le plus représenté concentre "
+        f"{format_integer(largest_neighbourhood_listings)} "
+        f"annonces, soit "
+        f"{format_percent(largest_neighbourhood_share)} "
+        f"des {format_integer(total_listings)} annonces "
+        "observées pour cette localisation."
+    ),
+)
 
 
 # ============================================================
-# Price distribution
+# Supply distribution
 # ============================================================
 
 st.divider()
 
 section_header(
-    "Distribution des prix",
+    "Répartition de l'offre",
     (
-        "Répartition des annonces disposant d'un prix "
-        "selon leur tranche tarifaire."
+        "Nombre d'annonces et poids de chaque quartier "
+        "dans le marché observé."
     ),
 )
 
 
-priced_distribution = current_distribution[
-    current_distribution["price_band_order"] > 0
+supply_chart_data = current[
+    [
+        "neighbourhood_label",
+        "listing_count",
+        "market_share_pct",
+    ]
 ].copy()
 
-priced_distribution = priced_distribution.sort_values(
-    "price_band_order"
+
+supply_chart_data["listing_label"] = (
+    supply_chart_data["listing_count"]
+    .apply(format_integer)
 )
 
 
-price_band_labels = {
-    "01_<50": "< 50 €",
-    "02_50_99": "50–99 €",
-    "03_100_149": "100–149 €",
-    "04_150_199": "150–199 €",
-    "05_200_299": "200–299 €",
-    "06_300_PLUS": "300 € et +",
-}
+neighbourhood_order = (
+    supply_chart_data[
+        "neighbourhood_label"
+    ].tolist()
+)
 
 
-if has_price_data and not priced_distribution.empty:
-
-    priced_distribution["price_band_label"] = (
-        priced_distribution["price_band"].map(
-            price_band_labels
-        )
+supply_bars = (
+    alt.Chart(supply_chart_data)
+    .mark_bar(
+        color=CHART_BLUE,
+        cornerRadiusEnd=4,
     )
-
-    priced_distribution["price_band_label"] = (
-        priced_distribution["price_band_label"]
-        .fillna(
-            priced_distribution["price_band"]
-        )
-    )
-
-    priced_distribution["chart_label"] = (
-        priced_distribution.apply(
-            lambda row: (
-                f"{format_integer(row['listing_count'])} · "
-                f"{format_percent(row['priced_listing_share_pct'])}"
+    .encode(
+        y=alt.Y(
+            "neighbourhood_label:N",
+            title=None,
+            sort=neighbourhood_order,
+            axis=alt.Axis(
+                labelLimit=260,
+                labelPadding=8,
             ),
-            axis=1,
+        ),
+        x=alt.X(
+            "listing_count:Q",
+            title="Nombre d'annonces",
+        ),
+        tooltip=[
+            alt.Tooltip(
+                "neighbourhood_label:N",
+                title="Quartier",
+            ),
+            alt.Tooltip(
+                "listing_count:Q",
+                title="Annonces",
+                format=",d",
+            ),
+            alt.Tooltip(
+                "market_share_pct:Q",
+                title="Part du marché (%)",
+                format=".1f",
+            ),
+        ],
+    )
+    .properties(
+        height=max(
+            300,
+            neighbourhood_count * 32,
         )
     )
+)
 
-    price_band_order = (
-        priced_distribution
-        .sort_values("price_band_order")[
-            "price_band_label"
-        ]
-        .tolist()
+
+supply_labels = (
+    alt.Chart(supply_chart_data)
+    .mark_text(
+        align="left",
+        baseline="middle",
+        dx=8,
+        fontSize=11,
+    )
+    .encode(
+        y=alt.Y(
+            "neighbourhood_label:N",
+            sort=neighbourhood_order,
+        ),
+        x=alt.X(
+            "listing_count:Q",
+        ),
+        text=alt.Text(
+            "listing_label:N",
+        ),
+    )
+)
+
+
+st.altair_chart(
+    supply_bars + supply_labels,
+    use_container_width=True,
+)
+
+
+# ============================================================
+# Price analysis
+# ============================================================
+
+st.divider()
+
+section_header(
+    "Prix par quartier",
+    (
+        "Comparaison des niveaux tarifaires parmi "
+        "les annonces disposant d'un prix exploitable."
+    ),
+)
+
+
+price_data = current[
+    (
+        current["listings_with_price"] > 0
+    )
+    & current["median_price"].notna()
+].copy()
+
+
+if price_data.empty:
+
+    st.info(
+        "Aucune information tarifaire exploitable "
+        "n'est disponible pour cette observation."
     )
 
+else:
 
-    distribution_bars = (
-        alt.Chart(priced_distribution)
+    price_data = price_data.sort_values(
+        [
+            "median_price",
+            "listing_count",
+        ],
+        ascending=[False, False],
+    )
+
+    price_data["median_price_label"] = (
+        price_data["median_price"]
+        .apply(format_optional_currency)
+    )
+
+    price_order = (
+        price_data[
+            "neighbourhood_label"
+        ].tolist()
+    )
+
+    price_bars = (
+        alt.Chart(price_data)
         .mark_bar(
-            cornerRadiusTopLeft=4,
-            cornerRadiusTopRight=4,
-            size=42,
+            color=CHART_LIGHT_BLUE,
+            cornerRadiusEnd=4,
         )
         .encode(
-            x=alt.X(
-                "price_band_label:N",
+            y=alt.Y(
+                "neighbourhood_label:N",
                 title=None,
-                sort=price_band_order,
+                sort=price_order,
                 axis=alt.Axis(
-                    labelAngle=0,
-                    labelPadding=10,
-                    labelLimit=120,
+                    labelLimit=260,
+                    labelPadding=8,
                 ),
             ),
-            y=alt.Y(
-                "listing_count:Q",
-                title="Nombre d'annonces",
-                axis=alt.Axis(
-                    format=",d",
+            x=alt.X(
+                "median_price:Q",
+                title="Prix médian (€)",
+                scale=alt.Scale(
+                    zero=True,
                 ),
             ),
             tooltip=[
                 alt.Tooltip(
-                    "price_band_label:N",
-                    title="Tranche",
+                    "neighbourhood_label:N",
+                    title="Quartier",
                 ),
                 alt.Tooltip(
-                    "listing_count:Q",
-                    title="Annonces",
-                    format=",d",
-                ),
-                alt.Tooltip(
-                    "priced_listing_share_pct:Q",
-                    title="Part des annonces tarifées",
-                    format=".1f",
+                    "median_price:Q",
+                    title="Prix médian",
+                    format=".2f",
                 ),
                 alt.Tooltip(
                     "average_price:Q",
@@ -431,245 +754,699 @@ if has_price_data and not priced_distribution.empty:
                     format=".2f",
                 ),
                 alt.Tooltip(
-                    "median_price:Q",
-                    title="Prix médian",
-                    format=".2f",
+                    "listings_with_price:Q",
+                    title="Annonces avec prix",
+                    format=",d",
+                ),
+                alt.Tooltip(
+                    "price_coverage_pct:Q",
+                    title="Couverture tarifaire (%)",
+                    format=".1f",
                 ),
             ],
         )
         .properties(
-            height=330,
-        )
-    )
-
-
-    distribution_labels = (
-        alt.Chart(priced_distribution)
-        .mark_text(
-            dy=-10,
-            fontSize=12,
-        )
-        .encode(
-            x=alt.X(
-                "price_band_label:N",
-                sort=price_band_order,
-            ),
-            y=alt.Y(
-                "listing_count:Q",
-            ),
-            text=alt.Text(
-                "chart_label:N",
-            ),
-        )
-    )
-
-
-    st.altair_chart(
-        distribution_bars + distribution_labels,
-        use_container_width=True,
-    )
-
-
-    note(
-        "Les pourcentages représentent la part de chaque tranche "
-        "parmi les annonces disposant d'un prix. Les annonces sans "
-        "prix sont exclues de cette distribution."
-    )
-
-
-    # ========================================================
-    # Distribution details
-    # ========================================================
-
-    st.write("")
-
-    section_header(
-        "Détail des tranches tarifaires",
-        (
-            "Volume, poids et niveaux de prix "
-            "au sein de chaque tranche."
-        ),
-    )
-
-
-    price_detail = priced_distribution[
-        [
-            "price_band_label",
-            "listing_count",
-            "priced_listing_share_pct",
-            "average_price",
-            "median_price",
-            "min_price",
-            "max_price",
-        ]
-    ].copy()
-
-
-    price_detail = price_detail.rename(
-        columns={
-            "price_band_label": "Tranche de prix",
-            "listing_count": "Annonces",
-            "priced_listing_share_pct": "Part tarifée (%)",
-            "average_price": "Prix moyen (€)",
-            "median_price": "Prix médian (€)",
-            "min_price": "Minimum (€)",
-            "max_price": "Maximum (€)",
-        }
-    )
-
-
-    price_detail["Annonces"] = (
-        price_detail["Annonces"]
-        .apply(format_integer)
-    )
-
-    price_detail["Part tarifée (%)"] = (
-        price_detail["Part tarifée (%)"]
-        .apply(format_percent)
-    )
-
-    for column in [
-        "Prix moyen (€)",
-        "Prix médian (€)",
-        "Minimum (€)",
-        "Maximum (€)",
-    ]:
-
-        price_detail[column] = (
-            price_detail[column]
-            .apply(
-                lambda value: format_currency(
-                    value,
-                    decimals=2,
-                )
+            height=max(
+                300,
+                len(price_data) * 32,
             )
         )
-
-
-    st.dataframe(
-        price_detail,
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "Tranche de prix": st.column_config.TextColumn(
-                width="medium",
-            ),
-        },
     )
 
+    price_labels = (
+        alt.Chart(price_data)
+        .mark_text(
+            align="left",
+            baseline="middle",
+            dx=8,
+            fontSize=11,
+        )
+        .encode(
+            y=alt.Y(
+                "neighbourhood_label:N",
+                sort=price_order,
+            ),
+            x=alt.X(
+                "median_price:Q",
+            ),
+            text=alt.Text(
+                "median_price_label:N",
+            ),
+        )
+    )
 
-else:
+    st.altair_chart(
+        price_bars + price_labels,
+        use_container_width=True,
+    )
 
-    st.info(
-        "Aucune distribution tarifaire n'est disponible "
-        "pour cette observation."
+    note(
+        "Les prix moyen et médian sont calculés uniquement "
+        "sur les annonces disposant d'une information "
+        "tarifaire exploitable. La couverture tarifaire "
+        "peut varier selon le quartier."
     )
 
 
 # ============================================================
-# Historical price evolution
+# Room type structure
 # ============================================================
 
 st.divider()
 
 section_header(
-    "Évolution historique des prix",
+    "Structure de l'offre",
     (
-        "Évolution du prix moyen et du prix médian "
-        "sur les observations disposant d'une information tarifaire."
+        "Composition de l'offre par type de logement "
+        "dans chaque quartier."
     ),
 )
 
 
-price_history = market[
-    market["listings_with_price"] > 0
+room_type_data = current[
+    [
+        "neighbourhood_label",
+        "entire_home_listing_count",
+        "private_room_listing_count",
+        "shared_room_listing_count",
+    ]
 ].copy()
 
-price_history = price_history[
-    price_history["average_price"].notna()
-    & price_history["median_price"].notna()
-].copy()
 
-price_history = price_history.sort_values(
-    "snapshot_date"
+room_type_data = room_type_data.rename(
+    columns={
+        "entire_home_listing_count": (
+            "Logement entier"
+        ),
+        "private_room_listing_count": (
+            "Chambre privée"
+        ),
+        "shared_room_listing_count": (
+            "Chambre partagée"
+        ),
+    }
 )
 
 
-if not price_history.empty:
+room_type_long = room_type_data.melt(
+    id_vars=[
+        "neighbourhood_label",
+    ],
+    var_name="room_type",
+    value_name="listing_count",
+)
 
-    price_history["date_label"] = (
-        price_history["snapshot_date"]
-        .apply(format_date_fr)
+
+room_type_chart = (
+    alt.Chart(room_type_long)
+    .mark_bar()
+    .encode(
+        y=alt.Y(
+            "neighbourhood_label:N",
+            title=None,
+            sort=neighbourhood_order,
+            axis=alt.Axis(
+                labelLimit=260,
+                labelPadding=8,
+            ),
+        ),
+        x=alt.X(
+            "listing_count:Q",
+            title="Nombre d'annonces",
+            stack="zero",
+        ),
+        color=alt.Color(
+            "room_type:N",
+            title=None,
+            scale=alt.Scale(
+                domain=[
+                    "Logement entier",
+                    "Chambre privée",
+                    "Chambre partagée",
+                ],
+                range=[
+                    CHART_BLUE,
+                    CHART_LIGHT_BLUE,
+                    CHART_GREY,
+                ],
+            ),
+            legend=alt.Legend(
+                orient="bottom",
+                direction="horizontal",
+            ),
+        ),
+        tooltip=[
+            alt.Tooltip(
+                "neighbourhood_label:N",
+                title="Quartier",
+            ),
+            alt.Tooltip(
+                "room_type:N",
+                title="Type",
+            ),
+            alt.Tooltip(
+                "listing_count:Q",
+                title="Annonces",
+                format=",d",
+            ),
+        ],
+    )
+    .properties(
+        height=max(
+            300,
+            neighbourhood_count * 32,
+        )
+    )
+)
+
+
+st.altair_chart(
+    room_type_chart,
+    use_container_width=True,
+)
+
+
+# ============================================================
+# Availability
+# ============================================================
+
+st.divider()
+
+section_header(
+    "Disponibilité publique par quartier",
+    (
+        "Comparaison de la disponibilité moyenne "
+        "publiquement observée dans les calendriers Airbnb."
+    ),
+)
+
+
+availability_data = current[
+    [
+        "neighbourhood_label",
+        "listing_count",
+        "average_availability_rate_pct",
+        "average_availability_30",
+        "average_availability_365",
+    ]
+].copy()
+
+
+availability_data = availability_data[
+    availability_data[
+        "average_availability_rate_pct"
+    ].notna()
+].copy()
+
+
+if availability_data.empty:
+
+    st.info(
+        "Aucune donnée de disponibilité exploitable "
+        "n'est disponible pour cette observation."
     )
 
-    date_order = (
-        market
-        .sort_values("snapshot_date")[
-            "snapshot_date"
+else:
+
+    availability_data = (
+        availability_data.sort_values(
+            "average_availability_rate_pct",
+            ascending=False,
+        )
+    )
+
+    availability_order = (
+        availability_data[
+            "neighbourhood_label"
+        ].tolist()
+    )
+
+    availability_chart = (
+        alt.Chart(availability_data)
+        .mark_bar(
+            color=CHART_GREEN,
+            cornerRadiusEnd=4,
+        )
+        .encode(
+            y=alt.Y(
+                "neighbourhood_label:N",
+                title=None,
+                sort=availability_order,
+                axis=alt.Axis(
+                    labelLimit=260,
+                    labelPadding=8,
+                ),
+            ),
+            x=alt.X(
+                "average_availability_rate_pct:Q",
+                title="Disponibilité moyenne (%)",
+                scale=alt.Scale(
+                    domain=[0, 100],
+                ),
+            ),
+            tooltip=[
+                alt.Tooltip(
+                    "neighbourhood_label:N",
+                    title="Quartier",
+                ),
+                alt.Tooltip(
+                    "listing_count:Q",
+                    title="Annonces",
+                    format=",d",
+                ),
+                alt.Tooltip(
+                    "average_availability_rate_pct:Q",
+                    title="Disponibilité moyenne (%)",
+                    format=".1f",
+                ),
+                alt.Tooltip(
+                    "average_availability_30:Q",
+                    title="Jours disponibles à 30 jours",
+                    format=".1f",
+                ),
+                alt.Tooltip(
+                    "average_availability_365:Q",
+                    title="Jours disponibles à 365 jours",
+                    format=".1f",
+                ),
+            ],
+        )
+        .properties(
+            height=max(
+                300,
+                len(availability_data) * 32,
+            )
+        )
+    )
+
+    st.altair_chart(
+        availability_chart,
+        use_container_width=True,
+    )
+
+
+note(
+    "La disponibilité correspond aux jours publiquement "
+    "observés comme disponibles sur Airbnb. Elle ne doit "
+    "pas être interprétée comme un taux d'inoccupation "
+    "observé ni comme l'inverse d'un taux d'occupation."
+)
+
+
+# ============================================================
+# Review activity
+# ============================================================
+
+st.divider()
+
+section_header(
+    "Activité récente",
+    (
+        "Volume de reviews reconstruit à partir des données "
+        "de reviews disponibles jusqu'au snapshot."
+    ),
+)
+
+
+review_data = current[
+    [
+        "neighbourhood_label",
+        "reconstructed_review_count_l30d",
+        "reconstructed_review_count_l90d",
+        "reconstructed_review_count_l365d",
+    ]
+].copy()
+
+
+review_data = review_data.sort_values(
+    "reconstructed_review_count_l90d",
+    ascending=False,
+)
+
+
+review_order = (
+    review_data[
+        "neighbourhood_label"
+    ].tolist()
+)
+
+
+review_chart = (
+    alt.Chart(review_data)
+    .mark_bar(
+        color=CHART_BLUE,
+        cornerRadiusEnd=4,
+    )
+    .encode(
+        y=alt.Y(
+            "neighbourhood_label:N",
+            title=None,
+            sort=review_order,
+            axis=alt.Axis(
+                labelLimit=260,
+                labelPadding=8,
+            ),
+        ),
+        x=alt.X(
+            "reconstructed_review_count_l90d:Q",
+            title="Reviews reconstruites sur 90 jours",
+        ),
+        tooltip=[
+            alt.Tooltip(
+                "neighbourhood_label:N",
+                title="Quartier",
+            ),
+            alt.Tooltip(
+                "reconstructed_review_count_l30d:Q",
+                title="Reviews L30D",
+                format=",d",
+            ),
+            alt.Tooltip(
+                "reconstructed_review_count_l90d:Q",
+                title="Reviews L90D",
+                format=",d",
+            ),
+            alt.Tooltip(
+                "reconstructed_review_count_l365d:Q",
+                title="Reviews L365D",
+                format=",d",
+            ),
+        ],
+    )
+    .properties(
+        height=max(
+            300,
+            neighbourhood_count * 32,
+        )
+    )
+)
+
+
+st.altair_chart(
+    review_chart,
+    use_container_width=True,
+)
+
+
+note(
+    "Le volume de reviews est un indicateur d'activité "
+    "observable. Il ne constitue pas une mesure directe "
+    "du nombre de séjours ni du taux d'occupation."
+)
+
+
+# ============================================================
+# Neighbourhood transitions
+# ============================================================
+
+st.divider()
+
+section_header(
+    "Évolution des quartiers",
+    (
+        "Variation de l'offre entre l'observation sélectionnée "
+        "et l'observation précédente."
+    ),
+)
+
+
+current_transition = transitions[
+    transitions["snapshot_date"]
+    == selected_snapshot
+].copy()
+
+
+if current_transition.empty:
+
+    insight_box(
+        "Aucune transition disponible",
+        (
+            "Cette observation ne dispose pas d'une "
+            "comparaison territoriale exploitable avec "
+            "une observation précédente."
+        ),
+    )
+
+else:
+
+    current_transition = (
+        current_transition.sort_values(
+            [
+                "net_listing_change",
+                "current_listing_count",
+            ],
+            ascending=[False, False],
+        )
+        .reset_index(drop=True)
+    )
+
+    current_transition[
+        "neighbourhood_label"
+    ] = (
+        current_transition["neighbourhood"]
+        .apply(format_neighbourhood)
+    )
+
+    previous_snapshot = (
+        current_transition[
+            "previous_snapshot_date"
         ]
-        .apply(format_date_fr)
+        .dropna()
+        .max()
+    )
+
+    total_previous = int(
+        current_transition[
+            "previous_listing_count"
+        ].sum()
+    )
+
+    total_current = int(
+        current_transition[
+            "current_listing_count"
+        ].sum()
+    )
+
+    total_net_change = int(
+        current_transition[
+            "net_listing_change"
+        ].sum()
+    )
+
+    total_retained = int(
+        current_transition[
+            "retained_listing_count"
+        ].sum()
+    )
+
+    total_disappeared = int(
+        current_transition[
+            "disappeared_listing_count"
+        ].sum()
+    )
+
+    total_new = int(
+        current_transition[
+            "newly_observed_listing_count"
+        ].sum()
+    )
+
+    total_returned = int(
+        current_transition[
+            "returned_after_gap_listing_count"
+        ].sum()
+    )
+
+    total_moved_in = int(
+        current_transition[
+            "moved_in_listing_count"
+        ].sum()
+    )
+
+    total_moved_out = int(
+        current_transition[
+            "moved_out_listing_count"
+        ].sum()
+    )
+
+    market_net_change_pct = safe_divide(
+        total_net_change,
+        total_previous,
+        multiplier=100.0,
+    )
+
+    retention_pct = safe_divide(
+        total_retained,
+        total_previous,
+        multiplier=100.0,
+    )
+
+    disappearance_pct = safe_divide(
+        total_disappeared,
+        total_previous,
+        multiplier=100.0,
+    )
+
+    insight_box(
+        (
+            f"Du "
+            f"{format_date_fr(previous_snapshot)} "
+            f"au "
+            f"{format_date_fr(selected_snapshot)}"
+        ),
+        (
+            f"L'offre territoriale passe de "
+            f"{format_integer(total_previous)} à "
+            f"{format_integer(total_current)} annonces, "
+            f"soit une variation nette de "
+            f"{format_integer(total_net_change)} annonces "
+            f"({format_percent(market_net_change_pct)})."
+        ),
+    )
+
+    kpi_grid(
+        [
+            {
+                "label": "Annonces retenues",
+                "value": format_integer(
+                    total_retained
+                ),
+                "detail": (
+                    f"{format_percent(retention_pct)} "
+                    "de la population précédente"
+                ),
+            },
+            {
+                "label": "Annonces disparues",
+                "value": format_integer(
+                    total_disappeared
+                ),
+                "detail": (
+                    f"{format_percent(disappearance_pct)} "
+                    "de la population précédente"
+                ),
+            },
+            {
+                "label": "Nouvelles observations",
+                "value": format_integer(
+                    total_new
+                ),
+                "detail": (
+                    "Annonces observées pour "
+                    "la première fois"
+                ),
+            },
+            {
+                "label": "Retours après absence",
+                "value": format_integer(
+                    total_returned
+                ),
+                "detail": (
+                    "Annonces réobservées après "
+                    "au moins un snapshot absent"
+                ),
+            },
+        ],
+        columns=2,
+    )
+
+    st.write("")
+
+    section_header(
+        "Variation nette par quartier",
+        (
+            "Écart entre le nombre d'annonces du snapshot "
+            "précédent et celui du snapshot sélectionné."
+        ),
+    )
+
+    transition_chart_data = (
+        current_transition[
+            [
+                "neighbourhood_label",
+                "previous_listing_count",
+                "current_listing_count",
+                "net_listing_change",
+                "net_listing_change_pct",
+            ]
+        ]
+        .copy()
+    )
+
+    transition_chart_data["direction"] = (
+        transition_chart_data[
+            "net_listing_change"
+        ].apply(
+            lambda value: (
+                "Hausse"
+                if value > 0
+                else (
+                    "Baisse"
+                    if value < 0
+                    else "Stable"
+                )
+            )
+        )
+    )
+
+    transition_chart_data[
+        "change_label"
+    ] = (
+        transition_chart_data[
+            "net_listing_change"
+        ].apply(
+            lambda value: (
+                f"+{format_integer(value)}"
+                if value > 0
+                else format_integer(value)
+            )
+        )
+    )
+
+    transition_order = (
+        transition_chart_data.sort_values(
+            "net_listing_change",
+            ascending=False,
+        )[
+            "neighbourhood_label"
+        ]
         .tolist()
     )
 
-
-    price_history_long = price_history.melt(
-        id_vars=[
-            "snapshot_date",
-            "date_label",
-        ],
-        value_vars=[
-            "average_price",
-            "median_price",
-        ],
-        var_name="indicator",
-        value_name="price",
-    )
-
-
-    price_history_long["indicator_label"] = (
-        price_history_long["indicator"].map(
-            {
-                "average_price": "Prix moyen",
-                "median_price": "Prix médian",
-            }
+    transition_bars = (
+        alt.Chart(
+            transition_chart_data
         )
-    )
-
-
-    historical_chart = (
-        alt.Chart(price_history_long)
-        .mark_line(
-            point=True,
-            strokeWidth=3,
+        .mark_bar(
+            cornerRadiusEnd=4,
         )
         .encode(
-            x=alt.X(
-                "date_label:N",
+            y=alt.Y(
+                "neighbourhood_label:N",
                 title=None,
-                sort=date_order,
+                sort=transition_order,
                 axis=alt.Axis(
-                    labelAngle=0,
-                    labelPadding=10,
+                    labelLimit=260,
+                    labelPadding=8,
                 ),
             ),
-            y=alt.Y(
-                "price:Q",
-                title="Prix (€)",
-                scale=alt.Scale(
-                    zero=False,
-                ),
+            x=alt.X(
+                "net_listing_change:Q",
+                title="Variation nette des annonces",
             ),
             color=alt.Color(
-                "indicator_label:N",
+                "direction:N",
                 title=None,
                 scale=alt.Scale(
                     domain=[
-                        "Prix moyen",
-                        "Prix médian",
+                        "Hausse",
+                        "Baisse",
+                        "Stable",
                     ],
                     range=[
-                        "#2563EB",
-                        "#60A5FA",
+                        CHART_GREEN,
+                        CHART_RED,
+                        CHART_GREY,
                     ],
                 ),
                 legend=alt.Legend(
@@ -679,406 +1456,98 @@ if not price_history.empty:
             ),
             tooltip=[
                 alt.Tooltip(
-                    "date_label:N",
-                    title="Observation",
+                    "neighbourhood_label:N",
+                    title="Quartier",
                 ),
                 alt.Tooltip(
-                    "indicator_label:N",
-                    title="Indicateur",
+                    "previous_listing_count:Q",
+                    title="Annonces précédentes",
+                    format=",d",
                 ),
                 alt.Tooltip(
-                    "price:Q",
-                    title="Prix",
-                    format=".2f",
+                    "current_listing_count:Q",
+                    title="Annonces actuelles",
+                    format=",d",
+                ),
+                alt.Tooltip(
+                    "net_listing_change:Q",
+                    title="Variation nette",
+                    format="+,d",
+                ),
+                alt.Tooltip(
+                    "net_listing_change_pct:Q",
+                    title="Variation (%)",
+                    format="+.1f",
                 ),
             ],
         )
         .properties(
-            height=320,
+            height=max(
+                300,
+                len(
+                    transition_chart_data
+                ) * 32,
+            )
         )
     )
-
 
     st.altair_chart(
-        historical_chart,
+        transition_bars,
         use_container_width=True,
     )
-
-
-else:
-
-    st.info(
-        "Aucun historique tarifaire exploitable n'est disponible."
-    )
-
-
-# ============================================================
-# Historical price coverage
-# ============================================================
-
-st.write("")
-
-section_header(
-    "Couverture tarifaire historique",
-    (
-        "Part des annonces disposant d'un prix "
-        "pour chaque observation."
-    ),
-)
-
-
-coverage_history = market.copy()
-
-coverage_history["price_coverage_pct"] = (
-    100.0
-    * coverage_history["listings_with_price"]
-    / coverage_history["listing_count"]
-)
-
-coverage_history["date_label"] = (
-    coverage_history["snapshot_date"]
-    .apply(format_date_fr)
-)
-
-coverage_history["coverage_label"] = (
-    coverage_history["price_coverage_pct"]
-    .apply(format_percent)
-)
-
-coverage_history = coverage_history.sort_values(
-    "snapshot_date"
-)
-
-coverage_date_order = (
-    coverage_history["date_label"].tolist()
-)
-
-
-coverage_bars = (
-    alt.Chart(coverage_history)
-    .mark_bar(
-        cornerRadiusTopLeft=4,
-        cornerRadiusTopRight=4,
-        size=52,
-    )
-    .encode(
-        x=alt.X(
-            "date_label:N",
-            title=None,
-            sort=coverage_date_order,
-            axis=alt.Axis(
-                labelAngle=0,
-                labelPadding=10,
-            ),
-        ),
-        y=alt.Y(
-            "price_coverage_pct:Q",
-            title="Couverture tarifaire (%)",
-            scale=alt.Scale(
-                domain=[0, 100],
-            ),
-        ),
-        color=alt.condition(
-            alt.datum.price_coverage_pct > 0,
-            alt.value("#2563EB"),
-            alt.value("#D1D5DB"),
-        ),
-        tooltip=[
-            alt.Tooltip(
-                "date_label:N",
-                title="Observation",
-            ),
-            alt.Tooltip(
-                "listing_count:Q",
-                title="Annonces observées",
-                format=",d",
-            ),
-            alt.Tooltip(
-                "listings_with_price:Q",
-                title="Annonces avec prix",
-                format=",d",
-            ),
-            alt.Tooltip(
-                "price_coverage_pct:Q",
-                title="Couverture",
-                format=".1f",
-            ),
-        ],
-    )
-    .properties(
-        height=280,
-    )
-)
-
-
-coverage_labels = (
-    alt.Chart(coverage_history)
-    .mark_text(
-        dy=-10,
-        fontSize=12,
-    )
-    .encode(
-        x=alt.X(
-            "date_label:N",
-            sort=coverage_date_order,
-        ),
-        y=alt.Y(
-            "price_coverage_pct:Q",
-        ),
-        text=alt.Text(
-            "coverage_label:N",
-        ),
-    )
-)
-
-
-st.altair_chart(
-    coverage_bars + coverage_labels,
-    use_container_width=True,
-)
-
-
-note(
-    "L'observation du 22/12/2025 ne contient aucune information "
-    "tarifaire. Cette absence de données ne correspond pas à "
-    "un niveau de prix égal à 0 €."
-)
-
-
-# ============================================================
-# Comparable price transition
-# ============================================================
-
-st.divider()
-
-section_header(
-    "Évolution à annonces comparables",
-    (
-        "Évolution des prix pour les annonces disposant "
-        "d'un prix dans deux observations consécutives."
-    ),
-)
-
-
-current_transition = transitions[
-    (
-        transitions["snapshot_date"]
-        == selected_snapshot
-    )
-    & (
-        transitions["transition_type"]
-        .astype(str)
-        .str.upper()
-        == "CONSECUTIVE"
-    )
-].copy()
-
-
-if current_transition.empty:
-
-    insight_box(
-        "Aucune comparaison consécutive disponible",
-        (
-            "Cette observation ne dispose pas d'une transition "
-            "consécutive exploitable pour comparer les prix "
-            "à population comparable."
-        ),
-    )
-
-
-else:
-
-    current_transition = (
-        current_transition
-        .sort_values(
-            "previous_snapshot_date",
-            ascending=False,
-        )
-        .iloc[0]
-    )
-
-
-    previous_snapshot_date = (
-        current_transition[
-            "previous_snapshot_date"
-        ]
-    )
-
-    comparable_listing_count = (
-        current_transition[
-            "comparable_listing_count"
-        ]
-    )
-
-    comparable_coverage_pct = (
-        current_transition[
-            "comparable_price_coverage_pct"
-        ]
-    )
-
-
-    insight_box(
-        (
-            f"Du {format_date_fr(previous_snapshot_date)} "
-            f"au {format_date_fr(selected_snapshot)}"
-        ),
-        (
-            f"L'analyse porte sur "
-            f"{format_integer(comparable_listing_count)} annonces "
-            f"disposant d'un prix exploitable dans les deux "
-            f"observations consécutives, soit une couverture "
-            f"comparable de "
-            f"{format_percent(comparable_coverage_pct)}."
-        ),
-    )
-
-
-    kpi_grid(
-        [
-            {
-                "label": "Annonces comparables",
-                "value": format_integer(
-                    comparable_listing_count
-                ),
-                "detail": (
-                    f"Couverture : "
-                    f"{format_percent(comparable_coverage_pct)}"
-                ),
-            },
-            {
-                "label": "Prix médian précédent",
-                "value": format_currency(
-                    current_transition[
-                        "median_previous_price"
-                    ]
-                ),
-                "detail": format_date_fr(
-                    previous_snapshot_date
-                ),
-            },
-            {
-                "label": "Prix médian actuel",
-                "value": format_currency(
-                    current_transition[
-                        "median_current_price"
-                    ]
-                ),
-                "detail": format_date_fr(
-                    selected_snapshot
-                ),
-            },
-            {
-                "label": "Variation médiane",
-                "value": format_currency(
-                    current_transition[
-                        "median_price_change"
-                    ],
-                    decimals=2,
-                ),
-                "detail": (
-                    f"{format_percent(current_transition['median_price_change_pct'])} "
-                    f"par rapport à l'observation précédente"
-                ),
-            },
-        ],
-        columns=2,
-    )
-
-
-    # ========================================================
-    # Direction of price movements
-    # ========================================================
 
     st.write("")
 
     section_header(
-        "Sens des évolutions",
+        "Mouvements territoriaux",
         (
-            "Répartition des annonces comparables selon "
-            "l'évolution de leur prix."
+            "Entrées et sorties observables entre quartiers "
+            "sur deux snapshots consécutifs."
         ),
     )
 
-
-    price_movements = pd.DataFrame(
+    movement_summary = pd.DataFrame(
         {
             "movement": [
-                "En hausse",
-                "En baisse",
-                "Inchangé",
+                "Entrées dans un quartier",
+                "Sorties d'un quartier",
             ],
-            "count": [
-                current_transition[
-                    "price_increase_count"
-                ],
-                current_transition[
-                    "price_decrease_count"
-                ],
-                current_transition[
-                    "unchanged_price_count"
-                ],
-            ],
-            "share_pct": [
-                current_transition[
-                    "price_increase_share_pct"
-                ],
-                current_transition[
-                    "price_decrease_share_pct"
-                ],
-                current_transition[
-                    "unchanged_price_share_pct"
-                ],
+            "listing_count": [
+                total_moved_in,
+                total_moved_out,
             ],
         }
     )
 
-
-    price_movements["label"] = (
-        price_movements.apply(
-            lambda row: (
-                f"{format_integer(row['count'])} · "
-                f"{format_percent(row['share_pct'])}"
-            ),
-            axis=1,
-        )
-    )
-
-
-    movement_order = [
-        "En hausse",
-        "En baisse",
-        "Inchangé",
-    ]
-
-
-    movement_bars = (
-        alt.Chart(price_movements)
+    movement_chart = (
+        alt.Chart(movement_summary)
         .mark_bar(
-            cornerRadiusEnd=4,
-            size=28,
+            cornerRadiusTopLeft=4,
+            cornerRadiusTopRight=4,
         )
         .encode(
-            y=alt.Y(
+            x=alt.X(
                 "movement:N",
                 title=None,
-                sort=movement_order,
                 axis=alt.Axis(
-                    labelPadding=10,
+                    labelAngle=0,
                 ),
             ),
-            x=alt.X(
-                "count:Q",
-                title="Nombre d'annonces comparables",
+            y=alt.Y(
+                "listing_count:Q",
+                title="Nombre d'annonces",
             ),
             color=alt.Color(
                 "movement:N",
                 title=None,
                 scale=alt.Scale(
-                    domain=movement_order,
+                    domain=[
+                        "Entrées dans un quartier",
+                        "Sorties d'un quartier",
+                    ],
                     range=[
-                        "#2563EB",
-                        "#EF4444",
-                        "#9CA3AF",
+                        CHART_GREEN,
+                        CHART_RED,
                     ],
                 ),
                 legend=None,
@@ -1086,117 +1555,146 @@ else:
             tooltip=[
                 alt.Tooltip(
                     "movement:N",
-                    title="Évolution",
+                    title="Mouvement",
                 ),
                 alt.Tooltip(
-                    "count:Q",
+                    "listing_count:Q",
                     title="Annonces",
                     format=",d",
-                ),
-                alt.Tooltip(
-                    "share_pct:Q",
-                    title="Part",
-                    format=".1f",
                 ),
             ],
         )
         .properties(
-            height=220,
+            height=260,
         )
     )
-
-
-    movement_labels = (
-        alt.Chart(price_movements)
-        .mark_text(
-            align="left",
-            baseline="middle",
-            dx=8,
-            fontSize=12,
-        )
-        .encode(
-            y=alt.Y(
-                "movement:N",
-                sort=movement_order,
-            ),
-            x=alt.X(
-                "count:Q",
-            ),
-            text=alt.Text(
-                "label:N",
-            ),
-        )
-    )
-
 
     st.altair_chart(
-        movement_bars + movement_labels,
+        movement_chart,
         use_container_width=True,
     )
 
-
-    transition_grid(
-        [
-            {
-                "label": "En hausse",
-                "value": format_integer(
-                    current_transition[
-                        "price_increase_count"
-                    ]
-                ),
-                "detail": (
-                    f"{format_percent(current_transition['price_increase_share_pct'])} "
-                    f"des annonces comparables"
-                ),
-            },
-            {
-                "label": "En baisse",
-                "value": format_integer(
-                    current_transition[
-                        "price_decrease_count"
-                    ]
-                ),
-                "detail": (
-                    f"{format_percent(current_transition['price_decrease_share_pct'])} "
-                    f"des annonces comparables"
-                ),
-            },
-            {
-                "label": "Inchangé",
-                "value": format_integer(
-                    current_transition[
-                        "unchanged_price_count"
-                    ]
-                ),
-                "detail": (
-                    f"{format_percent(current_transition['unchanged_price_share_pct'])} "
-                    f"des annonces comparables"
-                ),
-            },
-            {
-                "label": "Écart moyen",
-                "value": format_currency(
-                    current_transition[
-                        "average_price_change"
-                    ],
-                    decimals=2,
-                ),
-                "detail": (
-                    f"{format_percent(current_transition['average_price_change_pct'])} "
-                    f"en moyenne"
-                ),
-            },
-        ],
-        columns=2,
-    )
-
-
     note(
-        "La comparaison porte uniquement sur les annonces disposant "
-        "d'un prix dans deux observations consécutives. Les transitions "
-        "de type AFTER_GAP sont volontairement exclues afin de ne pas "
-        "mélanger des périodes comportant des observations manquantes."
+        "Un changement de quartier est directement observable "
+        "uniquement lorsqu'une annonce est présente dans deux "
+        "snapshots consécutifs et que son quartier change. "
+        "Une annonce réapparue après une absence reste classée "
+        "comme retour après gap, car son éventuel déplacement "
+        "pendant la période non observée ne peut pas être daté."
     )
+
+
+# ============================================================
+# Detailed table
+# ============================================================
+
+st.divider()
+
+section_header(
+    "Détail des quartiers",
+    (
+        "Vue synthétique des principaux indicateurs "
+        "de l'observation sélectionnée."
+    ),
+)
+
+
+detail = current[
+    [
+        "neighbourhood_label",
+        "listing_count",
+        "market_share_pct",
+        "host_count",
+        "entire_home_share_pct",
+        "superhost_listing_share_pct",
+        "median_price",
+        "price_coverage_pct",
+        "average_availability_rate_pct",
+        "reconstructed_review_count_l90d",
+    ]
+].copy()
+
+
+detail = detail.rename(
+    columns={
+        "neighbourhood_label": "Quartier",
+        "listing_count": "Annonces",
+        "market_share_pct": "Part du marché",
+        "host_count": "Hôtes",
+        "entire_home_share_pct": "Logements entiers",
+        "superhost_listing_share_pct": (
+            "Annonces Superhost"
+        ),
+        "median_price": "Prix médian",
+        "price_coverage_pct": (
+            "Couverture tarifaire"
+        ),
+        "average_availability_rate_pct": (
+            "Disponibilité moyenne"
+        ),
+        "reconstructed_review_count_l90d": (
+            "Reviews L90D"
+        ),
+    }
+)
+
+
+detail["Annonces"] = (
+    detail["Annonces"]
+    .apply(format_integer)
+)
+
+detail["Hôtes"] = (
+    detail["Hôtes"]
+    .apply(format_integer)
+)
+
+detail["Part du marché"] = (
+    detail["Part du marché"]
+    .apply(format_percent)
+)
+
+detail["Logements entiers"] = (
+    detail["Logements entiers"]
+    .apply(format_percent)
+)
+
+detail["Annonces Superhost"] = (
+    detail["Annonces Superhost"]
+    .apply(format_percent)
+)
+
+detail["Prix médian"] = (
+    detail["Prix médian"]
+    .apply(format_optional_currency)
+)
+
+detail["Couverture tarifaire"] = (
+    detail["Couverture tarifaire"]
+    .apply(format_percent)
+)
+
+detail["Disponibilité moyenne"] = (
+    detail["Disponibilité moyenne"]
+    .apply(format_optional_percent)
+)
+
+detail["Reviews L90D"] = (
+    detail["Reviews L90D"]
+    .apply(format_integer)
+)
+
+
+st.dataframe(
+    detail,
+    hide_index=True,
+    use_container_width=True,
+    column_config={
+        "Quartier": st.column_config.TextColumn(
+            width="large",
+        ),
+    },
+)
 
 
 # ============================================================
@@ -1206,42 +1704,47 @@ else:
 st.write("")
 
 with st.expander(
-    "Comment interpréter les prix ?"
+    "Comment interpréter l'analyse par quartier ?"
 ):
 
     st.markdown(
         """
-**Prix moyen et médian**
+**Quartier**
 
-Les indicateurs tarifaires portent uniquement sur les annonces pour
-lesquelles Inside Airbnb fournit un prix exploitable. Le prix médian
-est moins sensible aux valeurs extrêmes que le prix moyen.
+Le découpage territorial correspond à la valeur `neighbourhood`
+fournie dans les données préparées à partir d'Inside Airbnb.
+Sa nature peut varier selon la localisation étudiée : il ne faut
+donc pas supposer qu'il s'agit systématiquement d'un arrondissement
+administratif.
 
-**Couverture tarifaire**
+**Prix**
 
-La couverture correspond à la part des annonces observées disposant
-d'un prix. Elle doit être prise en compte lors de toute comparaison
-entre deux snapshots.
+Les indicateurs tarifaires sont calculés uniquement sur les annonces
+disposant d'un prix exploitable. La couverture tarifaire doit être
+prise en compte lors de la comparaison entre quartiers.
 
-**Distribution**
+**Disponibilité**
 
-Les tranches tarifaires sont calculées uniquement parmi les annonces
-disposant d'un prix. Les annonces sans information tarifaire sont
-exclues du graphique et du tableau de distribution.
+La disponibilité correspond aux jours publiquement observés comme
+disponibles dans les calendriers Airbnb. Elle ne constitue pas une
+mesure directe de vacance ou d'occupation.
 
-**Comparaison à annonces comparables**
+**Reviews**
 
-La comparaison utilise uniquement les transitions consécutives.
-Une annonce doit disposer d'un prix dans les deux observations pour
-être considérée comme comparable.
+Les volumes récents de reviews sont reconstruits à partir des données
+de reviews disponibles jusqu'à la date du snapshot. Ils constituent
+un indicateur d'activité observable, et non un nombre direct de
+séjours.
 
-Les transitions après une absence (`AFTER_GAP`) sont exclues de cette
-lecture afin de ne pas assimiler une comparaison espacée dans le temps
-à une évolution entre deux snapshots successifs.
+**Transitions**
 
-**Limite**
+Une disparition signifie qu'une annonce observée au snapshot
+précédent n'est plus observée au snapshot courant. Cela ne démontre
+pas une sortie permanente d'Airbnb.
 
-Le prix observé dans Inside Airbnb ne constitue ni un revenu réalisé,
-ni un prix effectivement payé par un voyageur.
+Les mouvements géographiques ne sont directement observables que
+pour les annonces présentes dans deux snapshots consécutifs.
+Une annonce réobservée après une période d'absence est identifiée
+comme un retour après gap.
         """
     )
