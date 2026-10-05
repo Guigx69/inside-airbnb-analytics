@@ -18,7 +18,7 @@ from ui.formatters import (
 )
 
 from ui.config import MARTS, get_session
-from ui.sidebar import render_sidebar
+from ui.sidebar import format_location_name, render_sidebar
 
 from ui.styles import apply_global_styles
 
@@ -69,8 +69,38 @@ def load_market_data():
 market, transitions = load_market_data()
 
 # ============================================================
-# Snapshot selection
+# Geographic context and snapshot selection
 # ============================================================
+
+selected_country, selected_city, selected_snapshot = render_sidebar()
+
+selected_snapshot = pd.to_datetime(
+    selected_snapshot
+).date()
+
+
+# ============================================================
+# Geographic filtering
+# ============================================================
+
+market = market[
+    (market["source_country"] == selected_country)
+    & (market["source_city"] == selected_city)
+].copy()
+
+transitions = transitions[
+    (transitions["source_country"] == selected_country)
+    & (transitions["source_city"] == selected_city)
+].copy()
+
+
+if market.empty:
+    st.error(
+        "Aucune donnée de marché n'est disponible "
+        "pour la localisation sélectionnée."
+    )
+    st.stop()
+
 
 snapshot_dates = sorted(
     market["snapshot_date"]
@@ -79,14 +109,10 @@ snapshot_dates = sorted(
     .tolist()
 )
 
-selected_snapshot = render_sidebar(
-    snapshot_dates=snapshot_dates,
-)
 
-selected_snapshot = pd.to_datetime(
-    selected_snapshot
-).date()
-
+# ============================================================
+# Selected observation
+# ============================================================
 
 current_market_df = market[
     market["snapshot_date"] == selected_snapshot
@@ -100,6 +126,7 @@ if current_market_df.empty:
     st.stop()
 
 current_market = current_market_df.iloc[0]
+
 
 transition_df = transitions[
     transitions["snapshot_date"] == selected_snapshot
@@ -157,11 +184,15 @@ page_header(
     title="Marché",
     icon="📈",
     subtitle=(
-        "Évolution de l'offre Airbnb à Lyon et dynamique "
+        "Évolution de l'offre Airbnb à "
+        f"{format_location_name(selected_city)} et dynamique "
         "des annonces entre les observations historiques."
     ),
     badges=[
-        "🇫🇷 Lyon, France",
+        (
+            f"📍 {format_location_name(selected_city)}, "
+            f"{format_location_name(selected_country)}"
+        ),
         f"📅 {format_date_fr(selected_snapshot)}",
         f"🗂️ {len(snapshot_dates)} observations historiques",
     ],
@@ -572,7 +603,7 @@ with st.expander(
     st.markdown(
         """
 Les mouvements sont reconstruits à partir de la présence d'une
-annonce dans les différents observations historiques.
+annonce dans les différentes observations historiques.
 
 - **Conservée** : présente dans les deux observations consécutives.
 - **Disparue** : présente précédemment mais absente actuellement.
