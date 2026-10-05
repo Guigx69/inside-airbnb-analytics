@@ -1,0 +1,147 @@
+﻿version: 2
+
+models:
+  - name: mart_market_snapshot
+    description: >
+      Market-level analytical mart for each Inside Airbnb snapshot.
+      The model has one row per country, city and snapshot date.
+      It aggregates the observed listing population and exposes supply,
+      pricing, availability, review, host and historical observation metrics.
+
+    columns:
+      - name: source_country
+        description: Country associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: source_city
+        description: City associated with the source dataset.
+        data_tests:
+          - not_null
+
+      - name: snapshot_date
+        description: Date of the Inside Airbnb snapshot.
+        data_tests:
+          - not_null
+
+      - name: listing_count
+        description: Number of listings observed in the market snapshot.
+        data_tests:
+          - not_null
+
+      - name: entire_home_listing_count
+        description: Number of listings with room type Entire home/apt.
+        data_tests:
+          - not_null
+
+      - name: private_room_listing_count
+        description: Number of listings with room type Private room.
+        data_tests:
+          - not_null
+
+      - name: shared_room_listing_count
+        description: Number of listings with room type Shared room.
+        data_tests:
+          - not_null
+
+      - name: listings_with_price
+        description: Number of listings with a non-null price.
+        data_tests:
+          - not_null
+
+      - name: average_price
+        description: >
+          Average listing price for listings with available price data.
+          Null when no listing in the market snapshot has a price.
+
+      - name: median_price
+        description: >
+          Median listing price for listings with available price data.
+          Null when no listing in the market snapshot has a price.
+
+      - name: average_availability_rate_pct
+        description: >
+          Average reconstructed calendar availability rate across listings
+          observed in the market snapshot.
+        data_tests:
+          - not_null
+
+      - name: average_availability_30
+        description: >
+          Average native 30-day availability across listings observed in
+          the market snapshot.
+        data_tests:
+          - not_null
+
+      - name: average_availability_365
+        description: >
+          Average native 365-day availability across listings observed in
+          the market snapshot.
+        data_tests:
+          - not_null
+
+      - name: native_review_count_total
+        description: >
+          Sum of the native Inside Airbnb number_of_reviews metric across
+          listings observed in the market snapshot.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_total
+        description: >
+          Total reconstructed review count as of the snapshot date across
+          listings observed in the market.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l30d
+        description: >
+          Total number of reconstructed reviews during the 30-day window
+          ending on the snapshot date.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l90d
+        description: >
+          Total number of reconstructed reviews during the 90-day window
+          ending on the snapshot date.
+        data_tests:
+          - not_null
+
+      - name: reconstructed_review_count_l365d
+        description: >
+          Total number of reconstructed reviews during the 365-day window
+          ending on the snapshot date.
+        data_tests:
+          - not_null
+
+      - name: host_count
+        description: Number of distinct hosts observed in the market snapshot.
+        data_tests:
+          - not_null
+
+      - name: superhost_listing_count
+        description: Number of observed listings whose host is a superhost.
+        data_tests:
+          - not_null
+
+      - name: first_observation_count
+        description: >
+          Number of listings for which this snapshot is the first observation
+          in the available historical dataset.
+        data_tests:
+          - not_null
+
+      - name: last_observation_count
+        description: >
+          Number of listings for which this snapshot is the last observation
+          in the available historical dataset.
+        data_tests:
+          - not_null
+
+      - name: gap_observation_count
+        description: >
+          Number of listings whose observation history contains at least one
+          gap between available market snapshots.
+        data_tests:
+          - not_null
