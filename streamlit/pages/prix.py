@@ -1,4 +1,3 @@
-import os
 import altair as alt
 import pandas as pd
 import streamlit as st
@@ -19,6 +18,7 @@ from ui.formatters import (
     format_signed_currency,
     format_signed_percent,
 )
+from ui.config import MARTS, get_session
 from ui.sidebar import render_sidebar
 from ui.styles import apply_global_styles
 
@@ -33,25 +33,20 @@ apply_global_styles()
 # Snowflake connection
 # ============================================================
 
-conn = st.connection(
-    "snowflake",
-    ttl=os.getenv("SNOWFLAKE_CONNECTION_TTL"),
-)
-
-session = conn.session()
+session = get_session()
 
 # =============================================================================
 # Configuration
 # =============================================================================
 
-MARKET_TABLE = "AIRBNB.DBT_GGILLET_MARTS.MART_MARKET_SNAPSHOT"
+MARKET_TABLE = f"{MARTS}.MART_MARKET_SNAPSHOT"
 
 PRICE_DISTRIBUTION_TABLE = (
-    "AIRBNB.DBT_GGILLET_MARTS.MART_PRICE_DISTRIBUTION_SNAPSHOT"
+    f"{MARTS}.MART_PRICE_DISTRIBUTION_SNAPSHOT"
 )
 
 PRICE_TRANSITION_TABLE = (
-    "AIRBNB.DBT_GGILLET_MARTS.MART_PRICE_TRANSITION"
+    f"{MARTS}.MART_PRICE_TRANSITION"
 )
 
 CHART_BLUE = "#356DCC"

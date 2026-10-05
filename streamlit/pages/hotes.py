@@ -1,4 +1,3 @@
-import os
 
 import altair as alt
 import pandas as pd
@@ -17,6 +16,7 @@ from ui.formatters import (
     format_integer,
     format_percent,
 )
+from ui.config import MARTS, get_session
 from ui.sidebar import render_sidebar
 from ui.styles import apply_global_styles
 
@@ -32,12 +32,7 @@ apply_global_styles()
 # Snowflake connection
 # ============================================================
 
-conn = st.connection(
-    "snowflake",
-    ttl=os.getenv("SNOWFLAKE_CONNECTION_TTL"),
-)
-
-session = conn.session()
+session = get_session()
 
 
 # ============================================================
@@ -45,7 +40,7 @@ session = conn.session()
 # ============================================================
 
 HOST_TABLE = (
-    "AIRBNB.DBT_GGILLET_MARTS."
+    f"{MARTS}."
     "MART_HOST_SNAPSHOT"
 )
 

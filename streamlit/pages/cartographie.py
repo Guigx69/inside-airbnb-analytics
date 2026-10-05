@@ -8,7 +8,6 @@ Version Snowflake-native :
 """
 
 import json
-import os
 
 import altair as alt
 import pandas as pd
@@ -17,6 +16,13 @@ import streamlit as st
 
 from ui.components import page_header, section_header, note
 from ui.formatters import format_date_fr, format_integer
+from ui.config import (
+    DATABASE,
+    MARTS_SCHEMA,
+    FCT_LISTING_SNAPSHOT,
+    REF_LYON_ARRONDISSEMENTS,
+    get_session,
+)
 from ui.sidebar import render_sidebar
 from ui.styles import apply_global_styles
 
@@ -27,8 +33,8 @@ from ui.styles import apply_global_styles
 
 apply_global_styles()
 
-MART = "AIRBNB.DBT_GGILLET_MARTS.FCT_LISTING_SNAPSHOT"
-BOUNDARIES_TABLE = "AIRBNB.DBT_GGILLET_MARTS.REF_LYON_ARRONDISSEMENTS"
+MART = FCT_LISTING_SNAPSHOT
+BOUNDARIES_TABLE = REF_LYON_ARRONDISSEMENTS
 BLUE = "#356DCC"
 
 INDICATORS = {
@@ -37,8 +43,7 @@ INDICATORS = {
     "Couverture tarifaire (%)": "price_coverage",
 }
 
-conn = st.connection("snowflake", ttl=os.getenv("SNOWFLAKE_CONNECTION_TTL"))
-session = conn.session()
+session = get_session()
 
 
 # ============================================================
@@ -93,10 +98,10 @@ def load_geo_data():
     columns = {
         row["COLUMN_NAME"].upper()
         for row in session.sql(
-            """
+            f"""
             SELECT COLUMN_NAME
-            FROM AIRBNB.INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = 'DBT_GGILLET_MARTS'
+            FROM {DATABASE}.INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = '{MARTS_SCHEMA}'
               AND TABLE_NAME = 'FCT_LISTING_SNAPSHOT'
             """
         ).collect()

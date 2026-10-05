@@ -3,8 +3,8 @@
 import altair as alt
 import pandas as pd
 import streamlit as st
-from snowflake.snowpark.context import get_active_session
 
+from ui.config import MARTS, get_session
 from ui.components import page_header, section_header
 from ui.formatters import format_date_fr
 from ui.styles import apply_global_styles
@@ -16,7 +16,6 @@ from ui.styles import apply_global_styles
 
 apply_global_styles()
 
-MARTS = "AIRBNB.DBT_GGILLET_MARTS"
 CHART_BLUE = "#356DCC"
 CHART_LIGHT_BLUE = "#79B8F3"
 
@@ -152,7 +151,7 @@ def grouped_chart(frame, category, value, order=None, horizontal=False, height=3
 
 @st.cache_data(ttl=600, show_spinner=False)
 def load_data():
-    session = get_active_session()
+    session = get_session()
 
     market = session.sql(f"""
         SELECT

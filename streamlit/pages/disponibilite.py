@@ -1,4 +1,3 @@
-import os
 
 import altair as alt
 import pandas as pd
@@ -17,6 +16,7 @@ from ui.formatters import (
     format_month_fr,
     format_percent,
 )
+from ui.config import MARTS, get_session
 from ui.sidebar import render_sidebar
 from ui.styles import apply_global_styles
 
@@ -32,12 +32,7 @@ apply_global_styles()
 # Snowflake connection
 # ============================================================
 
-conn = st.connection(
-    "snowflake",
-    ttl=os.getenv("SNOWFLAKE_CONNECTION_TTL"),
-)
-
-session = conn.session()
+session = get_session()
 
 
 # ============================================================
@@ -45,12 +40,12 @@ session = conn.session()
 # ============================================================
 
 HORIZON_TABLE = (
-    "AIRBNB.DBT_GGILLET_MARTS."
+    f"{MARTS}."
     "MART_AVAILABILITY_HORIZON_SNAPSHOT"
 )
 
 MONTHLY_TABLE = (
-    "AIRBNB.DBT_GGILLET_MARTS."
+    f"{MARTS}."
     "MART_CALENDAR_MONTH_SNAPSHOT"
 )
 

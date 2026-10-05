@@ -1,8 +1,8 @@
-import os
 import altair as alt
 import pandas as pd
 import streamlit as st
 
+from ui.config import MARTS, get_session
 from ui.sidebar import render_sidebar
 
 from ui.components import (
@@ -36,12 +36,7 @@ apply_global_styles()
 # Snowflake connection
 # ============================================================
 
-conn = st.connection(
-    "snowflake",
-    ttl=os.getenv("SNOWFLAKE_CONNECTION_TTL"),
-)
-
-session = conn.session()
+session = get_session()
 
 # ============================================================
 # Data loading
@@ -50,27 +45,27 @@ session = conn.session()
 @st.cache_data(ttl=3600)
 def load_data():
 
-    market = session.sql("""
+    market = session.sql(f"""
         SELECT *
-        FROM AIRBNB.DBT_GGILLET_MARTS.MART_MARKET_SNAPSHOT
+        FROM {MARTS}.MART_MARKET_SNAPSHOT
         ORDER BY SNAPSHOT_DATE
     """).to_pandas()
 
-    availability = session.sql("""
+    availability = session.sql(f"""
         SELECT *
-        FROM AIRBNB.DBT_GGILLET_MARTS.MART_AVAILABILITY_HORIZON_SNAPSHOT
+        FROM {MARTS}.MART_AVAILABILITY_HORIZON_SNAPSHOT
         ORDER BY SNAPSHOT_DATE
     """).to_pandas()
 
-    hosts = session.sql("""
+    hosts = session.sql(f"""
         SELECT *
-        FROM AIRBNB.DBT_GGILLET_MARTS.MART_HOST_SNAPSHOT
+        FROM {MARTS}.MART_HOST_SNAPSHOT
         ORDER BY SNAPSHOT_DATE
     """).to_pandas()
 
-    transitions = session.sql("""
+    transitions = session.sql(f"""
         SELECT *
-        FROM AIRBNB.DBT_GGILLET_MARTS.MART_MARKET_TRANSITION
+        FROM {MARTS}.MART_MARKET_TRANSITION
         ORDER BY SNAPSHOT_DATE
     """).to_pandas()
 

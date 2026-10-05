@@ -1,4 +1,3 @@
-import os
 
 import altair as alt
 import pandas as pd
@@ -18,6 +17,7 @@ from ui.formatters import (
     format_integer,
     format_percent,
 )
+from ui.config import MARTS, get_session
 from ui.sidebar import render_sidebar
 from ui.styles import apply_global_styles
 
@@ -33,12 +33,7 @@ apply_global_styles()
 # Snowflake connection
 # ============================================================
 
-conn = st.connection(
-    "snowflake",
-    ttl=os.getenv("SNOWFLAKE_CONNECTION_TTL"),
-)
-
-session = conn.session()
+session = get_session()
 
 
 # ============================================================
@@ -48,7 +43,7 @@ session = conn.session()
 @st.cache_data(ttl=3600)
 def load_price_data():
 
-    market = session.sql("""
+    market = session.sql(f"""
         SELECT
             SOURCE_COUNTRY,
             SOURCE_CITY,
@@ -57,13 +52,13 @@ def load_price_data():
             LISTINGS_WITH_PRICE,
             AVERAGE_PRICE,
             MEDIAN_PRICE
-        FROM AIRBNB.DBT_GGILLET_MARTS.MART_MARKET_SNAPSHOT
+        FROM {MARTS}.MART_MARKET_SNAPSHOT
         WHERE LOWER(SOURCE_COUNTRY) = 'france'
           AND LOWER(SOURCE_CITY) = 'lyon'
         ORDER BY SNAPSHOT_DATE
     """).to_pandas()
 
-    distribution = session.sql("""
+    distribution = session.sql(f"""
         SELECT
             SOURCE_COUNTRY,
             SOURCE_CITY,
@@ -78,7 +73,7 @@ def load_price_data():
             MAX_PRICE,
             MARKET_LISTING_SHARE_PCT,
             PRICED_LISTING_SHARE_PCT
-        FROM AIRBNB.DBT_GGILLET_MARTS.MART_PRICE_DISTRIBUTION_SNAPSHOT
+        FROM {MARTS}.MART_PRICE_DISTRIBUTION_SNAPSHOT
         WHERE LOWER(SOURCE_COUNTRY) = 'france'
           AND LOWER(SOURCE_CITY) = 'lyon'
         ORDER BY
@@ -86,7 +81,7 @@ def load_price_data():
             PRICE_BAND_ORDER
     """).to_pandas()
 
-    transitions = session.sql("""
+    transitions = session.sql(f"""
         SELECT
             SOURCE_COUNTRY,
             SOURCE_CITY,
@@ -114,7 +109,7 @@ def load_price_data():
             PRICE_INCREASE_SHARE_PCT,
             PRICE_DECREASE_SHARE_PCT,
             UNCHANGED_PRICE_SHARE_PCT
-        FROM AIRBNB.DBT_GGILLET_MARTS.MART_PRICE_TRANSITION
+        FROM {MARTS}.MART_PRICE_TRANSITION
         WHERE LOWER(SOURCE_COUNTRY) = 'france'
           AND LOWER(SOURCE_CITY) = 'lyon'
         ORDER BY
