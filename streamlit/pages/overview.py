@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 
 from ui.config import MARTS, get_session
-from ui.sidebar import render_sidebar
+from ui.sidebar import format_location_name, render_sidebar
 
 from ui.components import (
     insight_box,
@@ -96,35 +96,81 @@ for dataframe in [
     ).dt.date
 
 
-snapshot_dates = market["snapshot_date"].tolist()
-
 # ============================================================
-# Sidebar
+# Sidebar / geographic context
 # ============================================================
 
-selected_snapshot = render_sidebar(
-    snapshot_dates=snapshot_dates,
-)
+selected_country, selected_city, selected_snapshot = render_sidebar()
 
 selected_snapshot = pd.to_datetime(
     selected_snapshot
 ).date()
 
 # ============================================================
+# Selected location
+# ============================================================
+
+def filter_location(dataframe):
+    return dataframe[
+        (dataframe["source_country"] == selected_country)
+        & (dataframe["source_city"] == selected_city)
+    ].copy()
+
+
+market = filter_location(market)
+availability = filter_location(availability)
+hosts = filter_location(hosts)
+transitions = filter_location(transitions)
+
+snapshot_dates = sorted(
+    market["snapshot_date"]
+    .dropna()
+    .unique()
+    .tolist()
+)
+
+# ============================================================
 # Selected snapshot
 # ============================================================
 
-current_market = market[
+current_market_df = market[
     market["snapshot_date"] == selected_snapshot
-].iloc[0]
+]
 
-current_availability = availability[
+if current_market_df.empty:
+    st.error(
+        "Aucune donnée marché n'est disponible "
+        "pour la localisation et l'observation sélectionnées."
+    )
+    st.stop()
+
+current_market = current_market_df.iloc[0]
+
+current_availability_df = availability[
     availability["snapshot_date"] == selected_snapshot
-].iloc[0]
+]
 
-current_hosts = hosts[
+if current_availability_df.empty:
+    st.error(
+        "Aucune donnée de disponibilité n'est disponible "
+        "pour la localisation et l'observation sélectionnées."
+    )
+    st.stop()
+
+current_availability = current_availability_df.iloc[0]
+
+current_hosts_df = hosts[
     hosts["snapshot_date"] == selected_snapshot
-].iloc[0]
+]
+
+if current_hosts_df.empty:
+    st.error(
+        "Aucune donnée hôte n'est disponible "
+        "pour la localisation et l'observation sélectionnées."
+    )
+    st.stop()
+
+current_hosts = current_hosts_df.iloc[0]
 
 current_transition_df = transitions[
     transitions["snapshot_date"] == selected_snapshot
@@ -161,14 +207,18 @@ listings_per_host = (
 # Header
 # ============================================================
 
+display_country = format_location_name(selected_country)
+display_city = format_location_name(selected_city)
+
 page_header(
     title="Inside Airbnb Analytics",
     icon="🏙️",
     subtitle=(
-        "Observatoire du marché de la location courte durée à Lyon"
+        "Observatoire du marché de la location courte durée "
+        f"à {display_city}"
     ),
     badges=[
-        "🇫🇷 Lyon, France",
+        f"📍 {display_city}, {display_country}",
         f"📅 {format_date_short_fr(selected_snapshot)}",
         f"🗂️ {format_integer(len(snapshot_dates))} observations historiques",
     ],
