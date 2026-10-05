@@ -1,7 +1,7 @@
 """Cartographie V2.2.9.4 — Inside Airbnb Analytics (Lyon).
 
 Version Snowflake-native :
-- vrais contours administratifs depuis REF_LYON_ARRONDISSEMENTS ;
+- vrais contours administratifs depuis REF_GEOGRAPHIC_AREAS ;
 - vue choroplèthe par arrondissement sur les vrais contours administratifs ;
 - vue individuelle avec toutes les annonces géolocalisées ;
 - aucune dépendance PyPI/CDN supplémentaire.
@@ -20,7 +20,7 @@ from ui.config import (
     DATABASE,
     MARTS_SCHEMA,
     FCT_LISTING_SNAPSHOT,
-    REF_LYON_ARRONDISSEMENTS,
+    REF_GEOGRAPHIC_AREAS,
     get_session,
 )
 from ui.sidebar import render_sidebar
@@ -34,7 +34,7 @@ from ui.styles import apply_global_styles
 apply_global_styles()
 
 MART = FCT_LISTING_SNAPSHOT
-BOUNDARIES_TABLE = REF_LYON_ARRONDISSEMENTS
+BOUNDARIES_TABLE = REF_GEOGRAPHIC_AREAS
 BLUE = "#356DCC"
 
 INDICATORS = {
@@ -180,11 +180,14 @@ def load_boundaries():
     df = session.sql(
         f"""
         SELECT
-            CODE_INSEE,
-            ARRONDISSEMENT,
+            AREA_CODE,
+            AREA_NAME,
             ST_ASGEOJSON(GEOMETRY) AS GEOJSON
         FROM {BOUNDARIES_TABLE}
-        ORDER BY CODE_INSEE
+        WHERE LOWER(SOURCE_COUNTRY) = 'france'
+          AND LOWER(SOURCE_CITY) = 'lyon'
+          AND LOWER(AREA_LEVEL) = 'arrondissement'
+        ORDER BY AREA_CODE
         """
     ).to_pandas()
 
@@ -195,7 +198,7 @@ def load_boundaries():
         raw = row.GEOJSON
         geometry = json.loads(raw) if isinstance(raw, str) else raw
 
-        arrondissement = str(row.ARRONDISSEMENT)
+        arrondissement = str(row.AREA_NAME)
         arr_key = normalise_arrondissement(arrondissement)
         lon, lat = geometry_center(geometry)
 
@@ -203,7 +206,7 @@ def load_boundaries():
             {
                 "type": "Feature",
                 "properties": {
-                    "code_insee": str(row.CODE_INSEE),
+                    "code_insee": str(row.AREA_CODE),
                     "arrondissement": arrondissement,
                     "arr_key": arr_key,
                 },
@@ -214,7 +217,7 @@ def load_boundaries():
         if lon is not None and lat is not None:
             centers.append(
                 {
-                    "code_insee": str(row.CODE_INSEE),
+                    "code_insee": str(row.AREA_CODE),
                     "arrondissement": arrondissement,
                     "arr_key": arr_key,
                     "longitude": lon,
@@ -257,7 +260,7 @@ if geo.empty:
 
 if len(boundaries.get("features", [])) != 9:
     st.error(
-        "La table REF_LYON_ARRONDISSEMENTS doit contenir exactement "
+        "Le référentiel REF_GEOGRAPHIC_AREAS doit contenir exactement "
         "les 9 arrondissements de Lyon."
     )
     st.stop()
@@ -696,7 +699,7 @@ with st.expander("Méthodologie et limites"):
     st.markdown(
         """
         - Les contours sont les géométries administratives chargées dans
-          `REF_LYON_ARRONDISSEMENTS` à partir des données géographiques de la
+          `REF_GEOGRAPHIC_AREAS` à partir des données géographiques de la
           Métropole de Lyon.
         - En vue individuelle, chaque point correspond à une annonce disposant
           de coordonnées valides dans `FCT_LISTING_SNAPSHOT`.
