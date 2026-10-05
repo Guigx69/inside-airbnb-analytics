@@ -114,8 +114,22 @@ aggregated as (
             as available_days_365d,
 
         round(
-            100.0 * sum(available_days_365d)
-            / nullif(sum(represented_days_365d), 0),
+            100.0
+            * sum(
+                case
+                    when represented_days_365d = 365
+                    then available_days_365d
+                end
+            )
+            / nullif(
+                sum(
+                    case
+                        when represented_days_365d = 365
+                        then represented_days_365d
+                    end
+                ),
+                0
+            ),
             2
         ) as market_availability_rate_365d_pct,
 

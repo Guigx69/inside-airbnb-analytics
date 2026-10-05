@@ -123,7 +123,6 @@ models:
 
       - name: availability_rate_365d_pct
         description: >
-          Percentage of represented days marked available within the full
-          365-day horizon.
-        data_tests:
-          - not_null
+          Percentage of available days over the 365-day analytical horizon.
+          This metric is null when fewer than 365 calendar days are represented
+          for the listing and snapshot.

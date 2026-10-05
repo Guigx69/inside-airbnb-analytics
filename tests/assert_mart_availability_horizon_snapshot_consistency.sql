@@ -101,11 +101,15 @@ where
     or m.available_days_365d
         <> s.expected_available_days_365d
 
-    -- Complete horizon representation
+    -- Short horizons must be completely represented
     or m.represented_days_30d <> m.listing_count * 30
     or m.represented_days_60d <> m.listing_count * 60
     or m.represented_days_90d <> m.listing_count * 90
-    or m.represented_days_365d <> m.listing_count * 365
+
+    -- The 365-day source coverage may be partial for some listings.
+    -- It must never exceed the theoretical maximum.
+    or m.represented_days_365d > m.listing_count * 365
+    or m.represented_days_365d <= 0
 
     -- Available days cannot exceed represented days
     or m.available_days_30d not between 0 and m.represented_days_30d
@@ -129,8 +133,7 @@ where
     or m.median_listing_availability_rate_90d_pct not between 0 and 100
     or m.median_listing_availability_rate_365d_pct not between 0 and 100
 
-    -- With complete equal-sized horizons, the weighted market rate
-    -- and the average listing rate must reconcile after rounding
+    -- Equal-sized complete horizons must reconcile
     or abs(
         m.market_availability_rate_30d_pct
         - m.average_listing_availability_rate_30d_pct

@@ -35,13 +35,12 @@ models:
           - not_null
 
       - name: calendar_day_count
-        description: Number of distinct calendar dates available for the listing.
+        description: >
+          Number of distinct calendar dates available for the listing.
+          Source calendar coverage may vary across locations, snapshots,
+          and individual listings.
         data_tests:
           - not_null
-          - accepted_values:
-              arguments:
-                values: [365]
-                quote: false
 
       - name: first_calendar_date
         description: First calendar date available in the source snapshot.

@@ -148,11 +148,14 @@ final as (
             2
         ) as availability_rate_90d_pct,
 
-        round(
-            100.0 * available_days_365d
-            / nullif(represented_days_365d, 0),
-            2
-        ) as availability_rate_365d_pct
+        case
+            when represented_days_365d = 365 then
+                round(
+                    100.0 * available_days_365d / 365.0,
+                    2
+                )
+            else null
+        end as availability_rate_365d_pct
 
     from aggregated
 
