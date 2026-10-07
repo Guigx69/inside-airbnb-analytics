@@ -102,24 +102,21 @@ models:
 
       - name: availability_rate_30d_pct
         description: >
-          Percentage of represented days marked available within the first
-          30-day horizon.
-        data_tests:
-          - not_null
+          Percentage of available days over the 30-day analytical horizon.
+          This metric is null when fewer than 30 calendar days are represented
+          for the listing and snapshot.
 
       - name: availability_rate_60d_pct
         description: >
-          Percentage of represented days marked available within the first
-          60-day horizon.
-        data_tests:
-          - not_null
+          Percentage of available days over the 60-day analytical horizon.
+          This metric is null when fewer than 60 calendar days are represented
+          for the listing and snapshot.
 
       - name: availability_rate_90d_pct
         description: >
-          Percentage of represented days marked available within the first
-          90-day horizon.
-        data_tests:
-          - not_null
+          Percentage of available days over the 90-day analytical horizon.
+          This metric is null when fewer than 90 calendar days are represented
+          for the listing and snapshot.
 
       - name: availability_rate_365d_pct
         description: >

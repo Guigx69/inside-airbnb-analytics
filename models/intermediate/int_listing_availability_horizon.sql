@@ -130,23 +130,32 @@ final as (
     select
         *,
 
-        round(
-            100.0 * available_days_30d
-            / nullif(represented_days_30d, 0),
-            2
-        ) as availability_rate_30d_pct,
+        case
+            when represented_days_30d = 30 then
+                round(
+                    100.0 * available_days_30d / 30.0,
+                    2
+                )
+            else null
+        end as availability_rate_30d_pct,
 
-        round(
-            100.0 * available_days_60d
-            / nullif(represented_days_60d, 0),
-            2
-        ) as availability_rate_60d_pct,
+        case
+            when represented_days_60d = 60 then
+                round(
+                    100.0 * available_days_60d / 60.0,
+                    2
+                )
+            else null
+        end as availability_rate_60d_pct,
 
-        round(
-            100.0 * available_days_90d
-            / nullif(represented_days_90d, 0),
-            2
-        ) as availability_rate_90d_pct,
+        case
+            when represented_days_90d = 90 then
+                round(
+                    100.0 * available_days_90d / 90.0,
+                    2
+                )
+            else null
+        end as availability_rate_90d_pct,
 
         case
             when represented_days_365d = 365 then

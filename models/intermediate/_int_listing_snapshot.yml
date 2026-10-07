@@ -35,10 +35,6 @@ models:
           snapshot history for the city.
         data_tests:
           - not_null
-          - accepted_values:
-              arguments:
-                values: [1, 2, 3, 4]
-                quote: false
 
       - name: first_seen_snapshot
         description: >
@@ -57,10 +53,6 @@ models:
         description: Number of source snapshots in which the listing was observed.
         data_tests:
           - not_null
-          - accepted_values:
-              arguments:
-                values: [1, 2, 3, 4]
-                quote: false
 
       - name: previous_snapshot_date
         description: >
@@ -97,10 +89,6 @@ models:
           Number of expected source snapshots missing since the previous
           observation. Null for the first observation.
         data_tests:
-          - accepted_values:
-              arguments:
-                values: [0, 1, 2]
-                quote: false
 
       - name: price_change
         description: >

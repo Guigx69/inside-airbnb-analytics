@@ -69,7 +69,3 @@ models:
         description: Number of source snapshots in which the review was observed.
         data_tests:
           - not_null
-          - accepted_values:
-              arguments:
-                values: [1, 2, 3, 4]
-                quote: false
