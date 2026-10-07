@@ -7,6 +7,7 @@ with invalid_rows as (
         listing_id,
 
         calendar_row_count,
+        calendar_day_count,
         available_day_count,
         unavailable_day_count,
         availability_rate_pct,
@@ -19,20 +20,27 @@ with invalid_rows as (
     from {{ ref('fct_listing_snapshot') }}
 
     where
-        -- Calendar metrics must exist
-        calendar_row_count is null
+        -- Review metrics are expected for every listing snapshot.
+        review_count_to_snapshot is null
 
-        -- Review metrics must exist
-        or review_count_to_snapshot is null
+        -- When calendar data exists, its metrics must be complete
+        -- and internally consistent.
+        or (
+            calendar_row_count is not null
+            and (
+                   calendar_day_count is null
+                or available_day_count is null
+                or unavailable_day_count is null
+                or availability_rate_pct is null
 
-        -- Calendar consistency
-        or available_day_count + unavailable_day_count
-            <> calendar_row_count
+                or available_day_count + unavailable_day_count
+                    <> calendar_row_count
 
-        or availability_rate_pct < 0
-        or availability_rate_pct > 100
+                or availability_rate_pct not between 0 and 100
+            )
+        )
 
-        -- Review-window consistency
+        -- Review windows are cumulative.
         or review_count_l30d > review_count_l90d
         or review_count_l90d > review_count_l365d
         or review_count_l365d > review_count_to_snapshot

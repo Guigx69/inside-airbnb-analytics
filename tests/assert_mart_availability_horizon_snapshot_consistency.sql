@@ -101,55 +101,174 @@ where
     or m.available_days_365d
         <> s.expected_available_days_365d
 
-    -- Short horizons must be completely represented
-    or m.represented_days_30d <> m.listing_count * 30
-    or m.represented_days_60d <> m.listing_count * 60
-    or m.represented_days_90d <> m.listing_count * 90
+    -- Source coverage may be partial for every analytical horizon.
+    -- Represented days must remain positive and cannot exceed
+    -- the theoretical maximum for the snapshot population.
+    or m.represented_days_30d > m.listing_count * 30
+    or m.represented_days_30d <= 0
 
-    -- The 365-day source coverage may be partial for some listings.
-    -- It must never exceed the theoretical maximum.
+    or m.represented_days_60d > m.listing_count * 60
+    or m.represented_days_60d <= 0
+
+    or m.represented_days_90d > m.listing_count * 90
+    or m.represented_days_90d <= 0
+
     or m.represented_days_365d > m.listing_count * 365
     or m.represented_days_365d <= 0
 
-    -- Available days cannot exceed represented days
+    -- Cumulative represented horizons must be monotonic.
+    or m.represented_days_30d > m.represented_days_60d
+    or m.represented_days_60d > m.represented_days_90d
+    or m.represented_days_90d > m.represented_days_365d
+
+    -- Available days cannot exceed represented days.
     or m.available_days_30d not between 0 and m.represented_days_30d
     or m.available_days_60d not between 0 and m.represented_days_60d
     or m.available_days_90d not between 0 and m.represented_days_90d
     or m.available_days_365d not between 0 and m.represented_days_365d
 
-    -- Percentage bounds
-    or m.market_availability_rate_30d_pct not between 0 and 100
-    or m.market_availability_rate_60d_pct not between 0 and 100
-    or m.market_availability_rate_90d_pct not between 0 and 100
-    or m.market_availability_rate_365d_pct not between 0 and 100
+    -- Cumulative available horizons must be monotonic.
+    or m.available_days_30d > m.available_days_60d
+    or m.available_days_60d > m.available_days_90d
+    or m.available_days_90d > m.available_days_365d
 
-    or m.average_listing_availability_rate_30d_pct not between 0 and 100
-    or m.average_listing_availability_rate_60d_pct not between 0 and 100
-    or m.average_listing_availability_rate_90d_pct not between 0 and 100
-    or m.average_listing_availability_rate_365d_pct not between 0 and 100
+    -- Any non-null percentage must remain within valid bounds.
+    or (
+        m.market_availability_rate_30d_pct is not null
+        and m.market_availability_rate_30d_pct not between 0 and 100
+    )
+    or (
+        m.market_availability_rate_60d_pct is not null
+        and m.market_availability_rate_60d_pct not between 0 and 100
+    )
+    or (
+        m.market_availability_rate_90d_pct is not null
+        and m.market_availability_rate_90d_pct not between 0 and 100
+    )
+    or (
+        m.market_availability_rate_365d_pct is not null
+        and m.market_availability_rate_365d_pct not between 0 and 100
+    )
 
-    or m.median_listing_availability_rate_30d_pct not between 0 and 100
-    or m.median_listing_availability_rate_60d_pct not between 0 and 100
-    or m.median_listing_availability_rate_90d_pct not between 0 and 100
-    or m.median_listing_availability_rate_365d_pct not between 0 and 100
+    or (
+        m.average_listing_availability_rate_30d_pct is not null
+        and m.average_listing_availability_rate_30d_pct not between 0 and 100
+    )
+    or (
+        m.average_listing_availability_rate_60d_pct is not null
+        and m.average_listing_availability_rate_60d_pct not between 0 and 100
+    )
+    or (
+        m.average_listing_availability_rate_90d_pct is not null
+        and m.average_listing_availability_rate_90d_pct not between 0 and 100
+    )
+    or (
+        m.average_listing_availability_rate_365d_pct is not null
+        and m.average_listing_availability_rate_365d_pct not between 0 and 100
+    )
 
-    -- Equal-sized complete horizons must reconcile
-    or abs(
-        m.market_availability_rate_30d_pct
-        - m.average_listing_availability_rate_30d_pct
-    ) > 0.01
+    or (
+        m.median_listing_availability_rate_30d_pct is not null
+        and m.median_listing_availability_rate_30d_pct not between 0 and 100
+    )
+    or (
+        m.median_listing_availability_rate_60d_pct is not null
+        and m.median_listing_availability_rate_60d_pct not between 0 and 100
+    )
+    or (
+        m.median_listing_availability_rate_90d_pct is not null
+        and m.median_listing_availability_rate_90d_pct not between 0 and 100
+    )
+    or (
+        m.median_listing_availability_rate_365d_pct is not null
+        and m.median_listing_availability_rate_365d_pct not between 0 and 100
+    )
 
-    or abs(
-        m.market_availability_rate_60d_pct
-        - m.average_listing_availability_rate_60d_pct
-    ) > 0.01
+        -- Market and average listing rates must reconcile whenever
+    -- at least one listing has complete coverage for the horizon.
+    --
+    -- For a complete N-day horizon, every eligible listing has
+    -- the same denominator N, therefore:
+    --
+    --     SUM(available_days) / (N * listing_count)
+    --       =
+    --     AVG(available_days / N)
+    --
+    -- Both metrics must also be NULL when no listing has complete
+    -- coverage for the corresponding horizon.
 
-    or abs(
-        m.market_availability_rate_90d_pct
-        - m.average_listing_availability_rate_90d_pct
-    ) > 0.01
+    or (
+        (
+            m.market_availability_rate_30d_pct is null
+            and m.average_listing_availability_rate_30d_pct is not null
+        )
+        or (
+            m.market_availability_rate_30d_pct is not null
+            and m.average_listing_availability_rate_30d_pct is null
+        )
+        or (
+            m.market_availability_rate_30d_pct is not null
+            and m.average_listing_availability_rate_30d_pct is not null
+            and abs(
+                m.market_availability_rate_30d_pct
+                - m.average_listing_availability_rate_30d_pct
+            ) > 0.01
+        )
+    )
 
-    or abs(
-        m.market_availability_rate_365d_pct
-        - m.average_listing_availability_rate_365d_pct
-    ) > 0.01
+    or (
+        (
+            m.market_availability_rate_60d_pct is null
+            and m.average_listing_availability_rate_60d_pct is not null
+        )
+        or (
+            m.market_availability_rate_60d_pct is not null
+            and m.average_listing_availability_rate_60d_pct is null
+        )
+        or (
+            m.market_availability_rate_60d_pct is not null
+            and m.average_listing_availability_rate_60d_pct is not null
+            and abs(
+                m.market_availability_rate_60d_pct
+                - m.average_listing_availability_rate_60d_pct
+            ) > 0.01
+        )
+    )
+
+    or (
+        (
+            m.market_availability_rate_90d_pct is null
+            and m.average_listing_availability_rate_90d_pct is not null
+        )
+        or (
+            m.market_availability_rate_90d_pct is not null
+            and m.average_listing_availability_rate_90d_pct is null
+        )
+        or (
+            m.market_availability_rate_90d_pct is not null
+            and m.average_listing_availability_rate_90d_pct is not null
+            and abs(
+                m.market_availability_rate_90d_pct
+                - m.average_listing_availability_rate_90d_pct
+            ) > 0.01
+        )
+    )
+
+    or (
+        (
+            m.market_availability_rate_365d_pct is null
+            and m.average_listing_availability_rate_365d_pct is not null
+        )
+        or (
+            m.market_availability_rate_365d_pct is not null
+            and m.average_listing_availability_rate_365d_pct is null
+        )
+        or (
+            m.market_availability_rate_365d_pct is not null
+            and m.average_listing_availability_rate_365d_pct is not null
+            and abs(
+                m.market_availability_rate_365d_pct
+                - m.average_listing_availability_rate_365d_pct
+            ) > 0.01
+        )
+    )

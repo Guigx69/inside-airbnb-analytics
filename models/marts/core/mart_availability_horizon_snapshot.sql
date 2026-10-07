@@ -39,8 +39,22 @@ aggregated as (
             as available_days_30d,
 
         round(
-            100.0 * sum(available_days_30d)
-            / nullif(sum(represented_days_30d), 0),
+            100.0
+            * sum(
+                case
+                    when represented_days_30d = 30
+                    then available_days_30d
+                end
+            )
+            / nullif(
+                sum(
+                    case
+                        when represented_days_30d = 30
+                        then represented_days_30d
+                    end
+                ),
+                0
+            ),
             2
         ) as market_availability_rate_30d_pct,
 
@@ -64,8 +78,22 @@ aggregated as (
             as available_days_60d,
 
         round(
-            100.0 * sum(available_days_60d)
-            / nullif(sum(represented_days_60d), 0),
+            100.0
+            * sum(
+                case
+                    when represented_days_60d = 60
+                    then available_days_60d
+                end
+            )
+            / nullif(
+                sum(
+                    case
+                        when represented_days_60d = 60
+                        then represented_days_60d
+                    end
+                ),
+                0
+            ),
             2
         ) as market_availability_rate_60d_pct,
 
@@ -89,8 +117,22 @@ aggregated as (
             as available_days_90d,
 
         round(
-            100.0 * sum(available_days_90d)
-            / nullif(sum(represented_days_90d), 0),
+            100.0
+            * sum(
+                case
+                    when represented_days_90d = 90
+                    then available_days_90d
+                end
+            )
+            / nullif(
+                sum(
+                    case
+                        when represented_days_90d = 90
+                        then represented_days_90d
+                    end
+                ),
+                0
+            ),
             2
         ) as market_availability_rate_90d_pct,
 

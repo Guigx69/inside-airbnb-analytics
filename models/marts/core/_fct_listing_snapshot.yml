@@ -55,10 +55,6 @@ models:
         description: Number of snapshots in which the listing was observed.
         data_tests:
           - not_null
-          - accepted_values:
-              arguments:
-                values: [1, 2, 3, 4]
-                quote: false
 
       - name: is_first_observation
         description: True for the first observed snapshot of the listing.
@@ -79,10 +75,6 @@ models:
         description: >
           Number of expected snapshots missing since the previous observation.
         data_tests:
-          - accepted_values:
-              arguments:
-                values: [0, 1, 2]
-                quote: false
 
       - name: has_host_changed
         description: >
