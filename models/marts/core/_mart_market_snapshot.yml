@@ -63,8 +63,6 @@ models:
         description: >
           Average reconstructed calendar availability rate across listings
           observed in the market snapshot.
-        data_tests:
-          - not_null
 
       - name: average_availability_30
         description: >

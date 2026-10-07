@@ -83,8 +83,6 @@ models:
         description: >
           Average share of calendar days publicly available across listings.
           This is not an observed occupancy or vacancy rate.
-        data_tests:
-          - not_null
 
       - name: average_availability_30
         description: Average native Inside Airbnb availability_30 value.

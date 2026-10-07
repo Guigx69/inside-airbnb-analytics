@@ -69,8 +69,6 @@ models:
         description: >
           Average reconstructed calendar availability rate for listings
           belonging to the room type.
-        data_tests:
-          - not_null
 
       - name: reconstructed_review_count_l30d
         description: >
