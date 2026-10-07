@@ -78,3 +78,13 @@ models:
           snapshot date for listings in the segment.
         data_tests:
           - not_null
+      
+      - name: price_band_order
+        description: >
+          Numeric sort order associated with price_band, from 0 for NO_PRICE
+          to 6 for the highest priced band.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1, 2, 3, 4, 5, 6]

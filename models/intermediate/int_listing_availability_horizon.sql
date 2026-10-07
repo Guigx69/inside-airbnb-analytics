@@ -4,17 +4,35 @@
     )
 }}
 
-with calendar as (
+with listing_population as (
 
-    select
+    select distinct
         source_country,
         source_city,
         snapshot_date,
-        listing_id,
-        calendar_date,
-        is_available
+        listing_id
 
-    from {{ ref('stg_calendar') }}
+    from {{ ref('stg_listings') }}
+
+),
+
+calendar as (
+
+    select
+        c.source_country,
+        c.source_city,
+        c.snapshot_date,
+        c.listing_id,
+        c.calendar_date,
+        c.is_available
+
+    from {{ ref('stg_calendar') }} c
+
+    inner join listing_population l
+        on  c.source_country = l.source_country
+        and c.source_city = l.source_city
+        and c.snapshot_date = l.snapshot_date
+        and c.listing_id = l.listing_id
 
 ),
 
