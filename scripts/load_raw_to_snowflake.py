@@ -377,6 +377,12 @@ def classify_files(cursor, files, ingestion_log):
     for key, logged_rows in ingestion_log.items():
         actual_rows = raw_inventory.get(key)
 
+        # Un lot source vide est légitimement journalisé avec 0 ligne.
+        # Il ne peut pas apparaître dans l'inventaire RAW construit
+        # par GROUP BY puisqu'aucune ligne physique n'existe.
+        if actual_rows is None and logged_rows == 0:
+            continue
+
         if actual_rows is None:
             raise RuntimeError(
                 "\nIncohérence RAW / INGESTION_LOG :\n"
@@ -680,13 +686,76 @@ def parse_args():
         help="Display the ingestion plan without loading data.",
     )
 
+    parser.add_argument(
+        "--country",
+        help="Only load one country, for example: france",
+    )
+
+    parser.add_argument(
+        "--location",
+        help="Only load one location, for example: lyon",
+    )
+
+    parser.add_argument(
+        "--snapshot",
+        help="Only load one snapshot date, for example: 2026-06-22",
+    )
+
+    parser.add_argument(
+        "--files",
+        nargs="+",
+        choices=("listings", "calendar", "reviews"),
+        help="Only load selected dataset types.",
+    )
+
     return parser.parse_args()
+
+def filter_files(files, args):
+    selected = files
+
+    if args.country:
+        country = args.country.strip().lower()
+        selected = [
+            item
+            for item in selected
+            if item["country"].lower() == country
+        ]
+
+    if args.location:
+        location = args.location.strip().lower()
+        selected = [
+            item
+            for item in selected
+            if item["location"].lower() == location
+        ]
+
+    if args.snapshot:
+        selected = [
+            item
+            for item in selected
+            if item["snapshot_date"] == args.snapshot
+        ]
+
+    if args.files:
+        filenames = {
+            f"{dataset}.csv.gz"
+            for dataset in args.files
+        }
+
+        selected = [
+            item
+            for item in selected
+            if item["filename"] in filenames
+        ]
+
+    return selected
 
 def main():
     args = parse_args()
     validate_environment()
 
     files = load_manifest()
+    files = filter_files(files, args)
 
     print("=" * 100)
     print("INSIDE AIRBNB -> SNOWFLAKE RAW")
