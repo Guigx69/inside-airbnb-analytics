@@ -1,0 +1,7 @@
+# Isolated Python environment for dbt and RAW/geographic utilities.
+# Streamlit in Snowflake uses streamlit/pyproject.toml separately.
+dbt-core==1.12.4
+dbt-snowflake
+snowflake-connector-python
+requests
+shapely>=2.0
