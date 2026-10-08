@@ -21,14 +21,15 @@ performed by this script.
 
 The Git repository does not include `data/raw`. All selected
 `data_manifest.csv` archive paths must exist locally with the recorded
-size and SHA-256 before ingestion. There is no verified full historical
-download mechanism in the repository. Arrange an authorized transfer
-of the archive tree or independently verify a source download workflow.
+size and SHA-256 before ingestion. The collector `scripts/download_inside_airbnb.py` can discover currently
+published snapshots and download a selected city/snapshot, validating gzip
+and recording SHA-256 in the manifest. Previously published snapshots may
+no longer be in the live catalog; preserve historical archives separately.
 
-The loader validates all manifest entries **before filtering** to a
-country, city or snapshot. Thus even a scoped ingestion currently requires
-the full manifest archive set; do not promise a small-city bootstrap
-until that loader behavior is improved and tested.
+The loader filters the manifest **before validating archives**. A scoped
+city/snapshot ingestion only requires the corresponding local files.
+This was validated for Lyon 2026-09-17 on the existing development account;
+full historical recovery and fresh-account deployment remain unverified.
 
 ## Controlled execution order
 
