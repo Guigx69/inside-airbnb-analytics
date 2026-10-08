@@ -32,13 +32,13 @@ Review the target configuration before running:
 This command **writes** dbt objects and runs tests.
 
 ## Mode B: rebuild from source (not yet one-click)
-The repository excludes `data/raw/`. The ingestion script requires **every file listed in `data_manifest.csv`** to be present locally and to match the recorded byte size and SHA-256.
-Before ingestion, source archives must be obtained by an approved transfer or a separately verified download workflow. Snowflake RAW tables, `INGESTION_LOG` and `INSIDE_AIRBNB_STAGE` must already exist. Do not run ingestion until the target environment and expected data volumes have been reviewed.
+The repository excludes `data/raw/`. The collector `scripts/download_inside_airbnb.py` can retrieve snapshots currently available in the public catalog; historical snapshots missing from that catalog require an authorized archive transfer. The ingestion loader filters the manifest before validating archives, so only files in the selected city/snapshot scope are required. A Lyon 2026-09-17 collection, SHA-256 check, RAW ingestion, dbt run and targeted dbt tests succeeded on the development account.
+For a small-city pilot, use `python scripts/download_inside_airbnb.py --location lyon --dry-run --verify`, then an explicitly approved scoped `--sync --verify`, `python scripts/check_archives.py --country france --location lyon --hash`, and `python scripts/load_raw_to_snowflake.py --dry-run --country france --location lyon` before authorizing a real ingestion. Snowflake RAW tables, `INGESTION_LOG` and `INSIDE_AIRBNB_STAGE` must already exist. Do not run ingestion until the target environment and expected data volumes have been reviewed.
 
 ## Streamlit in Snowflake
 The deployment manifest is `streamlit/snowflake.yml`. It currently contains development-specific Snowflake identifiers, so deploying in another account requires adapting the identifiers and privileges. Do not deploy it unchanged to a production environment.
 
 ## Current limits
 - This quickstart provides a reproducible local toolchain and a read-only connection check, not a full Snowflake infrastructure bootstrap.
-- There is no verified automated download/replay path for the complete historical source manifest.
+- The current catalog download path is validated for Lyon; replay of the entire historical manifest remains unverified.
 - There is no demonstrated scheduled end-to-end orchestration in this repository.
