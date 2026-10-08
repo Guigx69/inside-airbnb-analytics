@@ -1,0 +1,50 @@
+-- Inside Airbnb RAW bootstrap for a NEW, dedicated Snowflake environment.
+-- REVIEW identifiers and privileges before executing. This script writes DDL.
+-- Execute with a role authorized to create schemas/tables/stages.
+-- It deliberately does NOT create roles, warehouses or databases.
+-- Do not run against the existing project without reviewing each statement.
+USE DATABASE AIRBNB;
+CREATE SCHEMA IF NOT EXISTS RAW;
+USE SCHEMA RAW;
+
+CREATE TABLE IF NOT EXISTS RAW_LISTINGS (
+  SOURCE_COUNTRY VARCHAR NOT NULL,
+  SOURCE_CITY VARCHAR NOT NULL,
+  SNAPSHOT_DATE DATE NOT NULL,
+  SOURCE_FILE VARCHAR NOT NULL,
+  LOADED_AT TIMESTAMP_LTZ NOT NULL,
+  RAW_DATA VARIANT
+);
+CREATE TABLE IF NOT EXISTS RAW_CALENDAR (
+  SOURCE_COUNTRY VARCHAR NOT NULL,
+  SOURCE_CITY VARCHAR NOT NULL,
+  SNAPSHOT_DATE DATE NOT NULL,
+  SOURCE_FILE VARCHAR NOT NULL,
+  LOADED_AT TIMESTAMP_LTZ NOT NULL,
+  RAW_DATA VARIANT
+);
+CREATE TABLE IF NOT EXISTS RAW_REVIEWS (
+  SOURCE_COUNTRY VARCHAR NOT NULL,
+  SOURCE_CITY VARCHAR NOT NULL,
+  SNAPSHOT_DATE DATE NOT NULL,
+  SOURCE_FILE VARCHAR NOT NULL,
+  LOADED_AT TIMESTAMP_LTZ NOT NULL,
+  RAW_DATA VARIANT
+);
+CREATE TABLE IF NOT EXISTS INGESTION_LOG (
+  SOURCE_COUNTRY VARCHAR NOT NULL,
+  SOURCE_CITY VARCHAR NOT NULL,
+  SNAPSHOT_DATE DATE NOT NULL,
+  SOURCE_FILE VARCHAR NOT NULL,
+  TARGET_TABLE VARCHAR NOT NULL,
+  ROW_COUNT NUMBER(38,0) NOT NULL,
+  LOADED_AT TIMESTAMP_LTZ NOT NULL
+);
+CREATE STAGE IF NOT EXISTS INSIDE_AIRBNB_STAGE;
+
+-- After provisioning, grant INGESTION_ROLE access to the schema,
+-- tables, and stage (including READ/WRITE on internal stage) using
+-- your organization's approved privilege policy. Grant DBT_ROLE
+-- SELECT on the three RAW tables and USAGE on the database/schema.
+-- Snowflake CREATE ... IF NOT EXISTS does not validate existing layouts.
+-- Check DESCRIBE TABLE / DESCRIBE STAGE before ingestion.
