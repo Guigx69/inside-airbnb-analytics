@@ -88,7 +88,6 @@ models:
         description: >
           Number of expected source snapshots missing since the previous
           observation. Null for the first observation.
-        data_tests:
 
       - name: price_change
         description: >
