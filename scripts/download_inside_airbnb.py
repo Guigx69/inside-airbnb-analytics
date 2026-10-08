@@ -686,8 +686,14 @@ def main() -> int:
             status = inspect_status(
                 dataset,
                 manifest,
-                args.verify,
+                True,
             )
+
+            if status == "INVALID" and not args.overwrite:
+                raise RuntimeError(
+                    f"Local archive does not match manifest: {dataset.manifest_path}. "
+                    "Inspect the file before retrying with --overwrite."
+                )
 
             should_download = (
                 status == "NEW"
@@ -712,10 +718,8 @@ def main() -> int:
                     manifest,
                 )
 
+                write_manifest(manifest)
                 downloaded += 1
-
-        if downloaded:
-            write_manifest(manifest)
 
         print()
         print("=" * 100)
