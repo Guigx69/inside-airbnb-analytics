@@ -55,3 +55,6 @@ Thumbs.db
 
 # Geographic reference loader cache
 snowflake/reference/.geo_cache/
+
+# Rapports temporaires des chargements geographiques
+/geojson_world_*.json
