@@ -88,7 +88,7 @@ def sha256_file(path):
 
     return digest.hexdigest()
 
-def load_manifest():
+def load_manifest(args=None):
     if not MANIFEST_PATH.exists():
         raise RuntimeError(
             f"Manifest introuvable : {MANIFEST_PATH}"
@@ -143,6 +143,18 @@ def load_manifest():
 
             if filename not in FILE_TO_TABLE:
                 continue
+
+            if args is not None:
+                if args.country and country.lower() != args.country.strip().lower():
+                    continue
+                if args.location and location.lower() != args.location.strip().lower():
+                    continue
+                if args.snapshot and snapshot_date != args.snapshot:
+                    continue
+                if args.files and filename not in {
+                    f"{dataset}.csv.gz" for dataset in args.files
+                }:
+                    continue
 
             source_path = PROJECT_ROOT / relative_path
 
@@ -754,8 +766,7 @@ def main():
     args = parse_args()
     validate_environment()
 
-    files = load_manifest()
-    files = filter_files(files, args)
+    files = load_manifest(args)
 
     print("=" * 100)
     print("INSIDE AIRBNB -> SNOWFLAKE RAW")
