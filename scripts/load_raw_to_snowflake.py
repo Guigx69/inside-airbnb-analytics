@@ -233,7 +233,8 @@ def get_ingestion_log(cursor):
             TO_CHAR(SNAPSHOT_DATE, 'YYYY-MM-DD'),
             SOURCE_FILE,
             TARGET_TABLE,
-            ROW_COUNT
+            ROW_COUNT,
+            SOURCE_SHA256
         FROM {ingestion_log}
         """
     )
@@ -247,6 +248,7 @@ def get_ingestion_log(cursor):
         source_file,
         target_table,
         row_count,
+        source_sha256,
     ) in cursor.fetchall():
         key = (
             country,
@@ -262,7 +264,7 @@ def get_ingestion_log(cursor):
                 + " / ".join(str(value) for value in key)
             )
 
-        loaded[key] = int(row_count)
+        loaded[key] = {"row_count": int(row_count), "sha256": source_sha256}
 
     return loaded
 
@@ -392,7 +394,8 @@ def classify_files(cursor, files, ingestion_log):
     # tout lot journalisé doit réellement exister dans RAW
     # avec exactement le nombre de lignes journalisé.
     #
-    for key, logged_rows in ingestion_log.items():
+    for key, log_entry in ingestion_log.items():
+        logged_rows = log_entry["row_count"]
         actual_rows = raw_inventory.get(key)
 
         # Un lot source vide est légitimement journalisé avec 0 ligne.
@@ -455,8 +458,27 @@ def classify_files(cursor, files, ingestion_log):
             pending.append(item)
             continue
 
+        logged = ingestion_log[key]
+        stored_sha256 = logged["sha256"]
+        if stored_sha256 is None:
+            # Legacy ingestion: no historical checksum was stored.
+            # Never assume that the current local file matches historical RAW.
+            print(
+                "[WARN] Empreinte historique absente ; "
+                "impossible de confirmer le contenu déjà chargé : "
+                f"{item['relative_path']}"
+            )
+        elif stored_sha256.lower() != item["sha256"]:
+            raise RuntimeError(
+                "Fichier modifié depuis son ingestion : "
+                f"{item['relative_path']}\n"
+                f"SHA journal : {stored_sha256}\n"
+                f"SHA manifest: {item['sha256']}\n"
+                "Chargement interrompu : rechargement contrôlé "
+                "non encore activé."
+            )
         item["status"] = "LOADED"
-        item["row_count"] = ingestion_log[key]
+        item["row_count"] = logged["row_count"]
         skipped.append(item)
 
     return pending, skipped
@@ -646,7 +668,8 @@ def load_file(connection, cursor, item):
                 SOURCE_FILE,
                 TARGET_TABLE,
                 ROW_COUNT,
-                LOADED_AT
+                LOADED_AT,
+                SOURCE_SHA256
             )
             VALUES (
                 %s,
@@ -655,7 +678,8 @@ def load_file(connection, cursor, item):
                 %s,
                 %s,
                 %s,
-                CURRENT_TIMESTAMP()
+                CURRENT_TIMESTAMP(),
+                %s
             )
             """,
             (
@@ -665,6 +689,7 @@ def load_file(connection, cursor, item):
                 filename,
                 target_table,
                 loaded_rows,
+                item["sha256"],
             ),
         )
 
