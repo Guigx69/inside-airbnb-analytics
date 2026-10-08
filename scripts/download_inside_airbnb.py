@@ -597,6 +597,11 @@ def parse_args() -> argparse.Namespace:
     )
 
     scope.add_argument(
+        "--selection-file",
+        help="JSON geographic include/exclude selection (multi-continent/country/city)",
+    )
+
+    scope.add_argument(
         "--all",
         action="store_true",
         help="All locations in the Inside Airbnb catalog",
@@ -651,8 +656,19 @@ def main() -> int:
         catalog = get_catalog()
         inventory = build_inventory(catalog)
 
+        if args.selection_file:
+            from geography_selection import select_datasets
+            geographically_selected = select_datasets(inventory, args.selection_file)
+        else:
+            geographically_selected = filter_inventory(
+                inventory,
+                location=args.location,
+                country=args.country,
+                all_locations=args.all,
+            )
+
         selected = filter_inventory(
-            inventory,
+            geographically_selected,
             location=args.location,
             country=args.country,
             all_locations=args.all,
