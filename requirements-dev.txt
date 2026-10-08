@@ -5,3 +5,4 @@ dbt-snowflake
 snowflake-connector-python
 requests
 shapely>=2.0
+country_converter>=1.3
