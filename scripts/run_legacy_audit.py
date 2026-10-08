@@ -9,6 +9,8 @@ import csv
 import hashlib
 import json
 import os
+import time
+from contextlib import contextmanager
 from pathlib import Path
 import subprocess
 import sys
@@ -29,6 +31,26 @@ def atomic_json(path, payload):
         os.replace(temporary, path)
     finally:
         temporary.unlink(missing_ok=True)
+
+
+@contextmanager
+def exclusive_lock(state_path):
+    """Exclusive lock held for the whole campaign; stale locks require manual review."""
+    lock = state_path.with_name(state_path.name + ".lock")
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError as exc:
+        raise RuntimeError(
+            f"Audit déjà en cours ou verrou abandonné : {lock}. "
+            "Vérifier qu'aucun processus n'est actif avant de retirer manuellement le verrou."
+        ) from exc
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(f"pid={os.getpid()} started_utc={datetime.now(timezone.utc).isoformat()}\\n")
+        yield
+    finally:
+        lock.unlink(missing_ok=True)
 
 
 def manifest_digest():
@@ -88,6 +110,11 @@ def main():
     identity = {"manifest_sha256": manifest_digest(), "selection": selection,
                 "batch_size": args.batch_size}
     paths = selected_paths(args)
+    with exclusive_lock(args.state):
+        return run_campaign(args, identity, paths)
+
+
+def run_campaign(args, identity, paths):
     if args.state.exists():
         state = json.loads(args.state.read_text(encoding="utf-8"))
         if state.get("identity") != identity:
@@ -113,6 +140,9 @@ def main():
             break
         count = min(args.batch_size, len(paths) - offset)
         batch_report = args.state.with_name(args.state.stem + "_current_batch.json")
+        # A prior interrupted process may have left a complete-looking stale report.
+        # Never accept it as evidence of the current subprocess.
+        batch_report.unlink(missing_ok=True)
         command = [sys.executable, str(script), "--all", "--limit", str(count),
                    "--output", str(batch_report)]
         for name in ("country", "location", "snapshot"):
@@ -124,21 +154,27 @@ def main():
         if offset:
             command.extend(["--start-after", paths[offset - 1]])
         print(f"Audit lot {offset + 1} à {offset + count}/{len(paths)}", flush=True)
+        started_ns = time.time_ns()
         process = subprocess.run(command, check=False)
         if not batch_report.exists():
             raise RuntimeError("Rapport de lot absent ; aucun avancement enregistré.")
+        if batch_report.stat().st_mtime_ns < started_ns - 2_000_000_000:
+            raise RuntimeError("Rapport de lot trop ancien ; checkpoint inchangé.")
         batch = json.loads(batch_report.read_text(encoding="utf-8"))
         batch_results = batch.get("results", [])
         expected = paths[offset:offset + count]
+        if batch.get("method") != "canonical_json_multiset_sha256_v1":
+            raise RuntimeError("Méthode d'audit inconnue ; checkpoint inchangé.")
         if [r.get("path") for r in batch_results] != expected:
             raise RuntimeError("Résultats de lot inattendus ; checkpoint inchangé.")
-        # Persist every finished lot including failures, so failures cannot be silently skipped.
+        # Do not advance on a failed or interrupted subprocess.
+        if process.returncode != 0 or any(r.get("status") != "MATCH" for r in batch_results):
+            failure_report = args.state.with_name(args.state.stem + "_failure.json")
+            atomic_json(failure_report, {"results": batch_results, "returncode": process.returncode})
+            raise RuntimeError(f"Audit non conforme ; checkpoint inchangé. Détails : {failure_report}")
         results.extend(batch_results)
         state["updated_at_utc"] = datetime.now(timezone.utc).isoformat()
         atomic_json(args.state, state)
-        if process.returncode != 0 or any(r["status"] != "MATCH" for r in batch_results):
-            raise RuntimeError("Audit non conforme ; détails conservés dans le checkpoint. "
-                               "Aucune suite automatique.")
         batch_report.unlink(missing_ok=True)
 
     summary = {status: sum(r["status"] == status for r in results)
