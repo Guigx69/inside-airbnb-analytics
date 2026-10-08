@@ -7,8 +7,8 @@ sources:
       Each dataset contains historical snapshots identified by country,
       city and snapshot date.
 
-    database: AIRBNB
-    schema: RAW
+    database: "{{ env_var('SNOWFLAKE_DATABASE', 'AIRBNB') }}"
+    schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'RAW') }}"
 
     tables:
       - name: listings
