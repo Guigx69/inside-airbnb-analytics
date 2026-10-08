@@ -37,6 +37,7 @@ def classify(item, log, inventory):
 
 def main():
     parser = argparse.ArgumentParser(description="Read-only RAW reload impact plan")
+    parser.add_argument("--selection-file", help="Optional geography selection JSON")
     parser.add_argument("--country")
     parser.add_argument("--location")
     parser.add_argument("--snapshot")
