@@ -23,10 +23,6 @@ def commands(selection_file: str, execute: bool, sync: bool, dbt_build: bool,
         collector += ["--dry-run", "--verify"]
 
     steps = [("collector", collector)]
-    if not execute or sync:
-        # A live-catalog preview can reference not-yet-downloaded archives.
-        # On an executing sync, every newly published archive is fetched first.
-        pass
     steps.append(("archives", [python_executable, str(ROOT / "scripts" / "check_archives.py"),
                                "--selection-file", selection_file, "--hash"]))
     raw = [python_executable, str(ROOT / "scripts" / "load_raw_to_snowflake.py"),
@@ -35,7 +31,9 @@ def commands(selection_file: str, execute: bool, sync: bool, dbt_build: bool,
         raw.append("--dry-run")
     steps.append(("raw", raw))
     if execute and dbt_build:
-        steps.append(("dbt", ["dbt", "build", "--project-dir", str(ROOT)]))
+        dbt_exe = ROOT / ".venv" / "Scripts" / "dbt.exe"
+        dbt_command = str(dbt_exe) if dbt_exe.is_file() else "dbt"
+        steps.append(("dbt", [dbt_command, "build", "--project-dir", str(ROOT)]))
     return steps
 
 
