@@ -11,6 +11,7 @@ import csv
 import gzip
 import hashlib
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from load_raw_to_snowflake import (
@@ -133,15 +134,61 @@ def read_manifest():
 def main():
     parser = argparse.ArgumentParser(description="Audit RAW historique en lecture seule")
     parser.add_argument("--output", type=Path, help="Rapport JSON local facultatif")
+    parser.add_argument("--all", action="store_true", help="Auditer le manifeste par lots")
+    parser.add_argument("--country")
+    parser.add_argument("--location")
+    parser.add_argument("--snapshot")
+    parser.add_argument("--files", nargs="+", choices=("listings", "calendar", "reviews"))
+    parser.add_argument("--start-after", help="Chemin exact du dernier lot audité")
+    parser.add_argument("--limit", type=int, default=3, help="Lots maximum (1 à 50)")
     args = parser.parse_args()
 
+    if not 1 <= args.limit <= 50:
+        parser.error("--limit doit être compris entre 1 et 50")
+    if args.start_after and not args.all:
+        parser.error("--start-after nécessite --all")
     manifest = read_manifest()
+    if args.all:
+        if args.start_after and args.start_after not in manifest:
+            parser.error("--start-after doit correspondre à un chemin du manifeste")
+        keys = []
+        for path in sorted(manifest):
+            if args.start_after and path <= args.start_after:
+                continue
+            parts = Path(path).parts
+            if len(parts) != 6 or parts[:2] != ("data", "raw"):
+                continue
+            _, _, country, city, snapshot, filename = parts
+            if filename not in FILE_TO_TABLE:
+                continue
+            if args.country and country.lower() != args.country.lower():
+                continue
+            if args.location and city.lower() != args.location.lower():
+                continue
+            if args.snapshot and snapshot != args.snapshot:
+                continue
+            if args.files and filename not in {name + ".csv.gz" for name in args.files}:
+                continue
+            keys.append((country, city, snapshot, filename))
+        keys = keys[:args.limit]
+    else:
+        keys = [
+            k for k in PILOTS
+            if (not args.country or k[0].lower() == args.country.lower())
+            and (not args.location or k[1].lower() == args.location.lower())
+            and (not args.snapshot or k[2] == args.snapshot)
+            and (not args.files or k[3] in {name + ".csv.gz" for name in args.files})
+        ][:args.limit]
+    if not keys:
+        print("Aucun lot sélectionné ; aucune requête Snowflake.")
+        return 0
+    print(f"Lots sélectionnés : {len(keys)}")
     results = []
     connection = get_connection()
     try:
         cursor = connection.cursor()
         try:
-            for key in PILOTS:
+            for key in keys:
                 result = audit_one(cursor, key, manifest)
                 results.append(result)
                 print(
@@ -157,11 +204,21 @@ def main():
     finally:
         connection.close()
 
+    summary = {status: sum(r["status"] == status for r in results)
+               for status in ("MATCH", "MISMATCH", "UNVERIFIABLE")}
+    print(f"BILAN : {summary} ; dernier lot : {results[-1]['path']}")
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(
             json.dumps(
                 {"method": "canonical_json_multiset_sha256_v1",
+                 "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+                 "summary": summary,
+                 "last_path": results[-1]["path"],
+                 "selection": {"all": args.all, "limit": args.limit,
+                               "start_after": args.start_after, "country": args.country,
+                               "location": args.location, "snapshot": args.snapshot,
+                               "files": args.files},
                  "disclaimer": "Logical equivalence only; not original compressed-file identity",
                  "results": results},
                 indent=2, ensure_ascii=False,
