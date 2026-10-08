@@ -19,8 +19,8 @@ INSERT INTO V13_TX_RAW_TEST
 SELECT 'united-states','pacific-grove',TO_DATE('2026-03-31'),'listings.csv.gz',
        PARSE_JSON('{"id":"old-1"}');
 INSERT INTO V13_TX_LOG_TEST
-VALUES ('united-states','pacific-grove',TO_DATE('2026-03-31'),'listings.csv.gz',
-        'RAW_LISTINGS',1,REPEAT('a',64));
+SELECT 'united-states','pacific-grove',TO_DATE('2026-03-31'),'listings.csv.gz',
+       'RAW_LISTINGS',1,REPEAT('a',64);
 INSERT INTO V13_TX_PREP_TEST
 SELECT 'united-states','pacific-grove',TO_DATE('2026-03-31'),'listings.csv.gz',
        PARSE_JSON('{"id":"new-1"}')
