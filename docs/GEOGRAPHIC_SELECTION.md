@@ -49,7 +49,7 @@ selection regression tests passed.
 Airbnb catalog; archive preflight and RAW loader select only existing local
 manifest entries. The observed live preview (870 files, including 159 NEW)
 and local manifest (864 files) therefore are not directly interchangeable.
-A precise per-path reconciliation is still needed to explain the difference.
+Path-level reconciliation on Windows confirmed 711 shared files, 159 live-only files, and 153 manifest-only files (870 = 711 + 159; 864 = 711 + 153). Examples show September 2026 snapshots in the live catalog and September 2025 snapshots retained only in the local manifest. Preserve historical manifest entries; do not delete them when catalog entries rotate.
 
 **Limit:** full collector-to-dbt orchestration is not implemented yet.
 
