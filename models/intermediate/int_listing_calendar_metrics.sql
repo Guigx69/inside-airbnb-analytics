@@ -1,3 +1,5 @@
+{{ config(materialized='table') }}
+
 with calendar as (
 
     select *
