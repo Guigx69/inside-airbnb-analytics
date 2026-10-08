@@ -6,11 +6,14 @@ Only accepts the fixed 130-row Pacific Grove Listings source.
 import argparse
 import json
 import tempfile
+from collections import Counter
 from pathlib import Path
 
 from load_raw_to_snowflake import (
     load_manifest, get_connection, sha256_file, csv_gz_to_json_gz,
 )
+
+from audit_legacy_raw import canonical_hash, local_counts
 
 PILOT = "data/raw/united-states/pacific-grove/2026-03-31/listings.csv.gz"
 STAGE = "V13_PILOT_PREP_STAGE"
@@ -93,7 +96,31 @@ def main():
                 raise RuntimeError(
                     f"FAIL: count={actual}, metadata={correct_metadata}, raw_data={populated}"
                 )
+            # Compare complete JSON objects as a multiset, preserving duplicates.
+            # This checks logical equality, not identity of the original gzip bytes.
+            local_multiset, local_total = local_counts(item["path"])
+            cursor.execute(f"SELECT RAW_DATA FROM {TABLE}")
+            prepared_multiset = Counter()
+            prepared_total = 0
+            while True:
+                batch = cursor.fetchmany(1000)
+                if not batch:
+                    break
+                for (raw,) in batch:
+                    obj = json.loads(raw) if isinstance(raw, str) else raw
+                    if not isinstance(obj, dict):
+                        raise RuntimeError("Prepared RAW_DATA is not a JSON object")
+                    prepared_multiset[canonical_hash(obj)] += 1
+                    prepared_total += 1
+            missing = sum((local_multiset - prepared_multiset).values())
+            extra = sum((prepared_multiset - local_multiset).values())
+            if local_total != 130 or prepared_total != 130 or missing or extra:
+                raise RuntimeError(
+                    f"CONTENT MISMATCH: local={local_total}, prepared={prepared_total}, "
+                    f"missing={missing}, extra={extra}"
+                )
             print("PASS: 130 rows; 130 metadata matches; 130 non-null RAW_DATA")
+            print("PASS: canonical JSON multiset 130/130; missing=0; extra=0")
             print("Temporary Snowflake stage/table will be removed on session close")
     finally:
         cursor.close()
