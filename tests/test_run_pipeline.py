@@ -23,7 +23,8 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual([name for name, _ in steps], ["collector", "archives", "raw", "dbt"])
         self.assertIn("--sync", steps[0][1])
         self.assertNotIn("--dry-run", steps[2][1])
-        self.assertEqual(steps[3][1][:2], ["dbt", "build"])
+        self.assertEqual(steps[3][1][1], "build")
+        self.assertTrue(steps[3][1][0] == "dbt" or steps[3][1][0].endswith("dbt.exe"))
 
     def test_stop_on_failure(self):
         calls = []
