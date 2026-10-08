@@ -120,7 +120,13 @@ def load_manifest(args=None):
                 + ", ".join(sorted(missing_columns))
             )
 
-        for row in reader:
+        rows = list(reader)
+        if args is not None and args.selection_file:
+            from geography_selection import select_manifest_paths
+            selected_paths = select_manifest_paths(rows, args.selection_file)
+            rows = [row for row in rows if row["path"] in selected_paths]
+
+        for row in rows:
             relative_path = Path(row["path"])
 
             # Structure attendue :
@@ -696,6 +702,11 @@ def parse_args():
         "--dry-run",
         action="store_true",
         help="Display the ingestion plan without loading data.",
+    )
+
+    parser.add_argument(
+        "--selection-file",
+        help="Geographic selection JSON applied to the local manifest.",
     )
 
     parser.add_argument(

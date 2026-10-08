@@ -76,3 +76,18 @@ def select_datasets(inventory: list, selection_path: str | Path) -> list:
 
     return [item for item in inventory
             if matches(item, "include") and not matches(item, "exclude")]
+
+
+def select_manifest_paths(rows: list[dict], selection_path: str | Path) -> set[str]:
+    """Apply the same geographic rules to local manifest entries, without HTTP."""
+    from types import SimpleNamespace
+
+    inventory = []
+    for row in rows:
+        parts = Path(row["path"]).parts
+        if len(parts) != 6 or parts[:2] != ("data", "raw"):
+            raise ValueError(f"Unexpected manifest path: {row['path']}")
+        inventory.append(SimpleNamespace(
+            country=parts[2], location=parts[3], manifest_path=row["path"]
+        ))
+    return {item.manifest_path for item in select_datasets(inventory, selection_path)}

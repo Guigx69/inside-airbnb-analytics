@@ -10,6 +10,7 @@ TYPES = {"listings", "calendar", "reviews"}
 
 def main():
     parser = argparse.ArgumentParser(description="Verify local source archives without Snowflake.")
+    parser.add_argument("--selection-file", help="Geographic selection JSON; applied to manifest")
     parser.add_argument("--country")
     parser.add_argument("--location")
     parser.add_argument("--snapshot")
@@ -21,7 +22,12 @@ def main():
     invalid = []
     total_bytes = 0
     with MANIFEST.open(newline="", encoding="utf-8") as handle:
-        for row in csv.DictReader(handle):
+        rows = list(csv.DictReader(handle))
+        if args.selection_file:
+            from geography_selection import select_manifest_paths
+            selected_paths = select_manifest_paths(rows, args.selection_file)
+            rows = [row for row in rows if row["path"] in selected_paths]
+        for row in rows:
             relative = Path(row["path"])
             parts = relative.parts
             if len(parts) != 6 or parts[:2] != ("data", "raw") or relative.name not in {f"{t}.csv.gz" for t in TYPES}:
