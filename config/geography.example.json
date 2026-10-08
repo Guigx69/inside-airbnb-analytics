@@ -1,0 +1,10 @@
+{
+  "include": {
+    "continents": ["Europe"],
+    "countries": ["Japan"],
+    "cities": ["Sydney"]
+  },
+  "exclude": {
+    "cities": ["Paris"]
+  }
+}
