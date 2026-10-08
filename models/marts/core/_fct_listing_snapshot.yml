@@ -74,7 +74,6 @@ models:
       - name: missing_snapshot_count
         description: >
           Number of expected snapshots missing since the previous observation.
-        data_tests:
 
       - name: has_host_changed
         description: >
