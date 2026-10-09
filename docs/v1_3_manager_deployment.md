@@ -41,9 +41,30 @@ Ne pas réinitialiser ni écraser les fichiers locaux non commités, notamment `
 1. `dbt debug` confirme la connexion à Snowflake.
 2. `dbt parse` ne présente aucune erreur.
 3. `dbt build --threads 4` : zéro erreur et tous les modèles construits ; conserver `target/run_results.json` et le journal du build.
-4. Vérifier les résultats des tests. Référence pré-optimisation : **PASS=480, WARN=1, ERROR=0, TOTAL=481**, temps **2 h 02 min 44 s**. Ne pas prétendre à une accélération globale avant une mesure complète.
+4. Vérifier les résultats des tests. Référence pré-optimisation : **PASS=480, WARN=1, ERROR=0, TOTAL=481**, temps **2 h 02 min 44 s**. Le benchmark complet du 9 octobre 2026 figure ci-dessous.
 5. Avertissement historique connu : test `assert_stg_calendar_listing_exists`, **3 163 clés calendar orphelines** réparties sur 103 groupes ville/snapshot. L'avertissement doit rester visible ; ne pas supprimer les observations sources pour le faire disparaître.
 6. Contrôler les deux intermédiaires et les marts dépendants ; les tests ciblés déjà exécutés sur la branche expérimentale ont donné 105/105 PASS.
+
+## Benchmark complet validé — 9 octobre 2026
+
+Exécution : `dbt build --threads 4` sur l'environnement de développement Snowflake.
+
+| Mesure | Avant V1.3 | Après V1.3 |
+| --- | ---: | ---: |
+| Durée totale | 2 h 02 min 44 s | 1 h 05 min 46,11 s |
+| Modèles tables | 12 | 14 |
+| Modèles vues | 13 | 11 |
+| Tests | 456 | 456 |
+| PASS | 480 | 480 |
+| WARN | 1 | 1 |
+| ERROR | 0 | 0 |
+| TOTAL | 481 | 481 |
+
+**Gain : environ 56 min 58 s, soit 46,4 % de réduction de durée** sur ce benchmark. Les temps peuvent varier selon la charge, la taille du warehouse et son cache.
+
+L'avertissement `assert_stg_calendar_listing_exists` est inchangé : 3 163 résultats, configurés en warning. Aucune suppression de données Calendar n'a été réalisée.
+
+Le benchmark valide l'environnement de développement ; la migration des données et l'exécution sur le compte Snowflake du manager restent à réaliser.
 
 ## Résultats de performance déjà observés
 
