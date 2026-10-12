@@ -40,19 +40,19 @@ Le JSON utilise deux blocs facultatifs `include` et `exclude`, avec les tableaux
 {"include":{"cities":["Lyon"]},"exclude":{}}
 ```
 
-**Un pays, France** — créer `config/geography.france.example.json` (ce fichier n'est pas livré dans le dépôt) :
+**Un pays, France** — créer `config/geography.france.example.json` (exemple fourni dans le dépôt) :
 
 ```json
 {"include":{"countries":["France"]},"exclude":{}}
 ```
 
-**Un continent, Europe** — créer `config/geography.europe.example.json` (ce fichier n'est pas livré dans le dépôt) :
+**Un continent, Europe** — créer `config/geography.europe.example.json` (exemple fourni dans le dépôt) :
 
 ```json
 {"include":{"continents":["Europe"]},"exclude":{}}
 ```
 
-**Deux pays** — créer `config/geography.multi.example.json` (ce fichier n'est pas livré dans le dépôt) :
+**Deux pays** — créer `config/geography.multi.example.json` (exemple fourni dans le dépôt) :
 
 ```json
 {"include":{"countries":["France","Spain"]},"exclude":{}}
