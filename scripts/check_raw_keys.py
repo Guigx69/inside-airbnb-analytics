@@ -20,8 +20,8 @@ def analyse_keys(filename, key_columns):
     file_path = SNAPSHOT_PATH / filename
 
     print("\n" + "=" * 90)
-    print(f"FILE : {filename}")
-    print(f"CLE CANDIDATE : {', '.join(key_columns)}")
+    print(f"FICHIER : {filename}")
+    print(f"CLÉ CANDIDATE : {', '.join(key_columns)}")
     print("=" * 90)
 
     keys = Counter()
@@ -47,8 +47,8 @@ def analyse_keys(filename, key_columns):
     )
 
     print(f"Nombre de lignes       : {row_count:,}")
-    print(f"Nombre de cles uniques : {len(keys):,}")
-    print(f"Cles dupliquees        : {len(duplicate_keys):,}")
+    print(f"Nombre de clés uniques : {len(keys):,}")
+    print(f"Clés dupliquées        : {len(duplicate_keys):,}")
     print(f"Lignes en doublon      : {duplicate_rows:,}")
 
     if duplicate_keys:
@@ -58,7 +58,7 @@ def analyse_keys(filename, key_columns):
             print(f"  {key} -> {count} occurrences")
 
     else:
-        print("RESULTAT                : CLE UNIQUE")
+        print("RÉSULTAT                : CLÉ UNIQUE")
 
 def inspect_review_duplicates():
     file_path = SNAPSHOT_PATH / "reviews.csv.gz"
