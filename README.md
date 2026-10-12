@@ -123,3 +123,8 @@ Les archives `data/raw/`, les secrets, les environnements virtuels et les résul
 La V1.3 valide les transformations et la qualité des données sur l'environnement de développement. Les coûts Snowflake, le déploiement sur un nouveau compte, les droits d'accès finaux du responsable et la sauvegarde indépendante des archives restent à traiter. La feuille de route géographique est : **Lyon → France → Europe → monde**.
 
 Les anomalies sources sont documentées, jamais masquées par une suppression arbitraire de lignes.
+
+
+## Reprise du projet par un responsable
+
+Le [manuel complet A à Z](docs/MANUEL_MANAGER_A_Z.md) détaille l'installation Windows, les deux scénarios Snowflake, les commandes d'ingestion et de build, les helpers, les contrôles, le diagnostic et les critères de livraison. Lire ce manuel avant toute exécution sur un nouveau compte.
