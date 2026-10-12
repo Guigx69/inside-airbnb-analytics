@@ -10,37 +10,37 @@ models:
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: previous_snapshot_date
-        description: Immediately preceding market snapshot date.
+        description: Date du snapshot de marché immédiatement précédent.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Current market snapshot date.
+        description: Date du snapshot de marché actuel.
         data_tests:
           - not_null
 
       - name: previous_listing_count
-        description: Number of listings observed in the previous snapshot.
+        description: Nombre d'annonces observées dans le snapshot précédent.
         data_tests:
           - not_null
 
       - name: current_listing_count
-        description: Number of listings observed in the current snapshot.
+        description: Nombre d'annonces observées dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: retained_listing_count
-        description: Listings observed in both consecutive snapshots.
+        description: Annonces observées dans les deux snapshots consécutifs.
         data_tests:
           - not_null
 
