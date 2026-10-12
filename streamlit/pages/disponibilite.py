@@ -22,14 +22,14 @@ from ui.styles import apply_global_styles
 
 
 # ============================================================
-# Global styles
+# Styles généraux
 # ============================================================
 
 apply_global_styles()
 
 
 # ============================================================
-# Snowflake connection
+# Connexion Snowflake
 # ============================================================
 
 session = get_session()
@@ -61,7 +61,7 @@ HORIZON_ORDER = [
 
 
 # ============================================================
-# Helpers
+# Fonctions utilitaires
 # ============================================================
 
 def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
@@ -256,7 +256,7 @@ if current_rows.empty:
 current = current_rows.iloc[0]
 
 # ============================================================
-# Header
+# En-tête
 # ============================================================
 
 page_header(
