@@ -19,6 +19,40 @@ L'audit différentiel a trouvé 120 nouveaux snapshots pour 119 zones (Vaud : de
 
 Les 25 modèles dbt et 456 tests du build précédent concernent **l'état antérieur** aux nouveaux snapshots. Les neuf pages Streamlit ont été contrôlées avant la synchronisation. **Aucune ingestion World ni reconstruction dbt post-synchronisation n'est établie.**
 
+## Fonctionnement de la mise à jour du manifeste
+
+**Le manifeste ne se met pas à jour tout seul.** Le collecteur interroge le catalogue officiel **uniquement lorsqu'il est exécuté**. Aucun planificateur intégré ne lance actuellement cette synchronisation à intervalle régulier.
+
+| Action | Lecture du catalogue | Téléchargement | Modification de `data_manifest.csv` |
+|---|---|---|---|
+| `--all --dry-run` | Oui | Non | Non |
+| `--all --dry-run --verify` | Oui | Non | Non |
+| `--all --sync` | Oui | Archives manquantes | Oui, pour les fichiers téléchargés |
+| `--all --sync --verify` | Oui | Archives manquantes | Oui, pour les fichiers téléchargés |
+
+**Procédure standard :**
+
+```powershell
+# 1. Détecter les fichiers disponibles
+.\.venv\Scripts\python.exe .\scripts\download_inside_airbnb.py --all --dry-run
+
+# 2. Télécharger les manquants et enrichir le manifeste
+.\.venv\Scripts\python.exe .\scripts\download_inside_airbnb.py --all --sync --verify
+
+# 3. Vérifier l'ensemble du manifeste (y compris l'historique)
+.\.venv\Scripts\python.exe .\scripts\check_archives.py --hash
+
+# 4. Publier le manifeste après contrôle
+git status --short
+git add data_manifest.csv
+git commit -m "data: synchroniser le catalogue Inside Airbnb"
+git push origin main
+```
+
+Le manifeste est **un inventaire de fichiers sources**, indépendant du compte Snowflake. Sur un compte Snowflake neuf, conserver le manifeste et les archives ; initialiser **RAW** et **INGESTION_LOG** vides, puis ingérer les lots souhaités. La présence d'une archive dans le manifeste ne signifie pas qu'elle a été chargée dans Snowflake.
+
+**Limite opérationnelle :** si une archive existe déjà sur disque mais manque dans le manifeste, vérifier la logique du collecteur avant de conclure que `--sync` la référencera automatiquement. Aucun mécanisme de planification, de publication Git automatique ou d'ingestion Snowflake automatique n'est fourni par cette commande.
+
 ## 2. Prévol (lecture seule)
 
 ```powershell
