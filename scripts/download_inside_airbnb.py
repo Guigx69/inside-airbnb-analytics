@@ -697,6 +697,7 @@ def main() -> int:
             return 0
 
         downloaded = 0
+        registered = 0
 
         for dataset in selected:
             status = inspect_status(
@@ -723,6 +724,15 @@ def main() -> int:
                 )
             )
 
+            if status == "UNTRACKED" and not args.overwrite:
+                # Archive déjà présente mais non référencée : ne pas la remplacer.
+                # Valider son contenu avant de l'inscrire dans le manifeste.
+                validate_gzip(dataset.local_path)
+                update_manifest(dataset, manifest)
+                write_manifest(manifest)
+                registered += 1
+                continue
+
             if should_download:
                 download_file(
                     dataset,
@@ -742,6 +752,7 @@ def main() -> int:
         print("SYNCHRONISATION TERMINÉE")
         print("=" * 100)
         print(f"Téléchargés : {downloaded}")
+        print(f"Archives locales ajoutées au manifeste : {registered}")
 
         print_summary(
             selected,
