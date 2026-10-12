@@ -1,0 +1,40 @@
+name: Audit du catalogue World
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Installer les dépendances du collecteur
+        run: python -m pip install "requests>=2.31,<3"
+      - name: Comparer le catalogue au manifeste
+        id: audit
+        continue-on-error: true
+        run: python scripts/audit_catalogue_world.py --rapport audit-world.json
+      - name: Publier le rapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-audit-world
+          path: audit-world.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Signaler les nouveautés ou une erreur
+        if: steps.audit.outcome == 'failure'
+        run: |
+          echo "::warning::Nouveaux fichiers possibles ou erreur de catalogue. Examiner le rapport et les logs."
+          exit 1
