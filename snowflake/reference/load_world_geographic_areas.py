@@ -277,9 +277,9 @@ def discover_catalog(session, url=CATALOG_URL):
         else:
             ambiguous.append(key)
     if ambiguous:
-        print(f"[CATALOG WARNING] ambiguous latest publications={len(ambiguous)}; excluded individually", file=sys.stderr)
+        print(f"[AVERTISSEMENT CATALOGUE] publications récentes ambiguës={len(ambiguous)} ; exclues individuellement", file=sys.stderr)
     if not discovered:
-        raise RuntimeError("No unambiguous Inside Airbnb destination GeoJSON URLs found in catalog")
+        raise RuntimeError("Aucune URL GeoJSON de destination Inside Airbnb non ambiguë trouvée dans le catalogue")
     return discovered
 
 
@@ -289,7 +289,7 @@ def destination_complete(country, city, expected_names, existing_keys):
 
 
 def resolve_sources(destinations, csv_sources, catalog_sources, catalog_error=None):
-    """Catalog-first resolution; CSV fallback; unresolved destinations remain quarantined."""
+    """Résolution prioritaire par le catalogue, repli sur CSV ; les destinations non résolues restent en quarantaine."""
     result, origin, unresolved = {}, {}, {}
     for key in sorted(destinations):
         if key in catalog_sources:
@@ -353,7 +353,7 @@ def repair_polygon(geom, max_area_change):
 
     if raw.is_empty or raw.geom_type not in ("Polygon", "MultiPolygon"):
 
-        raise ValueError(f"Empty or nonpolygon source geometry: {raw.geom_type}")
+        raise ValueError(f"Géométrie source vide ou non polygonale : {raw.geom_type}")
 
     before = raw.area
 
@@ -537,10 +537,10 @@ def dimensional_variants(part):
 
 
 def vertex_variants(part):
-    """Move one vertex by sub-millimetre-to-centimetre offsets; diagnostic only.
+    """Déplacer un sommet par de petits décalages, du sous-millimètre au centimètre ; diagnostic uniquement.
 
-    Reject any variant that changes ring count, validity or planar area > 0.1%.
-    The complete MultiPolygon still must pass strict Snowflake validation.
+    Rejeter toute variante qui modifie le nombre d'anneaux, la validité ou l'aire plane de plus de 0,1 %.
+    Le MultiPolygon complet doit toujours réussir la validation stricte de Snowflake.
     """
     if len(part.interiors) or len(part.exterior.coords) > 12:
         return
@@ -619,7 +619,7 @@ def contact_fusion_diagnostic(cur, original, index, label):
         neighbor = force_2d(part)
         if target.distance(neighbor) <= 1e-12:
             touching.append((j, neighbor))
-    print(f"  [FUSION] component={index} touching_neighbors={[j for j, _ in touching]}")
+    print(f"  [FUSION] composant={index} touching_neighbors={[j for j, _ in touching]}")
     for j, neighbor in touching:
         source_union = unary_union([target, neighbor])
         fused = []
@@ -633,7 +633,7 @@ def contact_fusion_diagnostic(cur, original, index, label):
             if buffered.geom_type == "Polygon":
                 fused.append(("buffer_zero", buffered))
         except Exception as exc:
-            print(f"  [FUSION ERROR] neighbor={j} operation=buffer_zero error={exc}")
+            print(f"  [ERREUR FUSION] neighbor={j} operation=buffer_zero error={exc}")
         for method, candidate in fused:
             original_pair = unary_union([target, neighbor])
             loss = original_pair.difference(candidate).area
@@ -683,7 +683,7 @@ def contour_reconstruction_diagnostic(cur, original, index, label):
           f"vertices={len(coords)} trials={len(trials)} diagnostic_only=True")
     for method, candidate in trials:
         if candidate.geom_type != "Polygon" or candidate.is_empty or not candidate.is_valid:
-            print(f"  [CONTOUR SKIP] component={index} method={method} "
+            print(f"  [CONTOUR IGNORÉ] component={index} method={method} "
                   f"geometry_type={candidate.geom_type} valid={candidate.is_valid}")
             continue
         lost = target.difference(candidate).area
@@ -718,7 +718,7 @@ def triangle_partition_diagnostic(cur, original, index, label):
     parts = list(original.geoms) if isinstance(original, MultiPolygon) else [original]
     target = force_2d(parts[index])
     if target.interiors or len(target.exterior.coords) != 5:
-        print(f"  [PARTITION SKIP] component={index} non_quadrilateral=True")
+        print(f"  [PARTITION IGNORÉE] component={index} non_quadrilateral=True")
         return
 
     coords = list(target.exterior.coords[:-1])
@@ -733,7 +733,7 @@ def triangle_partition_diagnostic(cur, original, index, label):
             pair = (Polygon(chain1), Polygon(chain2))
             partitions.append((f"diagonal_{a}_{b}", pair))
         except Exception as exc:
-            print(f"  [PARTITION ERROR] diagonal={a}_{b} error={exc}")
+            print(f"  [ERREUR PARTITION] diagonal={a}_{b} error={exc}")
     triangles = triangulate(target)
     inside = [t for t in triangles if target.covers(t.representative_point())]
     if len(inside) == 2:
@@ -743,7 +743,7 @@ def triangle_partition_diagnostic(cur, original, index, label):
           f"original_area_deg2={target.area:.16g} diagnostic_only=True")
     for method, pair in partitions:
         if any(p.is_empty or p.area <= 0 or not p.is_valid for p in pair):
-            print(f"  [PARTITION SKIP] method={method} degenerate_or_invalid_triangle=True")
+            print(f"  [PARTITION IGNORÉE] method={method} degenerate_or_invalid_triangle=True")
             continue
         pair_union = unary_union(pair)
         lost = target.difference(pair_union).area
@@ -757,8 +757,8 @@ def triangle_partition_diagnostic(cur, original, index, label):
         multipolygon = MultiPolygon(pair)
         multi_shapely_valid = multipolygon.is_valid
         multi_snowflake_valid = snowflake_valid(cur, multipolygon)
-        # Snowflake's native spherical union is a separate diagnostic: it is
-        # not equivalent to Shapely's planar union or a lossless replacement.
+        # L'union sphérique native de Snowflake constitue un diagnostic distinct : elle n'est
+        # ni équivalente à l'union plane de Shapely ni une substitution sans perte.
         native_union_valid = False
         native_union_area_m2 = None
         native_union_error = None
@@ -812,7 +812,7 @@ def generic_exact_partition_repair(cur, original, label):
     index = bad[0]
     target = force_2d(parts[index])
     if target.interiors or len(target.exterior.coords) != 5 or target.area <= 0:
-        print("  [PARTITION INTEGRATION] blocked: target is not a simple quadrilateral")
+        print("  [INTÉGRATION PARTITION] bloquée : la cible n'est pas un quadrilatère simple")
         return None
     coords = list(target.exterior.coords[:-1])
     variants = [
@@ -870,7 +870,7 @@ def targeted_repair(cur, original, label, max_delta=0.001):
     from itertools import product
     parts = list(original.geoms) if isinstance(original, MultiPolygon) else [original]
     bad = [i for i, part in enumerate(parts) if not snowflake_valid(cur, part)]
-    print(f"[TARGET] {label}: components={len(parts)} invalid={bad}")
+    print(f"[CIBLE] {label}: components={len(parts)} invalid={bad}")
     if not bad:
         return original if snowflake_valid(cur, original) else None
     replacements = {}
@@ -894,7 +894,7 @@ def targeted_repair(cur, original, label, max_delta=0.001):
         for method, candidate in variants:
             tested += 1
             if candidate.geom_type != "Polygon":
-                print(f"  [SKIP] component={index} method={method}: changes component count")
+                print(f"  [IGNORÉ] component={index} method={method}: changes component count")
                 continue
             delta = abs(candidate.area - part.area) / part.area if part.area > 0 else float("inf")
             if delta > max_delta:
@@ -916,7 +916,7 @@ def targeted_repair(cur, original, label, max_delta=0.001):
         partitioned = generic_exact_partition_repair(cur, original, label)
         if partitioned is not None:
             return partitioned
-        print(f"  [REPAIR TEST] {label}: unresolved_components={sorted(set(bad)-set(replacements))}")
+        print(f"  [TEST RÉPARATION] {label}: unresolved_components={sorted(set(bad)-set(replacements))}")
         return None
     attempts = 0
     for combination in product(*(replacements[i] for i in bad)):
@@ -996,16 +996,16 @@ def diagnose_components(conn, session, sources, names, report_path, max_area_cha
         full_json = json.dumps(mapping(combined), separators=(",", ":"))
         cur.execute("SELECT TRY_TO_GEOGRAPHY(%s) IS NOT NULL", (full_json,))
         whole_valid = cur.fetchone()[0]
-        print(f"[DIAG] {target}: components={len(parts)} "
+        print(f"[DIAGNOSTIC] {target}: components={len(parts)} "
               f"individually_invalid={len(invalid_indices)} "
               f"whole_valid={whole_valid} rejected_features={len(rejected)}")
-        print(f"       invalid component indices (first 30): {invalid_indices[:30]}")
+        print(f"       indices des composants invalides (30 premiers) : {invalid_indices[:30]}")
         if not invalid_indices and not whole_valid:
             print("       [INTERACTION] Components individually valid but combined "
                   "geography invalid; investigate geodesic overlaps/ring orientation.")
         if invalid_indices:
             repaired = targeted_repair(cur, combined, target)
-            print(f"       [REPAIR TEST] whole_valid_after={bool(repaired is not None)}")
+            print(f"       [TEST RÉPARATION] whole_valid_after={bool(repaired is not None)}")
         if rejected:
             print(f"       rejected feature examples: {rejected[:5]}")
     write_csv(report_path,
@@ -1083,10 +1083,10 @@ def main():
     if not args.inventory_only:
         try:
             catalog_sources = discover_catalog(session, args.catalog_url)
-            print(f"[CATALOG] discovered={len(catalog_sources)} destinations")
+            print(f"[CATALOGUE] destinations découvertes={len(catalog_sources)} destinations")
         except (requests.RequestException, ValueError, RuntimeError) as exc:
             catalog_error = str(exc)
-            print(f"[CATALOG WARNING] {catalog_error}; using inventory fallback where available", file=sys.stderr)
+            print(f"[AVERTISSEMENT CATALOGUE] {catalog_error} ; utilisation de l'inventaire de secours si disponible", file=sys.stderr)
 
     try:
 
@@ -1260,7 +1260,7 @@ def main():
 
                 report.append((country, city, len(expected), 0, 0, 0, 0, 0, len(expected), "ERROR"))
 
-                print(f"[ERROR] {country}/{city}: {exc}", file=sys.stderr)
+                print(f"[ERREUR] {country}/{city}: {exc}", file=sys.stderr)
                 for area in sorted(expected):
                     if (country, city, area) not in existing:
                         quarantine.append((country, city, area, "DOWNLOAD_ERROR", str(exc)))
@@ -1337,7 +1337,7 @@ def main():
             if area and (country, city, area) not in existing:
                 quarantine.append((country, city, area, status, detail))
         if blockers:
-            print(f"[QUARANTINE] {len(blockers)} unresolved source issues; continuing safe candidates.")
+            print(f"[QUARANTAINE] {len(blockers)} anomalies source non résolues ; poursuite avec les candidats sûrs.")
         if args.fail_on_quarantine and quarantine:
             write_csv(args.quarantine_report,
                       ("source_country", "source_city", "area_name", "status", "detail"),
@@ -1367,7 +1367,7 @@ def main():
         bad = cur.fetchall()
 
         if bad:
-            print(f"[REPAIR] {len(bad)} Snowflake-invalid neighbourhood geometries")
+            print(f"[RÉPARATION] {len(bad)} géométries de quartier invalides dans Snowflake")
             for country, city, area_name in bad:
                 cur.execute(
                     """SELECT GEOJSON FROM WORLD_GEO_STAGE
@@ -1381,7 +1381,7 @@ def main():
                                        "No safe repair found"))
                     cur.execute("DELETE FROM WORLD_GEO_STAGE WHERE SOURCE_COUNTRY=%s AND SOURCE_CITY=%s AND AREA_NAME=%s",
                                 (country, city, area_name))
-                    print(f"[QUARANTINE] {country}/{city}/{area_name}: no safe repair")
+                    print(f"[QUARANTAINE] {country}/{city}/{area_name} : aucune réparation sûre")
                     continue
                 cur.execute(
                     """UPDATE WORLD_GEO_STAGE SET GEOJSON=%s
@@ -1403,7 +1403,7 @@ def main():
 
         if already:
 
-            print(f"[BLOCKED] {already} candidate keys already exist in reference.", file=sys.stderr)
+            print(f"[BLOQUÉ] {already} clés candidates existent déjà dans la référence.", file=sys.stderr)
 
             return 2
 

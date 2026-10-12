@@ -174,7 +174,7 @@ def main():
         writer.writeheader()
         writer.writerows(rows)
     print('\n=== WORLD MATCHING ===')
-    print('Catalog destinations audited:', len(rows))
+    print('Destinations du catalogue auditées :', len(rows))
     print('Destinations du catalogue présentes dans FCT :', sum(r['in_fct'] for r in rows))
     print('Destinations FCT absentes du catalogue audité :', len(fct_destinations - inventory_keys))
     if fct_destinations - inventory_keys:
