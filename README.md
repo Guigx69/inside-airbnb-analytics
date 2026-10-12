@@ -49,7 +49,7 @@ Le contrôle d'archives suppose que les fichiers référencés dans `data_manife
 - **120 zones** recensées dans le catalogue, **553 snapshots courants** et **1 659 archives courantes**.
 - **120 nouveaux snapshots** détectés par comparaison des chemins (119 zones, deux nouvelles dates pour Vaud) ; **360 nouvelles archives** téléchargées et ajoutées au manifeste.
 - **1 989 entrées** dans `data_manifest.csv` après synchronisation, contre 1 629 avant ; aucune suppression ni modification des entrées historiques lors de la comparaison.
-- **1 659/1 659 archives du catalogue courant vérifiées** avec `--verify` (taille et SHA-256). Les **330 autres entrées historiques** du manifeste nécessitent le contrôle global `check_archives.py --hash` pour une preuve d'intégrité complète.
+- **1 659/1 659 archives du catalogue courant vérifiées** avec `--verify` (taille et SHA-256). Les **1 989/1 989 archives du manifeste** (dont 330 historiques) ont ensuite été vérifiées par `check_archives.py --hash` : 0 manquante, 0 invalide, 45,08 Gio.
 - Dernière date du catalogue observée : **05/10/2026 (Vaud)**. Ce constat est daté, pas une garantie de fraîcheur future.
 - **Non encore validé pour ces nouvelles données :** ingestion RAW World, exécution dbt après synchronisation, fraîcheur des marts et validation sur un compte Snowflake vierge.
 
