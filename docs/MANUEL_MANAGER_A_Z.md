@@ -48,7 +48,7 @@ Inside Airbnb (listings / calendar / reviews CSV.GZ)
   -> dbt MARTS (tables/vues analytiques)
 ```
 
-**25 modèles dbt :** 3 staging, 10 intermediate, 12 marts/fact. La V1.3 a été validée sur le compte source le 09/10/2026 : 14 tables, 11 vues, 456 tests, `PASS=480 WARN=1 ERROR=0`, durée 1 h 05 min 46 s. Le WARN `assert_stg_calendar_listing_exists` (3 163 clés orphelines) est connu ; ne pas le masquer en supprimant les données. **Ce benchmark ne prouve pas la validation d'un compte cible ni d'un build postérieur au snapshot septembre.**
+**25 modèles dbt :** 3 staging, 10 intermediate, 12 marts/fact. La V1.3 a été testée sur l'environnement de développement le 09/10/2026 : 14 tables, 11 vues, 456 tests, `PASS=480 WARN=1 ERROR=0`, durée 1 h 05 min 46 s. Le WARN `assert_stg_calendar_listing_exists` (3 163 clés orphelines) est connu ; ne pas le masquer en supprimant les données. **Ce benchmark ne prouve pas la validation d'un compte cible ni d'un build postérieur au snapshot septembre.**
 
 **Prudence métier :** une journée indisponible dans Calendar ne prouve pas qu'elle a été louée ; ne pas présenter l'indisponibilité comme une occupation réelle.
 
@@ -122,7 +122,7 @@ Les tables RAW doivent contenir les colonnes `SOURCE_COUNTRY`, `SOURCE_CITY`, `S
 
 ## 4B. Scénario B — compte Snowflake neuf
 
-**Ne jamais appliquer ces scripts à un compte existant sans revue administrative.** Scripts désormais inclus dans cette branche de livraison consolidée ; ils ne sont pas encore homologués sur compte vierge.
+**Ne jamais appliquer ces scripts à un compte existant sans revue administrative.** Les scripts de bootstrap doivent être validés sur un compte vierge avant leur utilisation en production.
 
 Dans Snowflake, avec un rôle administrateur habilité, **lire les SQL avant de les exécuter**, puis suivre l'ordre :
 
@@ -167,7 +167,7 @@ Le loader vérifie les archives, interroge le journal et l'inventaire RAW, puis 
 | 2026-06-22 | 3 414 575 | 9 317 | 469 378 |
 | 2026-09-17 | 3 358 365 | 9 201 | 473 321 |
 
-**17 692 229 lignes RAW** sur Lyon, toutes tables et dates confondues. La baisse de Calendar en mars est à investiguer si l'exhaustivité source est exigée. Ces volumes sont des références du compte source, **pas des contraintes imposées au compte cible**.
+**17 692 229 lignes RAW** sur Lyon, toutes tables et dates confondues. La baisse de Calendar en mars est à investiguer si l'exhaustivité source est exigée. Ces volumes sont des références de l'environnement de développement, **pas des contraintes imposées au compte cible**.
 
 ## 6. Construire et vérifier dbt
 
@@ -180,7 +180,7 @@ Après `dbt debug` et `dbt parse` réussis, si les tables RAW existent et que le
 .\.venv\Scripts\dbt.exe build --threads 4
 ```
 
-Ne pas relancer le build complet sur le compte source uniquement pour produire une preuve documentaire. Pour une correction ciblée, utiliser `dbt build --select <modele>+` après étude des dépendances. Les sorties `target/run_results.json`, `target/manifest.json` et les logs doivent être **copiées hors du répertoire temporaire avant nettoyage**.
+Ne pas relancer le build complet sur l'environnement de développement uniquement pour produire une preuve documentaire. Pour une correction ciblée, utiliser `dbt build --select <modele>+` après étude des dépendances. Les sorties `target/run_results.json`, `target/manifest.json` et les logs doivent être **copiées hors du répertoire temporaire avant nettoyage**.
 
 Pour visualiser la documentation dbt (si disponible sur le poste) :
 
@@ -210,7 +210,7 @@ Pour visualiser la documentation dbt (si disponible sur le poste) :
 
 ### Orchestrateur `run_pipeline.py`
 
-**Par défaut**, l'orchestrateur prévisualise collecte, vérification archives et RAW. Son argument `--selection-file` est **obligatoirement un fichier JSON de sélection existant**, même si la valeur par défaut pointe sur `config/geography.lyon.example.json`. Le fichier Lyon sélectionne la ville par son nom : contrôler la liste effective des fichiers, car ce critère seul ne filtre pas le pays. Le moteur géographique combine les critères inclusifs par **OU** (et non par ET) : ajouter `countries: [\"France\"]` inclurait **toutes les villes françaises**. Contrôler la sélection avant toute exécution ; le fichier géographique générique inclut Japon/Sydney et ne doit pas servir au pilote Lyon.
+**Par défaut**, l'orchestrateur prévisualise collecte, vérification archives et RAW. Son argument `--selection-file` est **obligatoire** et doit désigner un fichier JSON existant. Le fichier Lyon sélectionne la ville par son nom : contrôler la liste effective des fichiers, car ce critère seul ne filtre pas le pays. Le moteur géographique combine les critères inclusifs par **OU** (et non par ET) : ajouter `countries: [\"France\"]` inclurait **toutes les villes françaises**. Contrôler la sélection avant toute exécution ; le fichier géographique générique inclut Japon/Sydney et ne doit pas servir au pilote Lyon.
 
 ```powershell
 # Aperçu, sans écriture RAW (connexion Snowflake néanmoins)
@@ -238,7 +238,7 @@ Pour visualiser la documentation dbt (si disponible sur le poste) :
 | Avertissement dbt | Lire le nom et le nombre de lignes ; comparer au WARN connu ; ne pas ignorer un nouveau WARN. |
 | Dépassement de crédits | Suspendre le warehouse selon la procédure de l'administrateur ; ne pas relancer un build. |
 
-### Checklist de remise au manager
+### Checklist de transfert et de reprise
 
 - [ ] Code et documentation des PR validées intégrés sur une branche de livraison clairement identifiée.
 - [ ] Compte cible, rôle, warehouse et budget confirmés ; identifiants transmis hors Git.
@@ -258,4 +258,4 @@ Pour visualiser la documentation dbt (si disponible sur le poste) :
 4. N'utiliser `--execute`, `--sync`, le loader sans `--dry-run` ou `dbt build` qu'après accord explicite du propriétaire du compte cible.
 5. Ne pas considérer une commande `dbt parse` réussie comme preuve que les données et les droits de création sont valides ; `dbt debug` teste la connexion, `dbt build` écrit des objets.
 
-**État au 12/10/2026 :** RAW Lyon du compte source contrôlé (5 dates, 15 lots, 17 692 229 lignes) ; build V1.3 antérieur validé ; **pas de preuve de build sur compte manager ni de bootstrap sur compte vierge**. La livraison doit conserver cette distinction.
+**État au 12/10/2026 :** RAW Lyon du compte source contrôlé (5 dates, 15 lots, 17 692 229 lignes) ; build V1.3 antérieur validé ; **pas de preuve de build sur environnement cible ni de bootstrap sur compte vierge**. La livraison doit conserver cette distinction.
