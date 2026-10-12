@@ -157,7 +157,7 @@ Les mêmes commandes fonctionnent avec `config/geography.europe.example.json` ou
 
 **Après interruption :** inspecter les fichiers `.part`, le manifeste, les SHA-256, `INGESTION_LOG` et les volumes RAW ; relancer d'abord le `--dry-run`. Ne pas supposer qu'un journal suffit à prouver la complétude, ni supprimer/recharger des lots sans diagnostic. Conserver les logs et `target/run_results.json` après build.
 
-**Réception par le manager :** le périmètre choisi correspond aux fichiers inventoriés ; archives disponibles et intègres ; journal/RAW cohérents ; `dbt debug` et `dbt parse` OK ; build réellement exécuté si requis et résultats archivés ; droits de lecture des marts vérifiés ; anomalies et coûts documentés. Si l'une de ces étapes n'a pas été réalisée, noter **« non testé »**, pas « validé ».
+**Critères de réception :** le périmètre choisi correspond aux fichiers inventoriés ; archives disponibles et intègres ; journal/RAW cohérents ; `dbt debug` et `dbt parse` OK ; build réellement exécuté si requis et résultats archivés ; droits de lecture des marts vérifiés ; anomalies et coûts documentés. Si l'une de ces étapes n'a pas été réalisée, noter **« non testé »**, pas « validé ».
 
 ## 10. Limites explicites de la version actuelle
 
