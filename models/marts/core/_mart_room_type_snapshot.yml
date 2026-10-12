@@ -38,7 +38,7 @@ models:
                   - "Hotel room"
 
       - name: listing_count
-        description: Number of listings observed for the room type.
+        description: Nombre d'annonces observed for the room type.
         data_tests:
           - not_null
 
@@ -51,7 +51,7 @@ models:
           - not_null
 
       - name: listings_with_price
-        description: Number of listings with a non-null price.
+        description: Nombre d'annonces with a non-null price.
         data_tests:
           - not_null
 
