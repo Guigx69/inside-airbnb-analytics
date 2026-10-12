@@ -21,14 +21,14 @@ from ui.styles import apply_global_styles
 
 
 # ============================================================
-# Global styles
+# Styles généraux
 # ============================================================
 
 apply_global_styles()
 
 
 # ============================================================
-# Snowflake connection
+# Connexion Snowflake
 # ============================================================
 
 session = get_session()
@@ -54,7 +54,7 @@ CHART_GREY = "#8A94A6"
 
 
 # ============================================================
-# Helpers
+# Fonctions utilitaires
 # ============================================================
 
 def normalize_dataframe(
@@ -137,7 +137,7 @@ def format_neighbourhood(value):
 
 
 # ============================================================
-# Data loading
+# Chargement des données
 # ============================================================
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -260,7 +260,7 @@ selected_snapshot = pd.Timestamp(
 
 
 # ============================================================
-# Geographic filtering
+# Filtrage géographique
 # ============================================================
 
 snapshots = snapshots[
@@ -303,7 +303,7 @@ snapshot_dates = sorted(
 
 
 # ============================================================
-# Selected observation
+# Observation sélectionnée
 # ============================================================
 
 current = snapshots[
@@ -448,7 +448,7 @@ largest_neighbourhood_share = float(
 
 
 # ============================================================
-# Header
+# En-tête
 # ============================================================
 
 page_header(
@@ -927,7 +927,7 @@ st.altair_chart(
 
 
 # ============================================================
-# Availability
+# Disponibilité
 # ============================================================
 
 st.divider()
