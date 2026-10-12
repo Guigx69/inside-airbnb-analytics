@@ -11,33 +11,33 @@ models:
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Current Inside Airbnb snapshot date.
+        description: Current Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Identifier of the listing observed in the current snapshot.
+        description: Identifiant de l'annonce observée dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: snapshot_sequence
-        description: Chronological sequence number of the market snapshot.
+        description: Numéro d'ordre chronologique du snapshot de marché.
         data_tests:
           - not_null
 
       - name: market_previous_snapshot_date
         description: >
-          Immediately preceding market snapshot date. Null for the first
+          Date du snapshot de marché immédiatement précédent. Null for the first
           snapshot because no transition can be inferred.
 
       - name: first_seen_snapshot
@@ -46,7 +46,7 @@ models:
           - not_null
 
       - name: snapshot_count
-        description: Number of snapshots in which the listing is observed.
+        description: Nombre de snapshots dans lesquels l'annonce est observée.
         data_tests:
           - not_null
 
