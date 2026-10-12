@@ -114,7 +114,7 @@ Le second scénario **n'a pas encore été testé sur un compte vierge**. Les sc
 - `docs/` : documentation technique et livraison.
 - `data_manifest.csv` : inventaire et empreintes des archives, à préserver.
 
-Le manifeste GitHub `main` contient encore **1 626 entrées**, tandis que le manifeste local en compte **1 629** : les trois ajouts correspondent à Lyon au 17 septembre 2026. Les documents décrivant la version déployée restent fondés sur les quatre snapshots antérieurs jusqu'à nouvelle ingestion et validation dbt.
+Le manifeste GitHub `main` contient désormais **1 629 entrées** (commit `167cc5f`) : les trois ajouts correspondent à Lyon au 17 septembre 2026. Les documents décrivant la version déployée restent fondés sur les quatre snapshots antérieurs jusqu'à nouvelle ingestion et validation dbt.
 
 Les archives `data/raw/`, les secrets, les environnements virtuels et les résultats dbt générés ne doivent pas être versionnés. **GitHub ne constitue pas une sauvegarde des 35,16 Gio d'archives locales.**
 
