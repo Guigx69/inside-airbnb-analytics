@@ -71,7 +71,8 @@ Dans la **session PowerShell courante**, saisir les valeurs fournies par l'admin
 ```powershell
 $env:SNOWFLAKE_ACCOUNT = "<identifiant_compte>"
 $env:SNOWFLAKE_USER = "<utilisateur>"
-$env:DBT_SNOWFLAKE_PASSWORD = Read-Host "Mot de passe Snowflake"
+$securePassword = Read-Host "Mot de passe Snowflake" -AsSecureString
+$env:DBT_SNOWFLAKE_PASSWORD = [System.Net.NetworkCredential]::new("", $securePassword).Password
 $env:SNOWFLAKE_DATABASE = "AIRBNB"
 $env:SNOWFLAKE_WAREHOUSE = "DBT_WH"
 $env:SNOWFLAKE_ROLE = "INGESTION_ROLE"
@@ -207,7 +208,7 @@ Pour visualiser la documentation dbt (si disponible sur le poste) :
 
 ### Orchestrateur `run_pipeline.py`
 
-**Par défaut**, l'orchestrateur prévisualise collecte, vérification archives et RAW. Son argument `--selection-file` est **obligatoirement un fichier JSON de sélection existant**, même si la valeur par défaut pointe sur `config/geography.lyon.example.json`. Le fichier Lyon sélectionne la ville par son nom. Le moteur géographique combine les critères inclusifs par **OU** (et non par ET) : ajouter `countries: [\"France\"]` inclurait **toutes les villes françaises**. Contrôler la sélection avant toute exécution ; le fichier géographique générique inclut Japon/Sydney et ne doit pas servir au pilote Lyon.
+**Par défaut**, l'orchestrateur prévisualise collecte, vérification archives et RAW. Son argument `--selection-file` est **obligatoirement un fichier JSON de sélection existant**, même si la valeur par défaut pointe sur `config/geography.lyon.example.json`. Le fichier Lyon sélectionne la ville par son nom : contrôler la liste effective des fichiers, car ce critère seul ne filtre pas le pays. Le moteur géographique combine les critères inclusifs par **OU** (et non par ET) : ajouter `countries: [\"France\"]` inclurait **toutes les villes françaises**. Contrôler la sélection avant toute exécution ; le fichier géographique générique inclut Japon/Sydney et ne doit pas servir au pilote Lyon.
 
 ```powershell
 # Aperçu, sans écriture RAW (connexion Snowflake néanmoins)
@@ -246,5 +247,13 @@ Pour visualiser la documentation dbt (si disponible sur le poste) :
 - [ ] Build cible effectué **ou** indiqué explicitement comme non exécuté, avec logs.
 - [ ] Accès en lecture aux marts testé pour le responsable.
 - [ ] Résultats, anomalies, coûts et sauvegarde des archives documentés.
+
+### Prévol avant exécution réelle
+
+1. Lire le fichier de sélection `config/geography.lyon.example.json` et vérifier que la liste affichée par `check_archives.py --selection-file config/geography.lyon.example.json --hash` correspond exclusivement à la ville attendue ; le moteur de sélection combine les inclusions par OU.
+2. Confirmer la cible Snowflake via `SELECT CURRENT_ACCOUNT(), CURRENT_ROLE(), CURRENT_WAREHOUSE()` dans le worksheet ; le rôle utilisé par Python peut être différent du rôle courant du worksheet.
+3. Prévisualiser les lots RAW avec `--dry-run` et vérifier le nombre de lots `À charger` ; sur le compte source déjà chargé, il doit être nul si journal et RAW sont cohérents.
+4. N'utiliser `--execute`, `--sync`, le loader sans `--dry-run` ou `dbt build` qu'après accord explicite du propriétaire du compte cible.
+5. Ne pas considérer une commande `dbt parse` réussie comme preuve que les données et les droits de création sont valides ; `dbt debug` teste la connexion, `dbt build` écrit des objets.
 
 **État au 12/10/2026 :** RAW Lyon du compte source contrôlé (5 dates, 15 lots, 17 692 229 lignes) ; build V1.3 antérieur validé ; **pas de preuve de build sur compte manager ni de bootstrap sur compte vierge**. La livraison doit conserver cette distinction.
