@@ -67,6 +67,6 @@ where
     or r.reconstructed_review_count_l365d
         <> m.reconstructed_review_count_l365d
 
-    -- tolerance for the sum of individually rounded room-type shares
+    -- tolérance pour la somme des parts par type de logement arrondies individuellement
     or r.listing_share_total_pct < 99.99
     or r.listing_share_total_pct > 100.01
