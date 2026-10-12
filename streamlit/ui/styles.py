@@ -287,5 +287,5 @@ section[data-testid="stSidebar"] hr {
 
 
 def apply_global_styles() -> None:
-    """Apply the common visual system to the current Streamlit page."""
+    """Applique le système visuel commun à la page Streamlit actuelle."""
     st.markdown(GLOBAL_CSS, unsafe_allow_html=True)

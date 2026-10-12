@@ -135,7 +135,7 @@ def grouped_chart(frame, category, value, order=None, horizontal=False, height=3
         tooltip=tooltips,
     )
     if horizontal:
-        # A single selected zone should not occupy a huge blank chart.
+        # Une seule zone sélectionnée ne doit pas produire un graphique largement vide.
         base = base.encode(
             y=alt.Y(f"{category}:N", sort=order, title=None,
                     axis=alt.Axis(labelLimit=210, labelPadding=12, labelFontSize=12)),

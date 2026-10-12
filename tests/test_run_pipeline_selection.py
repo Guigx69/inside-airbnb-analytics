@@ -1,4 +1,4 @@
-"""Regression tests for safe explicit geographic selection (offline)."""
+"""Tests de non-régression hors ligne pour la sélection géographique explicite et sécurisée."""
 import importlib.util
 from pathlib import Path
 import sys

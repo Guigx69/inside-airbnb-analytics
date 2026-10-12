@@ -1,4 +1,4 @@
-"""Offline regression tests for geographic selection of local manifests."""
+"""Tests de non-régression hors ligne pour la sélection géographique des manifestes locaux."""
 import json
 import sys
 import tempfile
