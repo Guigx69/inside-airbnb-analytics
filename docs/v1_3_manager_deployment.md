@@ -2,7 +2,7 @@
 
 ## Statut
 
-Branche de livraison : `release/performance-v1-3` ; PR #3 vers `main` (brouillon jusqu'au benchmark final).
+Version V1.3 fusionnée dans `main` via la PR #3 (commit `6871e0726ad914d8ae57066209f140ed2d4cdfaa`). Le benchmark final a été validé le 9 octobre 2026.
 
 Cette livraison modifie **uniquement** la matérialisation de deux modèles :
 - `int_listing_calendar_metrics` : vue → table.
@@ -26,8 +26,8 @@ Depuis la racine du dépôt, avec l'environnement Python installé et activé :
 
 ```powershell
 git fetch origin
-git switch release/performance-v1-3
-git pull --ff-only origin release/performance-v1-3
+git switch main
+git pull --ff-only origin main
 
 .\.venv\Scripts\dbt.exe debug
 .\.venv\Scripts\dbt.exe parse
@@ -79,9 +79,9 @@ Ces durées sont issues d'exécutions différentes et ne représentent **pas** l
 ## Exploitation et retour arrière
 
 - Après chaque nouvel apport ou correction des données RAW, reconstruire les modèles intermédiaires et leurs dépendants avec `dbt build` ; les tables intermédiaires ne se rafraîchissent pas automatiquement.
-- Si le build échoue, conserver les journaux, identifier le modèle ou test en cause et ne pas fusionner la PR.
+- Si le build échoue, conserver les journaux et identifier le modèle ou test en cause avant tout nouveau déploiement.
 - Retour arrière applicatif : revenir à la version précédente des deux fichiers SQL via Git et relancer `dbt build` sur l'environnement concerné. Cette opération reconstruit les objets dbt ; planifier son coût Snowflake. Ne jamais vider ou réinitialiser les tables RAW pour ce retour arrière.
-- La fusion dans `main` et le déploiement sur le compte du manager nécessitent une validation explicite.
+- La fusion V1.3 dans `main` est effectuée ; le déploiement sur le compte du manager nécessite encore une validation explicite.
 
 ## Hors périmètre V1.3
 
