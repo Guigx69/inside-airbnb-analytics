@@ -20,10 +20,10 @@ with invalid_rows as (
     from {{ ref('fct_listing_snapshot') }}
 
     where
-        -- Review metrics are expected for every listing snapshot.
+        -- Des indicateurs d'avis sont attendus pour chaque snapshot d'annonce.
         review_count_to_snapshot is null
 
-        -- When calendar data exists, its metrics must be complete
+        -- Lorsque les données de calendrier existent, leurs indicateurs doivent être complets
         -- and internally consistent.
         or (
             calendar_row_count is not null
@@ -40,7 +40,7 @@ with invalid_rows as (
             )
         )
 
-        -- Review windows are cumulative.
+        -- Les fenêtres d'avis sont cumulatives.
         or review_count_l30d > review_count_l90d
         or review_count_l90d > review_count_l365d
         or review_count_l365d > review_count_to_snapshot
