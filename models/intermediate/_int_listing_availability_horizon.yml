@@ -3,14 +3,7 @@ version: 2
 models:
   - name: int_listing_availability_horizon
     description: >
-      Indicateurs de disponibilité reconstitués par annonce, calculés directement
-      from the detailed Inside Airbnb calendar. One row represents one listing
-      for one country, city and snapshot. Availability horizons are anchored
-      on the first calendar date actually observed for each listing rather
-      than directly on snapshot_date, because the calendar window may start
-      several days after the snapshot date. These metrics represent calendar
-      availability and must not be interpreted as observed occupancy or
-      confirmed bookings.
+      Indicateurs de disponibilité reconstitués par annonce à partir du calendrier détaillé Inside Airbnb. Chaque ligne correspond à une annonce, un pays, une ville et un snapshot. Les horizons commencent à la première date calendaire effectivement observée pour l'annonce, et non nécessairement à snapshot_date, car la fenêtre du calendrier peut débuter plusieurs jours après le snapshot. Ces mesures ne prouvent ni une occupation réelle ni des réservations confirmées.
 
     columns:
       - name: source_country

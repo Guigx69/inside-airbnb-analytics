@@ -3,12 +3,7 @@ version: 2
 models:
   - name: int_calendar_monthly_metrics
     description: >
-      Indicateurs mensuels de calendrier par annonce, calculés à partir du calendrier détaillé
-      Inside Airbnb calendar. One row represents one country, city,
-      snapshot, calendar month and listing. The model preserves partial
-      months and explicitly measures their calendar coverage. Availability
-      describes dates marked available in the source calendar and must not
-      be interpreted as observed occupancy or confirmed bookings.
+      Indicateurs mensuels du calendrier détaillé Inside Airbnb par annonce. Chaque ligne correspond à un pays, une ville, un snapshot, un mois et une annonce. Les mois partiels sont conservés et leur couverture est mesurée explicitement. La disponibilité indique les dates déclarées disponibles dans le calendrier source, et non une occupation constatée ou des réservations confirmées.
 
     columns:
       - name: source_country

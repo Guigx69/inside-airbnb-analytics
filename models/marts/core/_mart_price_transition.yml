@@ -3,11 +3,7 @@ version: 2
 models:
   - name: mart_price_transition
     description: >
-      Market-level analysis of listing price changes between two observed
-      Inside Airbnb snapshots. One row represents one observed snapshot
-      transition for a country and city. Transitions may be consecutive or
-      occur after one or more missing observations. Price-change metrics are
-      calculated only for listings having both a previous and a current price.
+      Analyse des variations de prix des annonces entre deux snapshots Inside Airbnb observés. Chaque ligne représente une transition pour un pays et une ville. Les snapshots peuvent être consécutifs ou séparés par une ou plusieurs observations manquantes. Les variations de prix sont calculées uniquement pour les annonces disposant d'un prix dans les deux snapshots.
 
     columns:
       - name: source_country

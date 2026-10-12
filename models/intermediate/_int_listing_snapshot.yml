@@ -3,10 +3,7 @@ version: 2
 models:
   - name: int_listing_snapshot
     description: >
-      Observations historiques des annonces dans les snapshots Inside Airbnb.
-      The model preserves one row per country, city, snapshot and listing,
-      and enriches each observation with listing-level history, previous
-      observations, snapshot continuity and attribute changes.
+      Observations historiques des annonces issues des snapshots Inside Airbnb. Chaque ligne correspond à une annonce pour un pays, une ville et un snapshot. Le modèle enrichit chaque observation avec l'historique de l'annonce, les observations précédentes, la continuité des snapshots et les changements d'attributs.
 
     columns:
       - name: source_country
