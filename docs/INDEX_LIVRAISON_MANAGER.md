@@ -7,8 +7,8 @@
 3. **[Déploiement V1.3](v1_3_manager_deployment.md)** — benchmark, modèles et particularités dbt.
 4. **[Contrôle RAW Lyon](controle_raw_lyon_2026-10-12.md)** — preuve des cinq snapshots et des 15 lots sur le compte source.
 5. **[Audit de livraison](audit_livraison_2026-10-12.md)** — statut vérifié et limites.
-6. **[Scénarios de déploiement](manager_deployment_two_scenarios.md)** — document de la PR #4, non encore intégré à cette branche.
-7. **[Bootstrap compte vierge](bootstrap_manager_lyon.md)** — document de la PR #5, non encore intégré à cette branche.
+6. **[Scénarios de déploiement](manager_deployment_two_scenarios.md)** — inclus dans cette branche consolidée.
+7. **[Bootstrap compte vierge](bootstrap_manager_lyon.md)** — inclus dans cette branche consolidée.
 
 ## Scripts et aides
 
@@ -28,7 +28,7 @@
 - Les archives CSV.GZ sont stockées localement, pas dans GitHub ; copie indépendante encore à organiser.
 - Le compte Snowflake source contient cinq snapshots Lyon journalisés et 17 692 229 lignes RAW Lyon ; la fraîcheur des marts après le dernier snapshot n'est pas établie.
 - La validation dbt de référence date du 9 octobre 2026 : 480 PASS, 1 WARN, 0 ERROR.
-- Les PR #4, #5 et #6 doivent être relues et intégrées explicitement avant de considérer `main` comme une livraison documentaire complète.
+- Les contenus des PR #4 et #5 ont été regroupés dans la branche de la PR #6 ; celle-ci doit être revue et fusionnée explicitement avant de considérer `main` comme une livraison documentaire complète.
 - Le bootstrap d'un compte vierge et le déploiement chez le manager ne sont pas encore testés.
 
 ## Condition de réception
