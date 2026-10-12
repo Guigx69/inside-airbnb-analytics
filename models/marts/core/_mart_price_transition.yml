@@ -115,10 +115,10 @@ models:
         description: Prix moyen actuel des annonces comparables.
 
       - name: median_previous_price
-        description: Median previous price among comparable listings.
+        description: Prix médian précédent parmi les annonces comparables.
 
       - name: median_current_price
-        description: Median current price among comparable listings.
+        description: Prix médian actuel parmi les annonces comparables.
 
       - name: average_price_change
         description: >

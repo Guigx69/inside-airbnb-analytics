@@ -3,10 +3,7 @@ version: 2
 models:
   - name: mart_price_distribution_snapshot
     description: >
-      Price distribution mart at country, city, snapshot and price-band grain.
-      Listings are segmented into six priced bands plus a NO_PRICE category.
-      The model provides listing population, price coverage, price statistics
-      and reconstructed review activity for each price segment.
+      Répartition des annonces par pays, ville, snapshot et tranche de prix. Six tranches de prix sont distinguées, ainsi que la catégorie NO_PRICE pour les prix manquants. Le modèle présente le nombre d'annonces, la couverture des prix, les statistiques de prix et l'activité d'avis reconstituée par tranche.
 
     columns:
       - name: source_country

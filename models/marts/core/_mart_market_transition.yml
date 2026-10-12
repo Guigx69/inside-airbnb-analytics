@@ -47,7 +47,7 @@ models:
           - not_null
 
       - name: net_listing_change_pct
-        description: Percentage change in listing count relative to the previous snapshot.
+        description: Variation en pourcentage du nombre d'annonces par rapport au snapshot précédent.
         data_tests:
           - not_null
 
@@ -98,6 +98,6 @@ models:
           - not_null
 
       - name: has_returned_listings
-        description: Whether the transition contains at least one returned-after-gap listing.
+        description: Indique si la transition comprend au moins une annonce réapparue après interruption.
         data_tests:
           - not_null

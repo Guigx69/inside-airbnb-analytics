@@ -3,12 +3,7 @@ version: 2
 models:
   - name: mart_calendar_month_snapshot
     description: >
-      Market-level monthly calendar availability mart derived from the
-      detailed Inside Airbnb calendar. One row represents one country,
-      city, snapshot and calendar month. Partial months are intentionally
-      preserved and accompanied by explicit coverage indicators.
-      Availability describes dates marked available in the source calendar
-      and must not be interprétés comme une occupation observée ou des réservations confirmées.
+      Indicateurs mensuels de disponibilité du marché calculés à partir du calendrier détaillé Inside Airbnb. Chaque ligne correspond à un pays, une ville, un snapshot et un mois calendaire. Les mois incomplets sont conservés avec des indicateurs explicites de couverture. La disponibilité correspond aux dates indiquées disponibles dans le calendrier source ; elle ne prouve ni une occupation ni une réservation confirmée.
 
     columns:
       - name: source_country
@@ -42,22 +37,22 @@ models:
           - not_null
 
       - name: first_observed_date
-        description: Earliest calendar date represented in the month across all listings.
+        description: Date calendaire représentée la plus ancienne du mois, toutes annonces confondues.
         data_tests:
           - not_null
 
       - name: last_observed_date
-        description: Latest calendar date represented in the month across all listings.
+        description: Date calendaire représentée la plus récente du mois, toutes annonces confondues.
         data_tests:
           - not_null
 
       - name: min_days_per_listing
-        description: Minimum number of represented days for an individual listing during the month.
+        description: Nombre minimal de jours représentés pour une annonce durant le mois.
         data_tests:
           - not_null
 
       - name: max_days_per_listing
-        description: Maximum number of represented days for an individual listing during the month.
+        description: Nombre maximal de jours représentés pour une annonce durant le mois.
         data_tests:
           - not_null
 
@@ -114,7 +109,7 @@ models:
           - not_null
 
       - name: full_month_listing_share_pct
-        description: Percentage of represented listings having complete monthly coverage.
+        description: Pourcentage d'annonces représentées bénéficiant d'une couverture mensuelle complète.
         data_tests:
           - not_null
 

@@ -17,7 +17,7 @@ models:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
@@ -42,7 +42,7 @@ models:
           - not_null
 
       - name: max_listings_per_host
-        description: Maximum number of observed listings controlled by one host.
+        description: Nombre maximal d'annonces observées détenues par un même hôte.
         data_tests:
           - not_null
 
@@ -132,27 +132,27 @@ models:
           - not_null
 
       - name: single_listing_host_share_pct
-        description: Percentage of observed hosts controlling exactly one listing.
+        description: Pourcentage d'hôtes observés possédant exactement une annonce.
         data_tests:
           - not_null
 
       - name: multi_listing_host_share_pct
-        description: Percentage of observed hosts controlling more than one listing.
+        description: Pourcentage d'hôtes observés possédant plusieurs annonces.
         data_tests:
           - not_null
 
       - name: top_1_pct_listing_share_pct
-        description: Percentage of observed listings controlled by the top 1 percent of hosts.
+        description: Pourcentage des annonces observées détenues par les 1 % d'hôtes les plus importants.
         data_tests:
           - not_null
 
       - name: top_5_pct_listing_share_pct
-        description: Percentage of observed listings controlled by the top 5 percent of hosts.
+        description: Pourcentage des annonces observées détenues par les 5 % d'hôtes les plus importants.
         data_tests:
           - not_null
 
       - name: top_10_pct_listing_share_pct
-        description: Percentage of observed listings controlled by the top 10 percent of hosts.
+        description: Pourcentage des annonces observées détenues par les 10 % d'hôtes les plus importants.
         data_tests:
           - not_null
 
@@ -167,11 +167,11 @@ models:
           - not_null
 
       - name: superhost_share_pct
-        description: Percentage of observed hosts classified as Superhosts.
+        description: Pourcentage d'hôtes observés classés Superhosts.
         data_tests:
           - not_null
 
       - name: identity_verified_host_share_pct
-        description: Percentage of observed hosts whose identity is marked as verified.
+        description: Pourcentage d'hôtes observés dont l'identité est indiquée comme vérifiée.
         data_tests:
           - not_null
