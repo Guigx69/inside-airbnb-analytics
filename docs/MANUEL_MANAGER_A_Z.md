@@ -207,20 +207,20 @@ Pour visualiser la documentation dbt (si disponible sur le poste) :
 
 ### Orchestrateur `run_pipeline.py`
 
-**Par défaut**, l'orchestrateur prévisualise collecte, vérification archives et RAW. Son argument `--selection-file` est **obligatoirement un fichier JSON de sélection existant**, même si la valeur par défaut pointe sur `config/geography.example.json`. L'exemple n'est pas une sélection de production.
+**Par défaut**, l'orchestrateur prévisualise collecte, vérification archives et RAW. Son argument `--selection-file` est **obligatoirement un fichier JSON de sélection existant**, même si la valeur par défaut pointe sur `config/geography.lyon.example.json`. Le fichier Lyon fourni est un exemple explicite à contrôler avant toute exécution ; le fichier géographique générique inclut Japon/Sydney et ne doit pas servir au pilote Lyon.
 
 ```powershell
 # Aperçu, sans écriture RAW (connexion Snowflake néanmoins)
-.\.venv\Scripts\python.exe .\scripts\run_pipeline.py --selection-file config/geography.example.json
+.\.venv\Scripts\python.exe .\scripts\run_pipeline.py --selection-file config/geography.lyon.example.json
 
 # Exécution réelle : RAW, sans téléchargement ni dbt build ; APRÈS validation
-.\.venv\Scripts\python.exe .\scripts\run_pipeline.py --selection-file config/geography.example.json --execute
+.\.venv\Scripts\python.exe .\scripts\run_pipeline.py --selection-file config/geography.lyon.example.json --execute
 
 # Exécution avec téléchargement et build : opération coûteuse / modifiante
-.\.venv\Scripts\python.exe .\scripts\run_pipeline.py --selection-file config/geography.example.json --execute --sync --dbt-build
+.\.venv\Scripts\python.exe .\scripts\run_pipeline.py --selection-file config/geography.lyon.example.json --execute --sync --dbt-build
 ```
 
-**Ne pas lancer le dernier exemple tel quel en production** : copier/adopter un JSON de sélection contrôlé, vérifier les villes et dates, le budget et les archives. L'orchestrateur s'arrête au premier code retour non nul ; il ne fournit pas de rollback transactionnel inter-étapes.
+**Ne pas lancer le dernier exemple tel quel en production** : vérifier le JSON de sélection Lyon fourni et l'adapter si nécessaire, vérifier les villes et dates, le budget et les archives. L'orchestrateur s'arrête au premier code retour non nul ; il ne fournit pas de rollback transactionnel inter-étapes.
 
 ## 8. Diagnostic, sécurité et transfert
 
