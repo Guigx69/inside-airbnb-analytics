@@ -234,7 +234,7 @@ Le fichier `tests/test_collecteur_world.py` couvre l'inventaire des trois types 
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_collecteur_world.py" -v
 ```
 
-Ces tests sont **hors réseau** et ne nécessitent pas Snowflake. Ils doivent être exécutés sur le poste de développement ou dans une CI configurée ; leur présence dans le dépôt ne vaut pas résultat de test.
+Ces tests sont **hors réseau** et ne nécessitent pas Snowflake. Huit tests supplémentaires dans `tests/test_loader_raw.py` vérifient la classification NEW/LOADED, les empreintes journalisées, les anciens journaux NULL, les écarts de lignes, les lots RAW orphelins et les doublons de journal. Les exécuter avec `python -m unittest discover -s tests -v`. Leur présence dans le dépôt ne vaut pas résultat de test et ne remplace pas un test réel Snowflake.
 
 ## 9. Critères de réception d'une mise à jour
 
