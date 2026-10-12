@@ -73,8 +73,7 @@ models:
 
       - name: expected_listing_days_for_present_listings
         description: >
-          Theoretical number of listing-days if every listing present during
-          the month were represented on every calendar day.
+          Nombre théorique de journées-annonces si chaque annonce présente durant le mois était représentée chaque jour calendaire.
         data_tests:
           - not_null
 
@@ -90,9 +89,7 @@ models:
 
       - name: average_listing_availability_rate_pct
         description: >
-          Unweighted average of individual listing availability rates.
-          Each listing receives the same weight regardless of the number
-          of represented days.
+          Moyenne non pondérée des taux de disponibilité individuels. Chaque annonce reçoit le même poids, quel que soit le nombre de jours représentés.
         data_tests:
           - not_null
 
@@ -103,8 +100,7 @@ models:
 
       - name: listing_day_coverage_pct
         description: >
-          Percentage of expected listing-days actually represented.
-          Values below 100 indicate partial calendar coverage.
+          Pourcentage des journées-annonces attendues effectivement représentées. Une valeur inférieure à 100 indique une couverture partielle du calendrier.
         data_tests:
           - not_null
 
@@ -115,21 +111,18 @@ models:
 
       - name: is_full_month_coverage
         description: >
-          True only when all expected listing-days for the represented
-          population are present.
+          Vrai uniquement lorsque toutes les journées-annonces attendues pour la population représentée sont présentes.
         data_tests:
           - not_null
 
       - name: market_availability_rate_pct
         description: >
-          Percentage of represented listing-days marked available.
-          This is weighted by represented listing-days and is not an occupancy rate.
+          Pourcentage des journées-annonces représentées indiquées disponibles. Ce taux est pondéré par les journées-annonces et ne constitue pas un taux d'occupation.
         data_tests:
           - not_null
 
       - name: market_unavailability_rate_pct
         description: >
-          Percentage of represented listing-days marked unavailable.
-          Unavailability must not be interpreted directly as a confirmed booking.
+          Pourcentage des journées-annonces représentées indiquées indisponibles. Une indisponibilité ne prouve pas une réservation.
         data_tests:
           - not_null

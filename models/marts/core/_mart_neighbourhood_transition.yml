@@ -48,8 +48,7 @@ models:
 
       - name: retained_listing_count
         description: >
-          Listings observed in both consecutive snapshots and remaining in the
-          same neighbourhood.
+          Annonces observées dans les deux snapshots consécutifs et conservées dans le même quartier.
         data_tests:
           - not_null
 
@@ -62,22 +61,19 @@ models:
 
       - name: moved_out_listing_count
         description: >
-          Listings observed in both consecutive snapshots whose neighbourhood
-          changed away from this neighbourhood.
+          Annonces observées dans les deux snapshots consécutifs ayant quitté ce quartier.
         data_tests:
           - not_null
 
       - name: moved_in_listing_count
         description: >
-          Listings observed in both consecutive snapshots whose neighbourhood
-          changed into this neighbourhood.
+          Annonces observées dans les deux snapshots consécutifs ayant rejoint ce quartier.
         data_tests:
           - not_null
 
       - name: newly_observed_listing_count
         description: >
-          Listings observed for the first time in the available historical
-          window in this neighbourhood.
+          Annonces observées pour la première fois dans ce quartier sur la période historique disponible.
         data_tests:
           - not_null
 

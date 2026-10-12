@@ -72,14 +72,12 @@ models:
 
       - name: inside_airbnb_calculated_host_listings_count
         description: >
-          Host listing count supplied by Inside Airbnb. Retained separately
-          from the reconstructed observed listing count.
+          Nombre d'annonces par hôte fourni par Inside Airbnb, conservé séparément du nombre d'annonces observées reconstitué.
         data_tests:
           - not_null
 
       - name: calculated_vs_observed_listing_difference
         description: >
-          Difference between Inside Airbnb's supplied host listing count and
-          the portfolio reconstructed from listing-level observations.
+          Écart entre le nombre d'annonces par hôte fourni par Inside Airbnb et le portefeuille reconstitué à partir des annonces observées.
         data_tests:
           - not_null
