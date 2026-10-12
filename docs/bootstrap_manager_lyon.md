@@ -12,9 +12,9 @@
 
 ## 2. Préparer le périmètre Lyon
 
-Le démarrage visé est **quatre snapshots de Lyon** (12 fichiers CSV.GZ si les trois types sont présents à chaque date). Les dates de référence du POC sont : 2025-09-18, 2025-12-22, 2026-03-25, 2026-06-22. Confirmer leur présence effective dans le manifeste et sur disque avant ingestion ; ne jamais créer de fichiers factices.
+Le périmètre initial **validé en V1.3** comprend quatre snapshots de Lyon (12 fichiers CSV.GZ). Le manifeste `main` contient désormais **un cinquième snapshot (2026-09-17)**, soit 15 fichiers Lyon au total, mais ce cinquième snapshot n'a pas encore été ingéré ni validé dans dbt. Les dates de référence du POC sont : 2025-09-18, 2025-12-22, 2026-03-25, 2026-06-22. Confirmer leur présence effective dans le manifeste et sur disque avant ingestion ; ne jamais créer de fichiers factices.
 
-Le `data_manifest.csv` local peut contenir des changements non commités : **ne pas le réinitialiser**. La sélection par `--country france --location lyon` utilise les chemins et empreintes présents dans ce manifeste.
+Le `data_manifest.csv` a été synchronisé sur `main` (commit `167cc5f`, 1 629 entrées) : ne pas le réinitialiser. La sélection par `--country france --location lyon` utilise les chemins et empreintes présents dans ce manifeste.
 
 ## 3. Vérification sans chargement
 
@@ -32,7 +32,7 @@ Le loader se connecte à Snowflake et inspecte le journal et l'inventaire RAW, m
 .\.venv\Scripts\python.exe .\scripts\load_raw_to_snowflake.py --country france --location lyon
 ```
 
-**Attention** : le loader `main` utilise `PUT`, `DELETE` du lot, `COPY INTO` puis journalisation ; il a été validé sur un environnement préexistant, pas encore sur ce bootstrap vierge. Ne pas le lancer avant vérification de la structure et des droits, et préférer un premier snapshot pilote (`--snapshot 2025-09-18`) avant les quatre.
+**Attention** : le loader `main` utilise `PUT`, `DELETE` du lot, `COPY INTO` puis journalisation ; il a été validé sur un environnement préexistant, pas encore sur ce bootstrap vierge. Ne pas le lancer avant vérification de la structure et des droits, et préférer un premier snapshot pilote (`--snapshot 2025-09-18`) avant d'étendre le périmètre. **Attention : sans filtre `--snapshot`, la sélection Lyon prend maintenant les cinq dates du manifeste, y compris celle non validée.**
 
 Après vérification des volumes RAW/journal :
 
@@ -80,4 +80,4 @@ Le relevé `SHOW GRANTS TO ROLE DBT_ROLE` confirme `USAGE` sur `DBT_WH` et `AIRB
 
 Le script `sql/bootstrap_manager_dbt_grants.sql` accorde les privilèges de base nécessaires à un rôle `DBT_ROLE` préexistant. Les créations de schémas sont documentées pour exécution **avec le rôle DBT_ROLE** afin d'éviter tout transfert de propriété. Les noms des schémas doivent correspondre au comportement réel de `generate_schema_name` et au profil dbt du compte cible.
 
-**Limites :** ni la création des utilisateurs/roles/warehouses ni les droits de consommation des marts par le manager ne sont automatisés. Vérifier ces éléments et tester `dbt debug` avant tout `dbt build`.
+**Limites :** ni la création des utilisateurs et leur affectation aux rôles ni les droits de consommation des marts par le manager ne sont automatisés. Vérifier ces éléments et tester `dbt debug` avant tout `dbt build`.
