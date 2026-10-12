@@ -175,17 +175,17 @@ def main():
         writer.writerows(rows)
     print('\n=== WORLD MATCHING ===')
     print('Catalog destinations audited:', len(rows))
-    print('Catalog destinations present in FCT:', sum(r['in_fct'] for r in rows))
-    print('FCT destinations absent from audited catalog:', len(fct_destinations - inventory_keys))
+    print('Destinations du catalogue présentes dans FCT :', sum(r['in_fct'] for r in rows))
+    print('Destinations FCT absentes du catalogue audité :', len(fct_destinations - inventory_keys))
     if fct_destinations - inventory_keys:
-        print('Absent:', ', '.join('/'.join(key) for key in sorted(fct_destinations - inventory_keys)))
-    print('Exact-name matched neighbourhoods:', sum(r['matched'] for r in rows))
-    print('FCT neighbourhoods:', sum(r['fct_neighbourhoods'] for r in rows))
-    print('GeoJSON duplicate-name extra features:', sum(r['duplicate_geojson_names'] for r in rows))
-    print('GeoJSON invalid features:', sum(r['invalid_features'] for r in rows))
-    print('Failed downloads/parses:', sum(r['status'] == 'ERROR' for r in rows))
+        print('Absentes :', ', '.join('/'.join(key) for key in sorted(fct_destinations - inventory_keys)))
+    print('Quartiers correspondants par nom exact :', sum(r['matched'] for r in rows))
+    print('Quartiers FCT :', sum(r['fct_neighbourhoods'] for r in rows))
+    print('Objets GeoJSON supplémentaires avec nom en doublon :', sum(r['duplicate_geojson_names'] for r in rows))
+    print('Objets GeoJSON invalides :', sum(r['invalid_features'] for r in rows))
+    print("Échecs de téléchargement ou d'analyse :", sum(r['status'] == 'ERROR' for r in rows))
     print('CSV:', args.output.resolve())
-    print('[READ-ONLY] Snowflake data unchanged.')
+    print('[LECTURE SEULE] Données Snowflake inchangées.')
     return 0 if all(r['status'] == 'OK' for r in rows) else 1
 
 

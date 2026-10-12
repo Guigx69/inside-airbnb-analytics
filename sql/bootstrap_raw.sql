@@ -1,8 +1,8 @@
--- Inside Airbnb RAW bootstrap for a NEW, dedicated Snowflake environment.
--- REVIEW identifiers and privileges before executing. This script writes DDL.
--- Execute with a role authorized to create schemas/tables/stages.
--- It deliberately does NOT create roles, warehouses or databases.
--- Do not run against the existing project without reviewing each statement.
+-- Initialisation RAW Inside Airbnb pour un environnement Snowflake NEUF et dédié.
+-- VÉRIFIER les identifiants et privilèges avant exécution : ce script exécute du DDL.
+-- Exécuter avec un rôle autorisé à créer des schémas, tables et stages.
+-- Ce script ne crée volontairement aucun rôle, entrepôt ni base de données.
+-- Ne pas exécuter sur le projet existant sans examiner chaque instruction.
 USE DATABASE AIRBNB;
 CREATE SCHEMA IF NOT EXISTS RAW;
 USE SCHEMA RAW;
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS INGESTION_LOG (
 );
 CREATE STAGE IF NOT EXISTS INSIDE_AIRBNB_STAGE;
 
--- After provisioning, grant INGESTION_ROLE access to the schema,
--- tables, and stage (including READ/WRITE on internal stage) using
--- your organization's approved privilege policy. Grant DBT_ROLE
--- SELECT on the three RAW tables and USAGE on the database/schema.
--- Snowflake CREATE ... IF NOT EXISTS does not validate existing layouts.
--- Check DESCRIBE TABLE / DESCRIBE STAGE before ingestion.
+-- Après préparation, autoriser INGESTION_ROLE à accéder au schéma,
+-- aux tables et au stage (dont READ/WRITE sur le stage interne) selon
+-- la politique de privilèges approuvée par l'organisation. Attribuer à DBT_ROLE
+-- SELECT sur les trois tables RAW et USAGE sur la base et le schéma.
+-- Snowflake CREATE ... IF NOT EXISTS ne vérifie pas la structure des objets existants.
+-- Contrôler DESCRIBE TABLE / DESCRIBE STAGE avant ingestion.

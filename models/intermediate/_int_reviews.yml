@@ -59,6 +59,6 @@ models:
           - not_null
 
       - name: snapshot_count
-        description: Number of source snapshots in which the review was observed.
+        description: Nombre de snapshots source dans lesquels l'avis a été observé.
         data_tests:
           - not_null

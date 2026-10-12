@@ -1,13 +1,13 @@
--- Administrator-only grants for an already created INGESTION_ROLE.
--- Review role and warehouse names before running in a NEW account.
--- No DROP/REVOKE/ownership transfer; no grants to PUBLIC.
--- This file does not create users, roles or warehouses.
+-- Autorisations réservées à l'administrateur pour INGESTION_ROLE déjà créé.
+-- Vérifier les noms du rôle et de l'entrepôt avant toute exécution sur un compte NEUF.
+-- Aucun DROP, REVOKE ou transfert de propriété ; aucune autorisation à PUBLIC.
+-- Ce fichier ne crée ni utilisateurs, ni rôles, ni entrepôts.
 
 GRANT USAGE ON WAREHOUSE DBT_WH TO ROLE INGESTION_ROLE;
 GRANT USAGE ON DATABASE AIRBNB TO ROLE INGESTION_ROLE;
 GRANT USAGE ON SCHEMA AIRBNB.RAW TO ROLE INGESTION_ROLE;
 
--- For an internal stage, grant READ before WRITE.
+-- Pour un stage interne, attribuer READ avant WRITE.
 GRANT READ ON STAGE AIRBNB.RAW.INSIDE_AIRBNB_STAGE TO ROLE INGESTION_ROLE;
 GRANT WRITE ON STAGE AIRBNB.RAW.INSIDE_AIRBNB_STAGE TO ROLE INGESTION_ROLE;
 
