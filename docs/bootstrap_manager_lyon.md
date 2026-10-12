@@ -12,7 +12,7 @@
 
 ## 2. Préparer le périmètre Lyon
 
-Le périmètre initial **validé en V1.3** comprend quatre snapshots de Lyon (12 fichiers CSV.GZ). Le manifeste `main` contient désormais **un cinquième snapshot (2026-09-17)**, soit 15 fichiers Lyon au total, mais ce cinquième snapshot n'a pas encore été ingéré ni validé dans dbt. Les dates de référence du POC sont : 2025-09-18, 2025-12-22, 2026-03-25, 2026-06-22. Confirmer leur présence effective dans le manifeste et sur disque avant ingestion ; ne jamais créer de fichiers factices.
+Le périmètre initial **validé en V1.3** comprend quatre snapshots de Lyon (12 fichiers CSV.GZ). Le manifeste `main` contient désormais **un cinquième snapshot (2026-09-17)**, soit 15 fichiers Lyon au total, et le journal `AIRBNB.RAW.INGESTION_LOG` du compte source affiche désormais trois fichiers pour chacune des cinq dates, y compris 2026-09-17. Ce constat atteste de la journalisation, pas encore de la complétude des tables RAW ni d'une reconstruction dbt après ingestion. Les dates de référence du POC sont : 2025-09-18, 2025-12-22, 2026-03-25, 2026-06-22. Confirmer leur présence effective dans le manifeste et sur disque avant ingestion ; ne jamais créer de fichiers factices.
 
 Le `data_manifest.csv` a été synchronisé sur `main` (commit `167cc5f`, 1 629 entrées) : ne pas le réinitialiser. La sélection par `--country france --location lyon` utilise les chemins et empreintes présents dans ce manifeste.
 
@@ -32,7 +32,7 @@ Le loader se connecte à Snowflake et inspecte le journal et l'inventaire RAW, m
 .\.venv\Scripts\python.exe .\scripts\load_raw_to_snowflake.py --country france --location lyon
 ```
 
-**Attention** : le loader `main` utilise `PUT`, `DELETE` du lot, `COPY INTO` puis journalisation ; il a été validé sur un environnement préexistant, pas encore sur ce bootstrap vierge. Ne pas le lancer avant vérification de la structure et des droits, et préférer un premier snapshot pilote (`--snapshot 2025-09-18`) avant d'étendre le périmètre. **Attention : sans filtre `--snapshot`, la sélection Lyon prend maintenant les cinq dates du manifeste, y compris celle non validée.**
+**Attention** : le loader `main` utilise `PUT`, `DELETE` du lot, `COPY INTO` puis journalisation ; il a été validé sur un environnement préexistant, pas encore sur ce bootstrap vierge. Ne pas le lancer avant vérification de la structure et des droits, et préférer un premier snapshot pilote (`--snapshot 2025-09-18`) avant d'étendre le périmètre. **Attention : sans filtre `--snapshot`, la sélection Lyon prend maintenant les cinq dates du manifeste, y compris celle dont la présence dans le journal d'ingestion est confirmée, mais dont la validation dbt reste à établir.**
 
 Après vérification des volumes RAW/journal :
 
