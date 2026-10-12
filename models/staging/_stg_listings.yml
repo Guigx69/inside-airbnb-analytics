@@ -9,35 +9,35 @@ models:
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Airbnb listing identifier.
+        description: Identifiant de l'annonce Airbnb.
         data_tests:
           - not_null
 
       - name: host_id
-        description: Airbnb host identifier.
+        description: Identifiant de l'hôte Airbnb.
         data_tests:
           - not_null
 
       - name: latitude
-        description: Listing latitude.
+        description: Latitude de l'annonce.
 
       - name: longitude
-        description: Listing longitude.
+        description: Longitude de l'annonce.
 
       - name: price
         description: >
