@@ -180,6 +180,8 @@ Ne jamais faire `git add .` sans examiner les changements : les archives, secret
 .\.venv\Scripts\python.exe .\scripts\load_raw_to_snowflake.py --dry-run
 ```
 
+Le mode `--dry-run` établit une connexion Snowflake et interroge `INGESTION_LOG` ainsi que les trois tables RAW : **aucune écriture**, mais des requêtes pouvant engager des crédits. Le chargeur journalise désormais `SOURCE_SHA256` pour les nouveaux lots et bloque un lot déjà journalisé dont l'empreinte non nulle diverge du manifeste. Les anciennes lignes dont `SOURCE_SHA256` est NULL ne sont pas rétroactivement attestées par cette comparaison ; le contrôle des nombres de lignes reste applicable. Vérifier la présence de la colonne dans le schéma cible avant d'utiliser ce chargeur mis à jour.
+
 Le loader réel utilise des opérations modifiantes (PUT, DELETE ciblé, COPY INTO, journalisation). **Faire d'abord un pilote sur une seule ville/date** et examiner les volumes, le journal et les erreurs. Exemple **à n'exécuter qu'après autorisation** :
 
 ```powershell
