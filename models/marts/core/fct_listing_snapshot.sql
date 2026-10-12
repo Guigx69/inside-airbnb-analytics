@@ -31,7 +31,7 @@ final as (
 
         -- ============================================================
         -- Business grain
-        -- One row per country / city / snapshot / listing
+        -- Une ligne par pays, ville, snapshot et annonce
         -- ============================================================
         l.source_country,
         l.source_city,
@@ -39,14 +39,14 @@ final as (
         l.listing_id,
 
         -- ============================================================
-        -- Listing
+        -- Annonce
         -- ============================================================
         listing_url,
         listing_name,
         listing_source,
 
         -- ============================================================
-        -- Host
+        -- Hôte
         -- ============================================================
         host_id,
         host_name,
@@ -79,7 +79,7 @@ final as (
         beds,
 
         -- ============================================================
-        -- Price and stay constraints
+        -- Contraintes de prix et de durée de séjour
         -- ============================================================
         price,
         minimum_nights,
@@ -123,9 +123,9 @@ final as (
         reviews_per_month,
 
         -- ============================================================
-        -- Reconstructed review metrics
-        -- Derived independently from deduplicated review-level data.
-        -- They are intentionally distinct from Inside Airbnb's native
+        -- Indicateurs d'avis reconstitués
+        -- Calculés indépendamment à partir des avis dédupliqués.
+        -- Ils sont volontairement distincts des indicateurs natifs d'Inside Airbnb
         -- number_of_reviews* attributes.
         -- ============================================================
         rm.review_count_to_snapshot,
@@ -144,13 +144,13 @@ final as (
 
         -- ============================================================
         -- Inside Airbnb estimates
-        -- These must not be interpreted as observed occupancy/revenue.
+        -- Ces valeurs ne représentent pas une occupation ou un revenu observé.
         -- ============================================================
         estimated_occupancy_l365d,
         estimated_revenue_l365d,
 
         -- ============================================================
-        -- Listing characteristics
+        -- Caractéristiques des annonces
         -- ============================================================
         license,
         is_instant_bookable,

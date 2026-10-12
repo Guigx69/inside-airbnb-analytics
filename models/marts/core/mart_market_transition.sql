@@ -74,7 +74,7 @@ final as (
         -- ============================================================
         -- Avertissement analytique
         --
-        -- "Disappeared" means absent from the next snapshot.
+        -- « Disparue » signifie absente du snapshot suivant.
         -- Cela ne doit pas être interprété comme une sortie confirmée d'Airbnb.
         -- ============================================================
         case

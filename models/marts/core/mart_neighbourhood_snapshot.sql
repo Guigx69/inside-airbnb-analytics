@@ -57,8 +57,8 @@ final as (
         -- ============================================================
         -- Availability
         --
-        -- Public availability must not be interpreted as observed
-        -- vacancy or as the inverse of observed occupancy.
+        -- La disponibilité publique ne doit pas être interprétée comme une
+        -- vacance observée ni comme l'inverse d'une occupation observée.
         -- ============================================================
         round(avg(availability_rate_pct), 2)
             as average_availability_rate_pct,
@@ -76,7 +76,7 @@ final as (
             as native_review_count_total,
 
         -- ============================================================
-        -- Reviews - reconstructed from review-level data
+        -- Avis : indicateurs reconstitués à partir des avis individuels
         -- ============================================================
         sum(review_count_to_snapshot)
             as reconstructed_review_count_total,
@@ -92,8 +92,8 @@ final as (
 
         -- ============================================================
         -- Geography
-        -- Representative centre of listing coordinates.
-        -- This is NOT an official arrondissement centroid.
+        -- Centre représentatif des coordonnées des annonces.
+        -- Ce n'est PAS le centroïde officiel d'un arrondissement.
         -- ============================================================
         avg(latitude)
             as average_listing_latitude,
