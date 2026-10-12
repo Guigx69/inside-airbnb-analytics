@@ -1,4 +1,4 @@
-"""Read-only local archive preflight for the Inside Airbnb manifest."""
+"""Contrôle local en lecture seule des archives du manifeste Inside Airbnb."""
 import argparse
 import csv
 import hashlib
@@ -9,13 +9,13 @@ MANIFEST = ROOT / "data_manifest.csv"
 TYPES = {"listings", "calendar", "reviews"}
 
 def main():
-    parser = argparse.ArgumentParser(description="Verify local source archives without Snowflake.")
-    parser.add_argument("--selection-file", help="Geographic selection JSON; applied to manifest")
+    parser = argparse.ArgumentParser(description="Vérifier les archives locales sans Snowflake.")
+    parser.add_argument("--selection-file", help="Sélection géographique JSON appliquée au manifeste")
     parser.add_argument("--country")
     parser.add_argument("--location")
     parser.add_argument("--snapshot")
     parser.add_argument("--files", nargs="+", choices=sorted(TYPES))
-    parser.add_argument("--hash", action="store_true", help="Verify SHA-256 (slower).")
+    parser.add_argument("--hash", action="store_true", help="Vérifier les empreintes SHA-256 (plus lent).")
     args = parser.parse_args()
     selected = 0
     missing = []
@@ -31,7 +31,7 @@ def main():
             relative = Path(row["path"])
             parts = relative.parts
             if len(parts) != 6 or parts[:2] != ("data", "raw") or relative.name not in {f"{t}.csv.gz" for t in TYPES}:
-                raise ValueError(f"Unexpected manifest path: {relative}")
+                raise ValueError(f"Chemin inattendu dans le manifeste : {relative}")
             _, _, country, location, snapshot, filename = parts
             if args.country and country != args.country.strip().lower():
                 continue
@@ -58,15 +58,15 @@ def main():
                         digest.update(chunk)
                 if digest.hexdigest().lower() != row["sha256"].strip().lower():
                     invalid.append(f"{relative}: SHA-256 mismatch")
-    print(f"Selected: {selected} archives / {total_bytes / 1024**3:.2f} GiB expected")
-    print(f"Missing: {len(missing)}; invalid: {len(invalid)}")
+    print(f"Sélection : {selected} archives / {total_bytes / 1024**3:.2f} Gio attendus")
+    print(f"Manquantes : {len(missing)} ; invalides : {len(invalid)}")
     for entry in (missing + invalid)[:30]:
         print(" -", entry)
     if not selected:
-        raise SystemExit("No matching manifest entries.")
+        raise SystemExit("Aucune entrée correspondante dans le manifeste.")
     if missing or invalid:
         raise SystemExit(1)
-    print("[OK] All selected archives verified" + (" (SHA-256)" if args.hash else " (size only)"))
+    print("[OK] Toutes les archives sélectionnées sont vérifiées" + (" (SHA-256)" if args.hash else " (taille uniquement)"))
 
 if __name__ == "__main__":
     main()
