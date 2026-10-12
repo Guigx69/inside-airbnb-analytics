@@ -61,7 +61,7 @@ models:
 
       - name: first_review_date_to_snapshot
         description: >
-          Earliest review date observed for the listing up to the snapshot date.
+          Date du plus ancien avis observé pour l'annonce jusqu'à la date du snapshot.
 
       - name: last_review_date_to_snapshot
         description: >
