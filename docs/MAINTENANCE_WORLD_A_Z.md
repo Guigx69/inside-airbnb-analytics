@@ -27,7 +27,7 @@ Les 25 modèles dbt et 456 tests du build précédent concernent **l'état anté
 |---|---|---|---|
 | `--all --dry-run` | Oui | Non | Non |
 | `--all --dry-run --verify` | Oui | Non | Non |
-| `--all --sync` | Oui | Archives manquantes | Oui, pour les fichiers téléchargés |
+| `--all --sync` | Oui | Archives manquantes | Oui, pour les fichiers téléchargés ou déjà présents non référencés |
 | `--all --sync --verify` | Oui | Archives manquantes | Oui, pour les fichiers téléchargés |
 
 **Procédure standard :**
@@ -51,7 +51,7 @@ git push origin main
 
 Le manifeste est **un inventaire de fichiers sources**, indépendant du compte Snowflake. Sur un compte Snowflake neuf, conserver le manifeste et les archives ; initialiser **RAW** et **INGESTION_LOG** vides, puis ingérer les lots souhaités. La présence d'une archive dans le manifeste ne signifie pas qu'elle a été chargée dans Snowflake.
 
-**Limite opérationnelle :** si une archive existe déjà sur disque mais manque dans le manifeste, vérifier la logique du collecteur avant de conclure que `--sync` la référencera automatiquement. Aucun mécanisme de planification, de publication Git automatique ou d'ingestion Snowflake automatique n'est fourni par cette commande.
+**Limite opérationnelle :** si une archive gzip existe déjà sur disque mais manque dans le manifeste, `--sync` la valide et l'enregistre sans la retélécharger ; une archive invalide bloque la synchronisation. Aucun mécanisme de planification, de publication Git automatique ou d'ingestion Snowflake automatique n'est fourni par cette commande.
 
 ## 2. Prévol (lecture seule)
 
@@ -104,7 +104,7 @@ Prévoir l'espace disque et une sauvegarde indépendante des CSV.GZ. Ne pas exé
 .\.venv\Scripts\python.exe .\scripts\download_inside_airbnb.py --all --sync
 ```
 
-Le script télécharge les fichiers manquants, vérifie leur intégrité gzip et inscrit taille et SHA-256 dans `data_manifest.csv`. Il n'écrit pas dans Snowflake. Après téléchargement :
+Le script télécharge les fichiers manquants, vérifie leur intégrité gzip et inscrit taille et SHA-256 dans `data_manifest.csv`. Il référence également les archives gzip locales non encore inscrites, sans les télécharger de nouveau. Il n'écrit pas dans Snowflake. Après téléchargement :
 
 ```powershell
 .\.venv\Scripts\python.exe .\scripts\download_inside_airbnb.py --all --dry-run --verify > verification_catalogue.txt 2>&1
@@ -200,6 +200,16 @@ Vérifier les neuf pages : Vue d'ensemble, Marché, Quartiers, Cartographie, Pri
 - **Essai Snowflake expiré ou crédits insuffisants :** ne pas tenter de build ; conserver les archives et preuves hors Snowflake.
 - **Sélection JSON :** inclusions combinées par **OU**, pas par ET. L'orchestrateur `run_pipeline.py` exige `--selection-file` ; il n'accepte pas directement `--all`. Pour World, utiliser les étapes séparées.
 - **Limites :** pas de garantie de rollback inter-étapes, de reprise transactionnelle globale, de déploiement vierge validé, ni de synchronisation automatique planifiée.
+
+## Tests locaux de non-régression
+
+Le fichier `tests/test_collecteur_world.py` couvre l'inventaire des trois types d'archives, la prise en charge d'une archive locale non référencée et la protection d'une empreinte déjà inscrite. Exécuter depuis la racine :
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_collecteur_world.py" -v
+```
+
+Ces tests sont **hors réseau** et ne nécessitent pas Snowflake. Ils doivent être exécutés sur le poste de développement ou dans une CI configurée ; leur présence dans le dépôt ne vaut pas résultat de test.
 
 ## 9. Critères de réception d'une mise à jour
 
