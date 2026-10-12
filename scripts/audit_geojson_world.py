@@ -183,7 +183,7 @@ def main():
     print('Quartiers FCT :', sum(r['fct_neighbourhoods'] for r in rows))
     print('Objets GeoJSON supplémentaires avec nom en doublon :', sum(r['duplicate_geojson_names'] for r in rows))
     print('Objets GeoJSON invalides :', sum(r['invalid_features'] for r in rows))
-    print('Échecs de téléchargement ou d'analyse :', sum(r['status'] == 'ERROR' for r in rows))
+    print("Échecs de téléchargement ou d'analyse :", sum(r['status'] == 'ERROR' for r in rows))
     print('CSV:', args.output.resolve())
     print('[LECTURE SEULE] Données Snowflake inchangées.')
     return 0 if all(r['status'] == 'OK' for r in rows) else 1
