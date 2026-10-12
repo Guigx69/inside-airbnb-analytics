@@ -1,0 +1,11 @@
+{
+  "include": {
+    "countries": [
+      "France"
+    ],
+    "cities": [
+      "Lyon"
+    ]
+  },
+  "exclude": {}
+}
