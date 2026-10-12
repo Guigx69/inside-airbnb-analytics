@@ -128,3 +128,8 @@ Les anomalies sources sont documentées, jamais masquées par une suppression ar
 ## Reprise du projet par un responsable
 
 Le [manuel complet A à Z](docs/MANUEL_MANAGER_A_Z.md) détaille l'installation Windows, les deux scénarios Snowflake, les commandes d'ingestion et de build, les helpers, les contrôles, le diagnostic et les critères de livraison. Lire ce manuel avant toute exécution sur un nouveau compte.
+
+
+### Sélection géographique complète
+
+Consulter le [guide opérationnel ville / pays / continent / multi-zones / monde](docs/GUIDE_GEOGRAPHIE_A_Z.md) avant toute collecte ou ingestion à grande échelle.
