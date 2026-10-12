@@ -76,7 +76,7 @@ where
     or m.latest_availability_window_start_date
         <> s.expected_latest_window_start_date
 
-    -- Source reconciliation
+    -- Rapprochement avec la source
     or m.represented_days_30d
         <> s.expected_represented_days_30d
 
@@ -101,9 +101,9 @@ where
     or m.available_days_365d
         <> s.expected_available_days_365d
 
-    -- Source coverage may be partial for every analytical horizon.
-    -- Represented days must remain positive and cannot exceed
-    -- the theoretical maximum for the snapshot population.
+    -- La couverture de la source peut être partielle pour chaque horizon analytique.
+    -- Les jours représentés doivent rester positifs et ne peuvent pas dépasser
+    -- le maximum théorique de la population du snapshot.
     or m.represented_days_30d > m.listing_count * 30
     or m.represented_days_30d <= 0
 
@@ -116,23 +116,23 @@ where
     or m.represented_days_365d > m.listing_count * 365
     or m.represented_days_365d <= 0
 
-    -- Cumulative represented horizons must be monotonic.
+    -- Les horizons représentés cumulés doivent être monotones.
     or m.represented_days_30d > m.represented_days_60d
     or m.represented_days_60d > m.represented_days_90d
     or m.represented_days_90d > m.represented_days_365d
 
-    -- Available days cannot exceed represented days.
+    -- Les jours disponibles ne peuvent pas dépasser les jours représentés.
     or m.available_days_30d not between 0 and m.represented_days_30d
     or m.available_days_60d not between 0 and m.represented_days_60d
     or m.available_days_90d not between 0 and m.represented_days_90d
     or m.available_days_365d not between 0 and m.represented_days_365d
 
-    -- Cumulative available horizons must be monotonic.
+    -- Les horizons de disponibilité cumulés doivent être monotones.
     or m.available_days_30d > m.available_days_60d
     or m.available_days_60d > m.available_days_90d
     or m.available_days_90d > m.available_days_365d
 
-    -- Any non-null percentage must remain within valid bounds.
+    -- Tout pourcentage non nul doit rester dans les limites valides.
     or (
         m.market_availability_rate_30d_pct is not null
         and m.market_availability_rate_30d_pct not between 0 and 100
@@ -184,18 +184,18 @@ where
         and m.median_listing_availability_rate_365d_pct not between 0 and 100
     )
 
-        -- Market and average listing rates must reconcile whenever
-    -- at least one listing has complete coverage for the horizon.
+        -- Les taux du marché et les taux moyens des annonces doivent concorder dès que
+    -- au moins une annonce dispose d'une couverture complète sur l'horizon.
     --
-    -- For a complete N-day horizon, every eligible listing has
-    -- the same denominator N, therefore:
+    -- Pour un horizon complet de N jours, chaque annonce éligible possède
+    -- le même dénominateur N, donc :
     --
     --     SUM(available_days) / (N * listing_count)
     --       =
     --     AVG(available_days / N)
     --
-    -- Both metrics must also be NULL when no listing has complete
-    -- coverage for the corresponding horizon.
+    -- Les deux indicateurs doivent aussi être NULL lorsqu'aucune annonce n'a de couverture
+    -- complète pour l'horizon correspondant.
 
     or (
         (
