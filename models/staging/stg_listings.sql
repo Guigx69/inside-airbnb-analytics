@@ -27,7 +27,7 @@ renamed_and_typed as (
         loaded_at,
 
         -- ---------------------------------------------------------------------
-        -- Listing
+        -- Annonce
         -- ---------------------------------------------------------------------
 
         try_to_number(raw_data:id::varchar)                         as listing_id,
@@ -40,7 +40,7 @@ renamed_and_typed as (
         try_to_date(raw_data:last_scraped::varchar)                 as last_scraped,
 
         -- ---------------------------------------------------------------------
-        -- Host
+        -- Hôte
         -- ---------------------------------------------------------------------
 
         try_to_number(raw_data:host_id::varchar)                    as host_id,
@@ -101,7 +101,7 @@ renamed_and_typed as (
         try_to_number(raw_data:beds::varchar)                       as beds,
 
         -- ---------------------------------------------------------------------
-        -- Price and stay rules
+        -- Règles de prix et de durée de séjour
         -- ---------------------------------------------------------------------
 
         try_to_decimal(
@@ -184,7 +184,7 @@ renamed_and_typed as (
         end                                                         as is_instant_bookable,
 
         -- ---------------------------------------------------------------------
-        -- Host portfolio
+        -- Portefeuille de l'hôte
         -- ---------------------------------------------------------------------
 
         try_to_number(
@@ -205,7 +205,7 @@ renamed_and_typed as (
 
         -- ---------------------------------------------------------------------
         -- Fields introduced in later snapshots
-        -- Missing JSON keys naturally return NULL in older snapshots.
+        -- Les clés JSON absentes renvoient naturellement NULL dans les anciens snapshots.
         -- ---------------------------------------------------------------------
 
         raw_data:host_profile_id::varchar                           as host_profile_id,
