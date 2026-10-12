@@ -10,17 +10,17 @@ models:
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Inside Airbnb snapshot date.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
