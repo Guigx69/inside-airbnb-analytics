@@ -31,7 +31,7 @@ Les 25 modèles dbt et 456 tests du build précédent concernent **l'état anté
 | `--all --dry-run` | Oui | Non | Non |
 | `--all --dry-run --verify` | Oui | Non | Non |
 | `--all --sync` | Oui | Archives manquantes | Oui, pour les fichiers téléchargés ou déjà présents non référencés |
-| `--all --sync --verify` | Oui | Archives manquantes | Oui, pour les fichiers téléchargés |
+| `--all --sync --verify` | Oui | Archives manquantes | Oui, pour les fichiers téléchargés ou déjà présents non référencés |
 
 **Procédure standard :**
 
@@ -55,6 +55,23 @@ git push origin main
 Le manifeste est **un inventaire de fichiers sources**, indépendant du compte Snowflake. Sur un compte Snowflake neuf, conserver le manifeste et les archives ; initialiser **RAW** et **INGESTION_LOG** vides, puis ingérer les lots souhaités. La présence d'une archive dans le manifeste ne signifie pas qu'elle a été chargée dans Snowflake.
 
 **Limite opérationnelle :** si une archive gzip existe déjà sur disque mais manque dans le manifeste, `--sync` la valide et l'enregistre sans la retélécharger ; une archive invalide bloque la synchronisation. Aucun mécanisme de planification, de publication Git automatique ou d'ingestion Snowflake automatique n'est fourni par cette commande.
+
+## Audit automatique hebdomadaire (GitHub Actions)
+
+Le workflow `.github/workflows/audit-world.yml` interroge le catalogue **chaque lundi à 06 h 17 UTC** et peut aussi être lancé manuellement depuis l'onglet **Actions** de GitHub. Il utilise `scripts/audit_catalogue_world.py` et produit un artefact JSON `audit-world.json` conservé 30 jours.
+
+Il compare les chemins du catalogue au manifeste **versionné sur la branche GitHub**. Il ne dispose pas des archives locales et **ne vérifie pas leur présence physique ni leurs empreintes**. Il ne télécharge rien, ne modifie pas le manifeste et ne se connecte pas à Snowflake.
+
+En local, depuis la racine du projet :
+
+```powershell
+.\.venv\Scripts\python.exe .\scripts\audit_catalogue_world.py --rapport audit-world.json
+$LASTEXITCODE
+```
+
+Codes de retour : **0** = aucune nouvelle archive dans le catalogue ; **2** = nouveaux chemins détectés ; **1** = erreur de lecture ou de structure. Dans GitHub Actions, les deux derniers cas signalent un échec nécessitant un examen humain. Les rapports peuvent contenir des chemins de jeux de données, mais aucun secret.
+
+Si de nouvelles archives sont détectées, lancer la synchronisation **sur le poste ou le serveur possédant le stockage des archives**, puis les contrôles SHA-256 et la publication du manifeste. Ne pas déclencher automatiquement une ingestion Snowflake sur ce signal.
 
 ## 2. Prévol (lecture seule)
 
@@ -202,7 +219,7 @@ Vérifier les neuf pages : Vue d'ensemble, Marché, Quartiers, Cartographie, Pri
 - **Journal RAW incohérent :** arrêter les écritures ; comparer `INGESTION_LOG` et les tables, sans suppression massive.
 - **Essai Snowflake expiré ou crédits insuffisants :** ne pas tenter de build ; conserver les archives et preuves hors Snowflake.
 - **Sélection JSON :** inclusions combinées par **OU**, pas par ET. L'orchestrateur `run_pipeline.py` exige `--selection-file` ; il n'accepte pas directement `--all`. Pour World, utiliser les étapes séparées.
-- **Limites :** pas de garantie de rollback inter-étapes, de reprise transactionnelle globale, de déploiement vierge validé, ni de synchronisation automatique planifiée.
+- **Limites :** pas de garantie de rollback inter-étapes, de reprise transactionnelle globale, de déploiement vierge validé, ni de téléchargement automatique planifié (seul l'audit du catalogue est planifié).
 
 ## Tests locaux de non-régression
 
