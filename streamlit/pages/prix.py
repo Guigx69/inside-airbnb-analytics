@@ -70,7 +70,7 @@ PRICE_BAND_LABELS = {
 # =============================================================================
 
 def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """Normalize Snowflake column names and snapshot dates."""
+    """Normaliser les noms de colonnes Snowflake et les dates des snapshots."""
 
     if df.empty:
         return df
