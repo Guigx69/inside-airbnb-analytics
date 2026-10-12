@@ -10,6 +10,8 @@
 6. **[Scénarios de déploiement](manager_deployment_two_scenarios.md)** — inclus dans cette branche consolidée.
 7. **[Bootstrap compte vierge](bootstrap_manager_lyon.md)** — inclus dans cette branche consolidée.
 
+**[Guide géographique A à Z](GUIDE_GEOGRAPHIE_A_Z.md)** — procédures détaillées pour ville, pays, continent, plusieurs zones, monde, exclusions, dates, types de fichiers et limites réelles du code.
+
 ## Scripts et aides
 
 | Chemin | Usage | Risque |
