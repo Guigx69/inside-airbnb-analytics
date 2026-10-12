@@ -153,7 +153,7 @@ Les mêmes commandes fonctionnent avec `config/geography.europe.example.json` ou
 
 ## 9. Dimensionnement, reprise et critères d'acceptation
 
-**Avant un pays/continent/monde :** inventorier le nombre de fichiers et snapshots ; calculer les tailles depuis `data_manifest.csv` et prévoir une marge disque ; estimer le stockage Snowflake, le temps et les crédits ; vérifier la limite d'essai et la suspension automatique du warehouse ; commencer par **une ville et une date**, puis élargir par lots. Le manifeste source vérifié comporte 1 629 archives et environ 35,16 Gio ; ce chiffre ne garantit pas que toutes les archives du catalogue actuel soient présentes.
+**Avant un pays/continent/monde :** inventorier le nombre de fichiers et snapshots ; calculer les tailles depuis `data_manifest.csv` et prévoir une marge disque ; estimer le stockage Snowflake, le temps et les crédits ; vérifier la limite d'essai et la suspension automatique du warehouse ; commencer par **une ville et une date**, puis élargir par lots. Après synchronisation d'octobre, le manifeste comporte 1 989 entrées ; les 1 659 archives du catalogue courant ont été vérifiées. La volumétrie exacte doit être recalculée depuis le manifeste ; les 330 archives historiques supplémentaires exigent un contrôle global distinct.
 
 **Après interruption :** inspecter les fichiers `.part`, le manifeste, les SHA-256, `INGESTION_LOG` et les volumes RAW ; relancer d'abord le `--dry-run`. Ne pas supposer qu'un journal suffit à prouver la complétude, ni supprimer/recharger des lots sans diagnostic. Conserver les logs et `target/run_results.json` après build.
 
