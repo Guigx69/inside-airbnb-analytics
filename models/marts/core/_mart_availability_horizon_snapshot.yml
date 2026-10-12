@@ -42,109 +42,109 @@ models:
           - not_null
 
       - name: represented_days_30d
-        description: Nombre total de journées-annonces représentées sur l'horizon de 30-day horizon.
+        description: Nombre total de journées-annonces représentées sur l'horizon de 30 jours.
         data_tests:
           - not_null
 
       - name: available_days_30d
-        description: Nombre total de jours indiqués disponibles sur l'horizon de 30-day horizon.
+        description: Nombre total de jours indiqués disponibles sur l'horizon de 30 jours.
         data_tests:
           - not_null
 
       - name: market_availability_rate_30d_pct
         description: >
-          Share of represented listing-days marked available across the
+          Part des journées-annonces représentées et indiquées disponibles sur
           30-day horizon.
         data_tests:
           - not_null
 
       - name: average_listing_availability_rate_30d_pct
-        description: Moyenne des taux de disponibilité individuels des annonces sur 30 days.
+        description: Moyenne des taux de disponibilité individuels des annonces sur 30 jours.
         data_tests:
           - not_null
 
       - name: median_listing_availability_rate_30d_pct
-        description: Médiane des taux de disponibilité individuels des annonces sur 30 days.
+        description: Médiane des taux de disponibilité individuels des annonces sur 30 jours.
         data_tests:
           - not_null
 
       - name: represented_days_60d
-        description: Nombre total de journées-annonces représentées sur l'horizon de 60-day horizon.
+        description: Nombre total de journées-annonces représentées sur l'horizon de 60 jours.
         data_tests:
           - not_null
 
       - name: available_days_60d
-        description: Nombre total de jours indiqués disponibles sur l'horizon de 60-day horizon.
+        description: Nombre total de jours indiqués disponibles sur l'horizon de 60 jours.
         data_tests:
           - not_null
 
       - name: market_availability_rate_60d_pct
         description: >
-          Share of represented listing-days marked available across the
+          Part des journées-annonces représentées et indiquées disponibles sur
           60-day horizon.
         data_tests:
           - not_null
 
       - name: average_listing_availability_rate_60d_pct
-        description: Moyenne des taux de disponibilité individuels des annonces sur 60 days.
+        description: Moyenne des taux de disponibilité individuels des annonces sur 60 jours.
         data_tests:
           - not_null
 
       - name: median_listing_availability_rate_60d_pct
-        description: Médiane des taux de disponibilité individuels des annonces sur 60 days.
+        description: Médiane des taux de disponibilité individuels des annonces sur 60 jours.
         data_tests:
           - not_null
 
       - name: represented_days_90d
-        description: Nombre total de journées-annonces représentées sur l'horizon de 90-day horizon.
+        description: Nombre total de journées-annonces représentées sur l'horizon de 90 jours.
         data_tests:
           - not_null
 
       - name: available_days_90d
-        description: Nombre total de jours indiqués disponibles sur l'horizon de 90-day horizon.
+        description: Nombre total de jours indiqués disponibles sur l'horizon de 90 jours.
         data_tests:
           - not_null
 
       - name: market_availability_rate_90d_pct
         description: >
-          Share of represented listing-days marked available across the
+          Part des journées-annonces représentées et indiquées disponibles sur
           90-day horizon.
         data_tests:
           - not_null
 
       - name: average_listing_availability_rate_90d_pct
-        description: Moyenne des taux de disponibilité individuels des annonces sur 90 days.
+        description: Moyenne des taux de disponibilité individuels des annonces sur 90 jours.
         data_tests:
           - not_null
 
       - name: median_listing_availability_rate_90d_pct
-        description: Médiane des taux de disponibilité individuels des annonces sur 90 days.
+        description: Médiane des taux de disponibilité individuels des annonces sur 90 jours.
         data_tests:
           - not_null
 
       - name: represented_days_365d
-        description: Nombre total de journées-annonces représentées sur l'horizon de 365-day horizon.
+        description: Nombre total de journées-annonces représentées sur l'horizon de 365 jours.
         data_tests:
           - not_null
 
       - name: available_days_365d
-        description: Nombre total de jours indiqués disponibles sur l'horizon de 365-day horizon.
+        description: Nombre total de jours indiqués disponibles sur l'horizon de 365 jours.
         data_tests:
           - not_null
 
       - name: market_availability_rate_365d_pct
         description: >
-          Share of represented listing-days marked available across the
+          Part des journées-annonces représentées et indiquées disponibles sur
           complete 365-day horizon.
         data_tests:
           - not_null
 
       - name: average_listing_availability_rate_365d_pct
-        description: Moyenne des taux de disponibilité individuels des annonces sur 365 days.
+        description: Moyenne des taux de disponibilité individuels des annonces sur 365 jours.
         data_tests:
           - not_null
 
       - name: median_listing_availability_rate_365d_pct
-        description: Médiane des taux de disponibilité individuels des annonces sur 365 days.
+        description: Médiane des taux de disponibilité individuels des annonces sur 365 jours.
         data_tests:
           - not_null
