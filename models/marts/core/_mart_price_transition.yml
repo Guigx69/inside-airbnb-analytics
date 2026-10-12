@@ -70,7 +70,7 @@ models:
 
       - name: comparable_listing_count
         description: >
-          Number of listings having both previous and current prices and
+          Nombre d'annonces having both previous and current prices and
           therefore usable for price-change analysis.
         data_tests:
           - not_null
