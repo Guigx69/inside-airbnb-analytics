@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only comparison of Inside Airbnb GeoJSON with Snowflake FCT neighbourhoods."""
+"""Comparaison en lecture seule des quartiers GeoJSON Inside Airbnb avec la table FCT Snowflake."""
 import argparse
 import csv
 import json
@@ -56,9 +56,9 @@ def connect_snowflake():
     )
 
 def read_fct(table):
-    # Identifier-only interpolation: never interpolate untrusted SQL fragments.
+    # Interpoler uniquement un identifiant validé, jamais du SQL non fiable.
     if not re.fullmatch(r'[A-Za-z_][A-Za-z_0-9]*', table):
-        raise ValueError('Invalid FCT table identifier')
+        raise ValueError('Identifiant de table FCT invalide')
     conn = connect_snowflake()
     try:
         with conn.cursor() as cursor:
