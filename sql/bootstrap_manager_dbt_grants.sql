@@ -14,10 +14,11 @@ GRANT SELECT ON TABLE AIRBNB.RAW.INGESTION_LOG TO ROLE DBT_ROLE;
 -- DBT_ROLE creates and owns the generated schemas and objects.
 -- Run the following statements in a DBT_ROLE session, AFTER the grants above:
 -- USE ROLE DBT_ROLE;
--- CREATE SCHEMA IF NOT EXISTS AIRBNB.DBT_GGILLET_STAGING;
--- CREATE SCHEMA IF NOT EXISTS AIRBNB.DBT_GGILLET_INTERMEDIATE;
--- CREATE SCHEMA IF NOT EXISTS AIRBNB.DBT_GGILLET_MARTS;
--- The dbt target schema must match DBT_SNOWFLAKE_SCHEMA=DBT_GGILLET
+-- CREATE SCHEMA IF NOT EXISTS AIRBNB.DBT_XXX_STAGING;
+-- CREATE SCHEMA IF NOT EXISTS AIRBNB.DBT_XXX_INTERMEDIATE;
+-- CREATE SCHEMA IF NOT EXISTS AIRBNB.DBT_XXX_MARTS;
+-- DBT_XXX is a placeholder: replace XXX with the manager/environment identifier.
+-- The dbt target schema must match DBT_SNOWFLAKE_SCHEMA=DBT_XXX
 -- if dbt's configured schema naming appends _STAGING/_INTERMEDIATE/_MARTS.
 -- Verify the project's generate_schema_name behavior before running dbt build.
 
