@@ -496,16 +496,16 @@ def geographic_component_diagnostic(cur, part, index):
     coords = list(part.exterior.coords)
     edges = [((a[0]-b[0])**2 + (a[1]-b[1])**2)**0.5
              for a, b in zip(coords, coords[1:])]
-    print(f"  [GEO] component={index} bounds={part.bounds} "
+    print(f"  [GEO] composant={index} bounds={part.bounds} "
           f"planar_area={part.area:.16g} min_edge_deg={min(edges):.12g} "
           f"max_edge_deg={max(edges):.12g}")
-    print(f"  [COORDS] component={index} exterior={coords!r}")
+    print(f"  [COORDS] composant={index} exterior={coords!r}")
     geojson = json.dumps(mapping(part), separators=(",", ":"))
     cur.execute("SELECT ST_AREA(TRY_TO_GEOGRAPHY(%s, TRUE))", (geojson,))
-    print(f"  [GEODESIC] component={index} allow_invalid_area_m2={cur.fetchone()[0]}")
+    print(f"  [GEODESIC] composant={index} allow_invalid_area_m2={cur.fetchone()[0]}")
     from shapely import force_2d
     flat = force_2d(part)
-    print(f"  [DIMENSIONS] component={index} has_z={part.has_z} "
+    print(f"  [DIMENSIONS] composant={index} has_z={part.has_z} "
           f"xy_unchanged={flat.equals(part)} "
           f"2d_snowflake_valid={snowflake_valid(cur, flat)}")
     # Vérifier l'interprétation sphérique de chaque arête sans modifier la géométrie.
@@ -513,7 +513,7 @@ def geographic_component_diagnostic(cur, part, index):
     coords2d = [(c[0], c[1]) for c in part.exterior.coords]
     for edge_index, (a, b) in enumerate(zip(coords2d, coords2d[1:])):
         line = LineString([a, b])
-        print(f"  [EDGE] component={index} edge={edge_index} "
+        print(f"  [EDGE] composant={index} edge={edge_index} "
               f"snowflake_valid={snowflake_valid(cur, line)}")
 
 
@@ -567,7 +567,7 @@ def topology_component_diagnostic(cur, original, index, label):
     target = force_2d(parts[index])
     others = [force_2d(p) for j, p in enumerate(parts) if j != index]
     if not others:
-        print(f"  [TOPOLOGY] component={index} isolated_only_component=True")
+        print(f"  [TOPOLOGY] composant={index} isolated_only_composant=True")
         return
     remaining = unary_union(others)
     covered = remaining.covers(target)
@@ -578,7 +578,7 @@ def topology_component_diagnostic(cur, original, index, label):
     overlap_ratio = overlap_area / target.area if target.area else 0.0
     uncovered_ratio = uncovered_area / target.area if target.area else 0.0
     distance = target.distance(remaining)
-    print(f"  [TOPOLOGY] component={index} covered_by_others={covered} "
+    print(f"  [TOPOLOGY] composant={index} covered_by_others={covered} "
           f"overlap_ratio={overlap_ratio:.12g} uncovered_ratio={uncovered_ratio:.12g} "
           f"nearest_distance_deg={distance:.12g}")
     contacts = []
@@ -592,16 +592,16 @@ def topology_component_diagnostic(cur, original, index, label):
             contacts.append((j, d, target.intersection(other).area, shared.length))
     contacts.sort(key=lambda item: (item[1], -item[2], item[0]))
     for j, d, intersection_area, shared_boundary in contacts[:10]:
-        print(f"  [NEIGHBOR] component={index} other={j} distance_deg={d:.12g} "
+        print(f"  [NEIGHBOR] composant={index} other={j} distance_deg={d:.12g} "
               f"intersection_area_deg2={intersection_area:.12g} "
               f"shared_boundary_deg={shared_boundary:.12g}")
     remaining_valid = snowflake_valid(cur, remaining)
-    print(f"  [EXCLUSION TEST] component={index} remaining_components={len(others)} "
+    print(f"  [EXCLUSION TEST] composant={index} remaining_components={len(others)} "
           f"remaining_snowflake_valid={remaining_valid} "
           f"lost_area_deg2={uncovered_area:.16g} "
-          f"lost_fraction_of_component={uncovered_ratio:.12g} "
+          f"lost_fraction_of_composant={uncovered_ratio:.12g} "
           "diagnostic_only=True")
-    print(f"  [POLICY] component={index} excluded=False; "
+    print(f"  [POLICY] composant={index} excluded=False; "
           "no automatic geometry deletion or replacement")
 
 
@@ -619,21 +619,21 @@ def contact_fusion_diagnostic(cur, original, index, label):
         neighbor = force_2d(part)
         if target.distance(neighbor) <= 1e-12:
             touching.append((j, neighbor))
-    print(f"  [FUSION] composant={index} touching_neighbors={[j for j, _ in touching]}")
+    print(f"  [FUSION] composant={index} voisins_contigus={[j for j, _ in touching]}")
     for j, neighbor in touching:
         source_union = unary_union([target, neighbor])
         fused = []
         if source_union.geom_type == "Polygon":
             fused.append(("unary_union", source_union))
         elif source_union.geom_type == "MultiPolygon":
-            print(f"  [FUSION] neighbor={j} unary_union_disconnected=True "
+            print(f"  [FUSION] voisin={j} unary_union_disconnected=True "
                   f"result_components={len(source_union.geoms)}")
         try:
             buffered = unary_union([target, neighbor]).buffer(0)
             if buffered.geom_type == "Polygon":
                 fused.append(("buffer_zero", buffered))
         except Exception as exc:
-            print(f"  [ERREUR FUSION] neighbor={j} operation=buffer_zero error={exc}")
+            print(f"  [ERREUR FUSION] voisin={j} opération=buffer_zero error={exc}")
         for method, candidate in fused:
             original_pair = unary_union([target, neighbor])
             loss = original_pair.difference(candidate).area
@@ -644,12 +644,12 @@ def contact_fusion_diagnostic(cur, original, index, label):
             rebuilt = [force_2d(p) for k, p in enumerate(parts) if k not in (index, j)] + [candidate]
             whole = MultiPolygon(rebuilt) if len(rebuilt) > 1 else rebuilt[0]
             whole_valid = whole.is_valid and snowflake_valid(cur, whole)
-            print(f"  [FUSION TEST] component={index} neighbor={j} method={method} "
+            print(f"  [FUSION TEST] composant={index} voisin={j} method={method} "
                   f"loss_deg2={loss:.16g} gain_deg2={gain:.16g} "
                   f"lossless={lossless} pair_valid={candidate_valid} "
                   f"whole_valid={whole_valid} resulting_components={len(rebuilt)} "
                   "diagnostic_only=True")
-    print(f"  [FUSION POLICY] component={index} applied=False; "
+    print(f"  [FUSION POLICY] composant={index} applied=False; "
           "no automatic topology changes")
 
 
@@ -663,7 +663,7 @@ def contour_reconstruction_diagnostic(cur, original, index, label):
     target = force_2d(parts[index])
     coords = list(target.exterior.coords[:-1])
     if target.interiors or len(coords) > 10 or target.area <= 0:
-        print(f"  [CONTOUR] component={index} unsupported_rings=True diagnostic_only=True")
+        print(f"  [CONTOUR] composant={index} unsupported_rings=True diagnostic_only=True")
         return
     trials = []
     for i in range(len(coords)):
@@ -679,11 +679,11 @@ def contour_reconstruction_diagnostic(cur, original, index, label):
         trials.append((f"triangle_{i}", tri))
     if triangles:
         trials.append(("triangle_union", unary_union(triangles)))
-    print(f"  [CONTOUR] component={index} original_area_deg2={target.area:.16g} "
+    print(f"  [CONTOUR] composant={index} aire_initiale_deg2={target.area:.16g} "
           f"vertices={len(coords)} trials={len(trials)} diagnostic_only=True")
     for method, candidate in trials:
         if candidate.geom_type != "Polygon" or candidate.is_empty or not candidate.is_valid:
-            print(f"  [CONTOUR IGNORÉ] component={index} method={method} "
+            print(f"  [CONTOUR IGNORÉ] composant={index} method={method} "
                   f"geometry_type={candidate.geom_type} valid={candidate.is_valid}")
             continue
         lost = target.difference(candidate).area
@@ -701,12 +701,12 @@ def contour_reconstruction_diagnostic(cur, original, index, label):
         # Conservation stricte : ni perte ni ajout supérieur à un millionième
         # de la surface du composant. Ne jamais autoriser son utilisation automatique dans cette version.
         coverage_preserved = loss_ratio <= 1e-6 and gain_ratio <= 1e-6
-        print(f"  [CONTOUR TEST] component={index} method={method} "
+        print(f"  [CONTOUR TEST] composant={index} method={method} "
               f"lost_deg2={lost:.16g} gained_deg2={gained:.16g} "
               f"loss_ratio={loss_ratio:.9g} gain_ratio={gain_ratio:.9g} "
               f"component_valid={component_valid} whole_valid={whole_valid} "
               f"coverage_preserved={coverage_preserved} diagnostic_only=True")
-    print(f"  [CONTOUR POLICY] component={index} applied=False; "
+    print(f"  [CONTOUR POLICY] composant={index} applied=False; "
           "no automatic simplification, triangulation or component exclusion")
 
 
@@ -718,7 +718,7 @@ def triangle_partition_diagnostic(cur, original, index, label):
     parts = list(original.geoms) if isinstance(original, MultiPolygon) else [original]
     target = force_2d(parts[index])
     if target.interiors or len(target.exterior.coords) != 5:
-        print(f"  [PARTITION IGNORÉE] component={index} non_quadrilateral=True")
+        print(f"  [PARTITION IGNORÉE] composant={index} non_quadrilateral=True")
         return
 
     coords = list(target.exterior.coords[:-1])
@@ -739,8 +739,8 @@ def triangle_partition_diagnostic(cur, original, index, label):
     if len(inside) == 2:
         partitions.append(("shapely_triangulate", tuple(inside)))
 
-    print(f"  [PARTITION] component={index} partitions={len(partitions)} "
-          f"original_area_deg2={target.area:.16g} diagnostic_only=True")
+    print(f"  [PARTITION] composant={index} partitions={len(partitions)} "
+          f"aire_initiale_deg2={target.area:.16g} diagnostic_only=True")
     for method, pair in partitions:
         if any(p.is_empty or p.area <= 0 or not p.is_valid for p in pair):
             print(f"  [PARTITION IGNORÉE] method={method} degenerate_or_invalid_triangle=True")
@@ -774,7 +774,7 @@ def triangle_partition_diagnostic(cur, original, index, label):
                 native_union_area_m2 = result[1]
             except Exception as exc:
                 native_union_error = str(exc).replace("\n", " ")[:250]
-        print(f"  [PARTITION TEST] component={index} method={method} "
+        print(f"  [PARTITION TEST] composant={index} method={method} "
               f"loss_ratio={loss_ratio:.12g} gain_ratio={gain_ratio:.12g} "
               f"overlap_deg2={overlap:.16g} shared_boundary_deg={shared:.16g} "
               f"exact_coverage={exact} triangles_valid={individually_valid} "
@@ -790,7 +790,7 @@ def triangle_partition_diagnostic(cur, original, index, label):
             whole_valid = whole.is_valid and snowflake_valid(cur, whole)
             print(f"  [PARTITION WHOLE] method={method} whole_valid={whole_valid} "
                   "diagnostic_only=True")
-    print(f"  [PARTITION POLICY] component={index} applied=False; "
+    print(f"  [PARTITION POLICY] composant={index} applied=False; "
           "no automatic partition or area loss")
 
 
@@ -841,7 +841,7 @@ def generic_exact_partition_repair(cur, original, label):
         # La validité Shapely n'est pas exigée : les triangles partagent une
         # arête interne. Snowflake doit accepter la géographie COMPLÈTE.
         whole_valid = snowflake_valid(cur, candidate)
-        print(f"  [PARTITION INTEGRATION] method={method} component={index} "
+        print(f"  [PARTITION INTEGRATION] method={method} composant={index} "
               f"loss_ratio={lost:.12g} gain_ratio={gained:.12g} "
               f"overlap_ratio={overlap:.12g} whole_snowflake_valid={whole_valid} "
               f"parts_before={len(parts)} parts_after={len(rebuilt)}")
@@ -877,7 +877,7 @@ def targeted_repair(cur, original, label, max_delta=0.001):
     for index in bad:
         part = parts[index]
         reason, rings = ring_diagnostics(part)
-        print(f"  [RINGS] component={index} reason={reason} "
+        print(f"  [RINGS] composant={index} reason={reason} "
               f"holes={len(part.interiors)} vertices={sum(r[1] for r in rings)}")
         for ring_name, vertices, duplicates, simple in rings[:8]:
             print(f"    [RING] {ring_name} vertices={vertices} duplicates={duplicates} simple={simple}")
@@ -894,22 +894,22 @@ def targeted_repair(cur, original, label, max_delta=0.001):
         for method, candidate in variants:
             tested += 1
             if candidate.geom_type != "Polygon":
-                print(f"  [IGNORÉ] component={index} method={method}: changes component count")
+                print(f"  [IGNORÉ] composant={index} method={method}: changes component count")
                 continue
             delta = abs(candidate.area - part.area) / part.area if part.area > 0 else float("inf")
             if delta > max_delta:
                 continue
             if snowflake_valid(cur, candidate):
                 if method.endswith("_diagnostic_only"):
-                    print(f"  [TRIANGLE] component={index} {method} accepted separately; "
+                    print(f"  [TRIANGLE] composant={index} {method} accepted separately; "
                           "not eligible for replacement")
                     continue
                 viable.append((method, candidate, delta))
-                print(f"  [CANDIDATE] component={index} method={method} area_delta={delta:.8%}")
+                print(f"  [CANDIDATE] composant={index} method={method} area_delta={delta:.8%}")
                 if len(viable) >= 12:
                     break
         if not viable:
-            print(f"  [UNRESOLVED] component={index}: {tested} local variants tested")
+            print(f"  [UNRESOLVED] composant={index}: {tested} local variants tested")
         else:
             replacements[index] = viable[:12]
     if len(replacements) != len(bad):

@@ -40,7 +40,7 @@ else:
     raise AssertionError('catalogue inutilisable accepté')
 print('[PASS] 3 offline V14.2 scenarios; no permanent writes')
 
-# Incremental completeness decisions (no database or HTTP calls).
+# Décisions de complétude incrémentale (sans appel à la base ni requête HTTP).
 assert mod.destination_complete('france', 'paris', {'A','B'}, {('france','paris','A'),('france','paris','B')})
 assert not mod.destination_complete('france', 'paris', {'A','B'}, {('france','paris','A')})
 assert not mod.destination_complete('france', 'paris', set(), set())
