@@ -44,6 +44,21 @@ Le contrôle d'archives suppose que les fichiers référencés dans `data_manife
 - **Lyon :** cinq snapshots, 15 lots RAW non vides, **17 692 229 lignes** contrôlées sur le compte source le 12/10/2026.
 - **Non testé :** bootstrap et build sur un compte Snowflake vierge chez le manager. La fraîcheur des marts après le dernier snapshot n'a pas été établie.
 
+## État opérationnel au 13/10/2026 — synchronisation World
+
+- **120 zones** recensées dans le catalogue, **553 snapshots courants** et **1 659 archives courantes**.
+- **120 nouveaux snapshots** détectés par comparaison des chemins (119 zones, deux nouvelles dates pour Vaud) ; **360 nouvelles archives** téléchargées et ajoutées au manifeste.
+- **1 989 entrées** dans `data_manifest.csv` après synchronisation, contre 1 629 avant ; aucune suppression ni modification des entrées historiques lors de la comparaison.
+- **1 659/1 659 archives du catalogue courant vérifiées** avec `--verify` (taille et SHA-256). Les **330 autres entrées historiques** du manifeste nécessitent le contrôle global `check_archives.py --hash` pour une preuve d'intégrité complète.
+- Dernière date du catalogue observée : **05/10/2026 (Vaud)**. Ce constat est daté, pas une garantie de fraîcheur future.
+- **Non encore validé pour ces nouvelles données :** ingestion RAW World, exécution dbt après synchronisation, fraîcheur des marts et validation sur un compte Snowflake vierge.
+
+> **Attention aux chiffres historiques ci-dessous :** la référence de 1 629 archives / 35,16 Gio décrit l'état **avant** la synchronisation d'octobre ; elle ne représente plus le manifeste actuel. Recalculer la volumétrie depuis `data_manifest.csv` plutôt que réutiliser cette taille.
+
+### Cycle de maintenance autonome
+
+Consulter **[la procédure de synchronisation World](docs/MAINTENANCE_WORLD_A_Z.md)** pour les commandes PowerShell reproductibles, les contrôles d'intégrité, le diagnostic et les conditions de passage à Snowflake. L'actualisation du manifeste **n'actualise pas automatiquement** les tables RAW ni les marts dbt.
+
 ## Points d'attention
 
 - Les variables d'environnement et mots de passe restent **hors Git** ; `DBT_XXX` est un placeholder à remplacer.
