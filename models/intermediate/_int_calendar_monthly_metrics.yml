@@ -12,32 +12,32 @@ models:
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Inside Airbnb snapshot date.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Identifier of the Airbnb listing.
+        description: Identifiant de l'annonce Airbnb.
         data_tests:
           - not_null
 
       - name: calendar_month
-        description: First day of the calendar month represented by the row.
+        description: Premier jour du mois calendaire représenté par la ligne.
         data_tests:
           - not_null
 
       - name: days_in_calendar_month
-        description: Total number of calendar days in the corresponding month.
+        description: Nombre total de jours calendaires du mois correspondant.
         data_tests:
           - not_null
 
