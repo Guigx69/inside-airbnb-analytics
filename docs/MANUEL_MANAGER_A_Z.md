@@ -120,7 +120,7 @@ Les tables RAW doivent contenir les colonnes `SOURCE_COUNTRY`, `SOURCE_CITY`, `S
 
 ## 4B. Scénario B — compte Snowflake neuf
 
-**Ne jamais appliquer ces scripts à un compte existant sans revue administrative.** Scripts disponibles dans la proposition de bootstrap `feature/manager-bootstrap-v1` / PR #5 ; ils ne sont pas encore homologués sur compte vierge. Ils doivent être intégrés au dépôt de livraison avant exécution.
+**Ne jamais appliquer ces scripts à un compte existant sans revue administrative.** Scripts désormais inclus dans cette branche de livraison consolidée ; ils ne sont pas encore homologués sur compte vierge.
 
 Dans Snowflake, avec un rôle administrateur habilité, **lire les SQL avant de les exécuter**, puis suivre l'ordre :
 
