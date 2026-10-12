@@ -928,8 +928,8 @@ else:
         columns=2,
     )
 
-    # Python 3.11-compatible:
-    # calculate the formatted percentage outside the f-string.
+    # Compatible avec Python 3.11 :
+    # calculer le pourcentage formaté hors de la f-string.
     median_change_pct_label = format_signed_percent(
         median_change_pct,
         decimals=1,

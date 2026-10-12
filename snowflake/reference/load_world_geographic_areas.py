@@ -347,7 +347,7 @@ def polygon_only(geom):
 
 def repair_polygon(geom, max_area_change):
 
-    """Return (polygon, repaired, relative area change); reject excessive changes."""
+    """Renvoie (polygone, réparé, variation relative de surface) ; rejette les écarts excessifs."""
 
     raw = shape(geom)
 
@@ -429,7 +429,7 @@ def snowflake_valid(cur, geom):
 
 
 def component_variants(part):
-    """Conservative local repairs; leave all other components byte-for-byte unchanged."""
+    """Réparations locales prudentes ; conserve tous les autres composants à l'identique."""
     yield "original", part
     operations = [
         ("make_valid", lambda g: polygon_only(make_valid(g))),
@@ -448,7 +448,7 @@ def component_variants(part):
 
 
 def ring_diagnostics(part):
-    """Describe local ring defects without modifying source coordinates."""
+    """Décrit les défauts des anneaux sans modifier les coordonnées source."""
     from shapely.validation import explain_validity
     from shapely.geometry import LinearRing
     rings = [("exterior", part.exterior)] + [(f"hole_{i}", r) for i, r in enumerate(part.interiors)]
@@ -508,7 +508,7 @@ def geographic_component_diagnostic(cur, part, index):
     print(f"  [DIMENSIONS] component={index} has_z={part.has_z} "
           f"xy_unchanged={flat.equals(part)} "
           f"2d_snowflake_valid={snowflake_valid(cur, flat)}")
-    # Check each edge's spherical interpretation without mutating the geometry.
+    # Vérifier l'interprétation sphérique de chaque arête sans modifier la géométrie.
     from shapely.geometry import LineString
     coords2d = [(c[0], c[1]) for c in part.exterior.coords]
     for edge_index, (a, b) in enumerate(zip(coords2d, coords2d[1:])):
@@ -559,7 +559,7 @@ def vertex_variants(part):
 
 
 def topology_component_diagnostic(cur, original, index, label):
-    """Read-only component topology. Never drop or replace source polygons."""
+    """Diagnostic topologique en lecture seule. Ne jamais supprimer ni remplacer les polygones source."""
     from shapely import force_2d
     from shapely.ops import unary_union
 
@@ -606,7 +606,7 @@ def topology_component_diagnostic(cur, original, index, label):
 
 
 def contact_fusion_diagnostic(cur, original, index, label):
-    """Read-only test of lossless fusion with touching components; no fallback deletion."""
+    """Test en lecture seule de fusion sans perte des composants adjacents ; aucune suppression de secours."""
     from shapely import force_2d
     from shapely.ops import unary_union
 
@@ -654,7 +654,7 @@ def contact_fusion_diagnostic(cur, original, index, label):
 
 
 def contour_reconstruction_diagnostic(cur, original, index, label):
-    """Read-only reconstruction trials. No source component is ever discarded."""
+    """Essais de reconstruction en lecture seule. Aucun composant source n'est supprimé."""
     from shapely import force_2d
     from shapely.ops import triangulate, unary_union
     from shapely.geometry import Polygon
@@ -673,7 +673,7 @@ def contour_reconstruction_diagnostic(cur, original, index, label):
     for tolerance in (1e-12, 1e-10, 1e-9, 1e-8, 1e-7):
         trials.append((f"simplify_{tolerance:.0e}", target.simplify(tolerance, preserve_topology=True)))
     trials.append(("convex_hull", target.convex_hull))
-    # Triangulation is tested both individually and as a union, with coverage metrics.
+    # Tester la triangulation individuellement et en union, avec les métriques de couverture.
     triangles = [t for t in triangulate(target) if target.covers(t.representative_point())]
     for i, tri in enumerate(triangles):
         trials.append((f"triangle_{i}", tri))
@@ -691,15 +691,15 @@ def contour_reconstruction_diagnostic(cur, original, index, label):
         loss_ratio = lost / target.area
         gain_ratio = gained / target.area
         component_valid = snowflake_valid(cur, candidate)
-        # Avoid querying a large assembled geometry for invalid candidates.
+        # Éviter d'interroger une grande géométrie assemblée pour les candidats invalides.
         whole_valid = False
         if component_valid:
             rebuilt = parts.copy()
             rebuilt[index] = candidate
             assembled = MultiPolygon(rebuilt) if len(rebuilt) > 1 else rebuilt[0]
             whole_valid = assembled.is_valid and snowflake_valid(cur, assembled)
-        # Strict preservation: neither losing nor adding more than one millionth
-        # of the component's area. Never authorize automatic use in this version.
+        # Conservation stricte : ni perte ni ajout supérieur à un millionième
+        # de la surface du composant. Ne jamais autoriser son utilisation automatique dans cette version.
         coverage_preserved = loss_ratio <= 1e-6 and gain_ratio <= 1e-6
         print(f"  [CONTOUR TEST] component={index} method={method} "
               f"lost_deg2={lost:.16g} gained_deg2={gained:.16g} "
@@ -711,7 +711,7 @@ def contour_reconstruction_diagnostic(cur, original, index, label):
 
 
 def triangle_partition_diagnostic(cur, original, index, label):
-    """Read-only exact partition tests; never authorizes replacement or writes REF."""
+    """Tests de partition exacte en lecture seule ; n'autorisent aucun remplacement ni écriture dans REF."""
     from shapely import force_2d
     from shapely.ops import triangulate, unary_union
 
@@ -723,7 +723,7 @@ def triangle_partition_diagnostic(cur, original, index, label):
 
     coords = list(target.exterior.coords[:-1])
     partitions = []
-    # Both diagonals of the source quadrilateral. Triangles must lie inside it.
+    # Les deux diagonales du quadrilatère source. Les triangles doivent rester à l'intérieur.
     for diagonal in ((0, 2), (1, 3)):
         a, b = diagonal
         i, j = sorted(diagonal)
@@ -783,7 +783,7 @@ def triangle_partition_diagnostic(cur, original, index, label):
               f"native_union_valid={native_union_valid} "
               f"native_union_area_m2={native_union_area_m2} "
               f"native_union_error={native_union_error} diagnostic_only=True")
-        # The full geometry test is meaningful only for a strict MultiPolygon.
+        # Le test de géométrie complète n'est pertinent que pour un MultiPolygon strict.
         if multi_shapely_valid and multi_snowflake_valid:
             rebuilt = [force_2d(p) for k, p in enumerate(parts) if k != index] + list(pair)
             whole = MultiPolygon(rebuilt)
@@ -835,18 +835,18 @@ def generic_exact_partition_repair(cur, original, label):
             continue
         if not all(snowflake_valid(cur, t) for t in pair):
             continue
-        # Retain all other source components, changing only the one bad sliver.
+        # Conserver tous les autres composants source ; modifier uniquement la portion défectueuse.
         rebuilt = [force_2d(p) for j, p in enumerate(parts) if j != index] + list(pair)
         candidate = MultiPolygon(rebuilt)
-        # Shapely validity is deliberately not required: the triangles share an
-        # internal edge. Snowflake must accept the COMPLETE geography instead.
+        # La validité Shapely n'est pas exigée : les triangles partagent une
+        # arête interne. Snowflake doit accepter la géographie COMPLÈTE.
         whole_valid = snowflake_valid(cur, candidate)
         print(f"  [PARTITION INTEGRATION] method={method} component={index} "
               f"loss_ratio={lost:.12g} gain_ratio={gained:.12g} "
               f"overlap_ratio={overlap:.12g} whole_snowflake_valid={whole_valid} "
               f"parts_before={len(parts)} parts_after={len(rebuilt)}")
         if whole_valid:
-            # Check whole-neighbourhood planar coverage as a second safeguard.
+            # Vérifier aussi la couverture plane du quartier entier comme seconde garantie.
             original_cover = unary_union([force_2d(p) for p in parts])
             rebuilt_cover = unary_union(rebuilt)
             denom = original_cover.area
@@ -942,7 +942,7 @@ def targeted_repair(cur, original, label, max_delta=0.001):
 
 
 def diagnose_components(conn, session, sources, names, report_path, max_area_change):
-    """Read-only topology and local-ring diagnosis; never updates REF."""
+    """Diagnostic topologique et des anneaux en lecture seule ; ne modifie jamais REF."""
     rows = []
     cur = conn.cursor()
     cur.execute("CREATE OR REPLACE TEMPORARY TABLE WORLD_GEO_DIAG ("
@@ -1331,8 +1331,8 @@ def main():
 
 
 
-        # A rejected source feature is nonblocking when another valid feature
-        # covers the same neighbourhood. All other unresolved keys are quarantined.
+        # Un objet source rejeté n'est pas bloquant lorsqu'un autre objet valide
+        # couvre le même quartier. Toutes les autres clés non résolues sont mises en quarantaine.
         for country, city, area, _, status, detail in blockers:
             if area and (country, city, area) not in existing:
                 quarantine.append((country, city, area, status, detail))

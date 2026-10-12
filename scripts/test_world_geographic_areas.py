@@ -47,7 +47,7 @@ assert not mod.destination_complete('france', 'paris', set(), set())
 assert not mod.destination_complete('france', 'paris', {'A'}, {('france','lyon','A')})
 print('[PASS] incremental completeness: complete, missing, empty and cross-city cases')
 
-# Unicode destination keys: URLs retain their original source spelling.
+# Clés de destination Unicode : les URL conservent l'orthographe source d'origine.
 result = catalog([
     row('brazil', 'são-paulo', '2026-06-14', region='sp'),
     row('colombia', 'bogotá', '2026-06-21', region='dc'),
