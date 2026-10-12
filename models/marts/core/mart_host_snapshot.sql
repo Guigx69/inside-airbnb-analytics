@@ -52,7 +52,7 @@ aggregated as (
         snapshot_date,
 
         -- ============================================================
-        -- Market population
+        -- Population du marché
         -- ============================================================
         count(*) as host_count,
         sum(observed_listing_count) as listing_count,
@@ -70,7 +70,7 @@ aggregated as (
             as max_listings_per_host,
 
         -- ============================================================
-        -- Host segmentation
+        -- Segmentation des hôtes
         -- ============================================================
         count_if(observed_host_segment = '1')
             as single_listing_host_count,
@@ -91,7 +91,7 @@ aggregated as (
             as multi_listing_host_count,
 
         -- ============================================================
-        -- Listings controlled by host type
+        -- Annonces détenues selon le type d'hôte
         -- ============================================================
         sum(
             case
@@ -110,7 +110,7 @@ aggregated as (
         ) as listings_controlled_by_multi_listing_hosts,
 
         -- ============================================================
-        -- Host characteristics
+        -- Caractéristiques des hôtes
         -- ============================================================
         count_if(is_superhost)
             as superhost_count,
@@ -119,15 +119,15 @@ aggregated as (
             as identity_verified_host_count,
 
         -- ============================================================
-        -- Price coverage
+        -- Couverture des prix
         -- ============================================================
         sum(listings_with_price)
             as listings_with_price,
 
          -- ============================================================
-        -- Host concentration
+        -- Concentration des hôtes
         -- Top X% thresholds use CEIL so that small populations still
-        -- contain at least the requested proportion of hosts.
+        -- incluent au moins la proportion d'hôtes demandée.
         -- ============================================================
         sum(
             case
@@ -179,7 +179,7 @@ final as (
         *,
 
         -- ============================================================
-        -- Host shares
+        -- Parts des hôtes
         -- ============================================================
         round(
             100.0 * single_listing_host_count
@@ -215,7 +215,7 @@ final as (
         ) as top_10_pct_listing_share_pct,
 
         -- ============================================================
-        -- Listing concentration by host type
+        -- Concentration des annonces selon le type d'hôte
         -- ============================================================
         round(
             100.0 * listings_controlled_by_single_listing_hosts
@@ -230,7 +230,7 @@ final as (
         ) as multi_listing_host_listing_share_pct,
 
         -- ============================================================
-        -- Host characteristics
+        -- Caractéristiques des hôtes
         -- ============================================================
         round(
             100.0 * superhost_count

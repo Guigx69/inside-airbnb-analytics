@@ -63,7 +63,7 @@ final as (
             as native_review_count_total,
 
         -- ============================================================
-        -- Reviews - reconstructed from review-level data
+        -- Avis : indicateurs reconstitués à partir des avis individuels
         -- ============================================================
         sum(review_count_to_snapshot)
             as reconstructed_review_count_total,

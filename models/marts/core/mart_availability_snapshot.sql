@@ -36,7 +36,7 @@ aggregated as (
             as unavailable_day_count,
 
         -- ============================================================
-        -- Market-level availability
+        -- Disponibilité à l'échelle du marché
         -- Weighted by represented calendar days
         -- ============================================================
         round(
@@ -52,7 +52,7 @@ aggregated as (
         ) as market_unavailability_rate_pct,
 
         -- ============================================================
-        -- Listing-level availability distribution
+        -- Répartition de la disponibilité par annonce
         -- ============================================================
         round(avg(availability_rate_pct), 2)
             as average_listing_availability_rate_pct,
@@ -90,7 +90,7 @@ aggregated as (
         -- Availability segmentation
         --
         -- These are availability bands, NOT occupancy bands.
-        -- An unavailable day must not automatically be interpreted
+        -- Un jour indisponible ne doit pas être automatiquement interprété
         -- as an observed booked night.
         -- ============================================================
         count_if(available_day_count = 0)

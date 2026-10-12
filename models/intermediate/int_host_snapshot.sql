@@ -20,14 +20,14 @@ host_aggregates as (
         host_id,
 
         -- ============================================================
-        -- Host descriptive attributes
+        -- Attributs descriptifs des hôtes
         -- ============================================================
         max(host_name) as host_name,
         min(host_since) as host_since,
 
         -- ============================================================
         -- Observed portfolio
-        -- Counts only listings actually present in this city/snapshot.
+        -- Compte uniquement les annonces réellement présentes dans cette ville et ce snapshot.
         -- ============================================================
         count(*) as observed_listing_count,
 
@@ -50,7 +50,7 @@ host_aggregates as (
             as median_listing_price,
 
         -- ============================================================
-        -- Host characteristics
+        -- Caractéristiques des hôtes
         -- ============================================================
         max(
             case when is_superhost then 1 else 0 end
@@ -61,8 +61,8 @@ host_aggregates as (
         ) = 1 as is_host_identity_verified,
 
         -- ============================================================
-        -- Inside Airbnb host portfolio attribute
-        -- Kept distinct from observed_listing_count.
+        -- Attribut du portefeuille d'hôtes fourni par Inside Airbnb
+        -- Conservé distinct de observed_listing_count.
         -- ============================================================
         max(calculated_host_listings_count)
             as inside_airbnb_calculated_host_listings_count
@@ -85,7 +85,7 @@ final as (
         *,
 
         -- ============================================================
-        -- Observed host segment
+        -- Segment des hôtes observés
         -- ============================================================
         case
             when observed_listing_count = 1
@@ -104,8 +104,8 @@ final as (
             as is_observed_multi_listing_host,
 
         -- ============================================================
-        -- Difference between observed local portfolio and the
-        -- Inside Airbnb supplied host portfolio attribute.
+        -- Écart entre le portefeuille local observé et
+        -- l'attribut de portefeuille d'hôtes fourni par Inside Airbnb.
         -- ============================================================
         inside_airbnb_calculated_host_listings_count
             - observed_listing_count

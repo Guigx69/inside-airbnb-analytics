@@ -45,12 +45,12 @@ final as (
 
         -- ============================================================
         -- Stable population
-        -- Listing remains in the same neighbourhood.
+        -- L'annonce reste dans le même quartier.
         -- ============================================================
         retained_listing_count,
 
         -- ============================================================
-        -- Absence from current snapshot
+        -- Absence du snapshot actuel
         -- Does NOT prove permanent Airbnb exit.
         -- ============================================================
         disappeared_listing_count,
@@ -63,7 +63,7 @@ final as (
         moved_in_listing_count,
 
         -- ============================================================
-        -- Current population acquisition / return
+        -- Entrée ou retour dans la population actuelle
         -- ============================================================
         newly_observed_listing_count,
         returned_after_gap_listing_count,
