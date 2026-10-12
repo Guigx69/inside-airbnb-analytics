@@ -19,7 +19,7 @@ aggregated as (
         snapshot_date,
 
         -- ============================================================
-        -- Market population
+        -- Population du marché
         -- ============================================================
         count(*) as listing_count,
 
