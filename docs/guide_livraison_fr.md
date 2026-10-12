@@ -40,7 +40,7 @@ cd C:\Projects\inside_airbnb
 .\.venv\Scripts\python.exe .\scripts\check_archives.py --country france --location lyon --hash
 ```
 
-Le premier contrôle a déjà réussi sur le poste de développement. Le manifeste local inclut **trois fichiers Lyon supplémentaires du 17/09/2026** ; le `git diff` a confirmé qu'il n'y a ni suppression ni modification d'entrée existante. **Ne pas confondre disponibilité des archives et ingestion/validation dbt du cinquième snapshot.** Le second contrôle permet de **constater**, sans supposer, combien de fichiers et de snapshots Lyon sont effectivement présents. Ne pas modifier le manifeste local non committé et ne pas exécuter `git reset --hard` ni `git clean`.
+Le premier contrôle a déjà réussi sur le poste de développement. Le manifeste GitHub `main` inclut désormais **trois fichiers Lyon supplémentaires du 17/09/2026** (commit `167cc5f`) ; le `git diff` initial a confirmé qu'il n'y a ni suppression ni modification d'entrée existante. **Ne pas confondre disponibilité des archives et ingestion/validation dbt du cinquième snapshot.** Le second contrôle permet de **constater**, sans supposer, combien de fichiers et de snapshots Lyon sont effectivement présents. Ne pas modifier le manifeste sans contrôle préalable et ne pas exécuter `git reset --hard` ni `git clean`.
 
 ## 5. Scénario A — compte avec RAW existant
 
