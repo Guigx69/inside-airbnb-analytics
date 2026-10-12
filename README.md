@@ -16,7 +16,7 @@ Plateforme analytique fondée sur les archives publiques [Inside Airbnb](https:/
 | Durée du build V1.3 | 1 h 05 min 46 s |
 | Durée avant optimisation | 2 h 02 min 44 s |
 | Réduction de durée mesurée | 46,4 % |
-| Archives locales vérifiées par SHA-256 | 1 629 |
+| Archives locales vérifiées par SHA-256 | 1 629 (manifeste local, incluant Lyon septembre 2026) |
 | Volume local des archives | 35,16 Gio |
 | Archives manquantes ou invalides | 0 |
 
@@ -113,6 +113,8 @@ Le second scénario **n'a pas encore été testé sur un compte vierge**. Les sc
 - `config/` : sélections géographiques d'exemple.
 - `docs/` : documentation technique et livraison.
 - `data_manifest.csv` : inventaire et empreintes des archives, à préserver.
+
+Le manifeste GitHub `main` contient encore **1 626 entrées**, tandis que le manifeste local en compte **1 629** : les trois ajouts correspondent à Lyon au 17 septembre 2026. Les documents décrivant la version déployée restent fondés sur les quatre snapshots antérieurs jusqu'à nouvelle ingestion et validation dbt.
 
 Les archives `data/raw/`, les secrets, les environnements virtuels et les résultats dbt générés ne doivent pas être versionnés. **GitHub ne constitue pas une sauvegarde des 35,16 Gio d'archives locales.**
 
