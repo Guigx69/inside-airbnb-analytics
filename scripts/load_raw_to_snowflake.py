@@ -233,7 +233,8 @@ def get_ingestion_log(cursor):
             TO_CHAR(SNAPSHOT_DATE, 'YYYY-MM-DD'),
             SOURCE_FILE,
             TARGET_TABLE,
-            ROW_COUNT
+            ROW_COUNT,
+            SOURCE_SHA256
         FROM {ingestion_log}
         """
     )
@@ -247,6 +248,7 @@ def get_ingestion_log(cursor):
         source_file,
         target_table,
         row_count,
+        source_sha256,
     ) in cursor.fetchall():
         key = (
             country,
@@ -262,7 +264,7 @@ def get_ingestion_log(cursor):
                 + " / ".join(str(value) for value in key)
             )
 
-        loaded[key] = int(row_count)
+        loaded[key] = {"row_count": int(row_count), "sha256": source_sha256.lower() if source_sha256 else None}
 
     return loaded
 
@@ -392,7 +394,8 @@ def classify_files(cursor, files, ingestion_log):
     # tout lot journalisé doit réellement exister dans RAW
     # avec exactement le nombre de lignes journalisé.
     #
-    for key, logged_rows in ingestion_log.items():
+    for key, log_entry in ingestion_log.items():
+        logged_rows = log_entry["row_count"]
         actual_rows = raw_inventory.get(key)
 
         # Un lot source vide est légitimement journalisé avec 0 ligne.
@@ -456,7 +459,12 @@ def classify_files(cursor, files, ingestion_log):
             continue
 
         item["status"] = "LOADED"
-        item["row_count"] = ingestion_log[key]
+        logged_sha = ingestion_log[key]["sha256"]
+        if logged_sha and logged_sha != item["sha256"]:
+            raise RuntimeError(
+                f"Empreinte source différente du journal pour {item['relative_path']}"
+            )
+        item["row_count"] = ingestion_log[key]["row_count"]
         skipped.append(item)
 
     return pending, skipped
@@ -646,7 +654,8 @@ def load_file(connection, cursor, item):
                 SOURCE_FILE,
                 TARGET_TABLE,
                 ROW_COUNT,
-                LOADED_AT
+                LOADED_AT,
+                SOURCE_SHA256
             )
             VALUES (
                 %s,
@@ -655,7 +664,8 @@ def load_file(connection, cursor, item):
                 %s,
                 %s,
                 %s,
-                CURRENT_TIMESTAMP()
+                CURRENT_TIMESTAMP(),
+                %s
             )
             """,
             (
@@ -665,6 +675,7 @@ def load_file(connection, cursor, item):
                 filename,
                 target_table,
                 loaded_rows,
+                item["sha256"],
             ),
         )
 
