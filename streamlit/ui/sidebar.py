@@ -6,7 +6,7 @@ from ui.formatters import format_date_fr
 
 @st.cache_data(ttl=3600)
 def load_available_locations():
-    """Return the geographic observations available in the marts."""
+    """Renvoyer les observations géographiques disponibles dans les marts."""
 
     session = get_session()
 
@@ -33,16 +33,16 @@ def load_available_locations():
 
 
 def format_location_name(value):
-    """Return a user-friendly geographic label."""
+    """Renvoyer un libellé géographique lisible."""
 
     return str(value).replace("-", " ").title()
 
 
 def render_sidebar():
-    """Render the global geographic context.
+    """Afficher le contexte géographique global.
 
-    Returns:
-        tuple: selected country, city and snapshot date.
+    Renvoie :
+        tuple : pays, ville et date de snapshot sélectionnés.
     """
 
     locations = load_available_locations()
@@ -54,7 +54,7 @@ def render_sidebar():
         st.stop()
 
     # ========================================================
-    # Country
+    # Pays
     # ========================================================
 
     countries = sorted(
@@ -76,7 +76,7 @@ def render_sidebar():
     ]
 
     # ========================================================
-    # Location
+    # Ville
     # ========================================================
 
     cities = sorted(
@@ -87,7 +87,7 @@ def render_sidebar():
     )
 
     selected_city = st.sidebar.selectbox(
-        "Location",
+        "Ville",
         options=cities,
         format_func=format_location_name,
         key="global_source_city",
