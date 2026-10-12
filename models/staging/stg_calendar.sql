@@ -16,26 +16,26 @@ renamed_and_typed as (
 
     select
 
-        -- Technical metadata
+        -- Métadonnées techniques
         source_country,
         source_city,
         snapshot_date,
         source_file,
         loaded_at,
 
-        -- Grain
+        -- Granularité
         try_to_number(raw_data:listing_id::varchar) as listing_id,
         try_to_date(raw_data:date::varchar)         as calendar_date,
 
-        -- Availability
+        -- Disponibilité
         case
             when lower(raw_data:available::varchar) = 't' then true
             when lower(raw_data:available::varchar) = 'f' then false
             else null
         end                                         as is_available,
 
-        -- Pricing
-        -- These attributes only exist in some source snapshots.
+        -- Tarification
+        -- Ces attributs n'existent que dans certains snapshots source.
         try_to_decimal(
             replace(
                 replace(raw_data:price::varchar, '$', ''),
@@ -56,7 +56,7 @@ renamed_and_typed as (
             2
         )                                           as adjusted_price,
 
-        -- Stay constraints
+        -- Contraintes de séjour
         try_to_number(
             raw_data:minimum_nights::varchar
         )                                           as minimum_nights,
