@@ -39,13 +39,15 @@ def commands(selection_file: str, execute: bool, sync: bool, dbt_build: bool,
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--selection-file", default="config/geography.example.json")
+    parser.add_argument("--selection-file", default=None)
     parser.add_argument("--execute", action="store_true", help="Allow RAW writes")
     parser.add_argument("--sync", action="store_true", help="Download missing archives (requires --execute)")
     parser.add_argument("--dbt-build", action="store_true", help="Run dbt build (requires --execute)")
     args = parser.parse_args(argv)
     if (args.sync or args.dbt_build) and not args.execute:
         parser.error("--sync and --dbt-build require --execute")
+    if not args.selection_file:
+        parser.error("Specify --selection-file explicitly; see docs/GUIDE_GEOGRAPHIE_A_Z.md")
     selection = Path(args.selection_file)
     if not selection.is_absolute():
         selection = ROOT / selection

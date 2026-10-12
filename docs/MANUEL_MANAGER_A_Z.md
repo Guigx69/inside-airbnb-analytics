@@ -1,6 +1,6 @@
 # Manuel d'installation et d'exploitation A à Z — Inside Airbnb Analytics
 
-**Public :** responsable / ingénieur repreneur. **Plateforme :** Windows PowerShell, Python, Snowflake, dbt, Git. **Version de référence :** V1.3, commit de données `167cc5f` sur `main` ; la documentation et le bootstrap proposés doivent être intégrés à `main` avant livraison définitive.
+**Public :** responsable / ingénieur repreneur. **Plateforme :** Windows PowerShell, Python, Snowflake, dbt, Git. **Version de référence :** V1.3 sur `main` ; les scripts de bootstrap et la documentation sont intégrés. Le bootstrap reste non validé sur un compte Snowflake vierge.
 
 > **Important.** Le dépôt GitHub contient le code, les scripts et le manifeste, **pas les 1 629 archives CSV.GZ (35,16 Gio)**. Une copie indépendante des archives est nécessaire pour reconstruire RAW sur un autre compte. Un compte Snowflake expiré ne constitue pas une sauvegarde. Ne jamais committer de secrets.
 
