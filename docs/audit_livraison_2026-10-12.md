@@ -11,8 +11,8 @@
 | README | En anglais et ancien résultat (445 tests) | Réécrit en français, benchmark V1.3 exact |
 | Guide V1.3 | Mentionne encore la branche et PR #3 avant fusion | Statut et commandes corrigés |
 | Dépendances | `requirements-dev.txt` présent ; dbt-core 1.12.4 fixé, dbt-snowflake non fixé | Version validée 1.12.1 documentée ; verrouillage complet à réaliser avant livraison reproductible |
-| Manifeste `main` | 1 627 lignes de données dans le fichier GitHub inspecté | Écart à expliquer avec les 1 629 archives locales vérifiées |
-| Lyon dans le manifeste `main` | 12 archives, 4 dates, 3 types par date | Périmètre de départ confirmé sur GitHub |
+| Manifeste `main` | 1 626 lignes de données dans le fichier GitHub inspecté | Écart expliqué : trois nouvelles archives Lyon du 17/09/2026, présentes localement mais non encore committées |
+| Lyon dans le manifeste `main` | 12 archives, 4 dates, 3 types par date sur `main` ; 15 archives et 5 dates en local | Périmètre de départ confirmé sur GitHub |
 | Orchestration | `run_pipeline.py` propose un mode aperçu par défaut | Préserver ; le dry-run RAW se connecte à Snowflake |
 | Infrastructure Snowflake | Scripts de bootstrap sur PR #5 | Pas encore fusionnés ni testés sur un compte vierge |
 | Documentation des deux scénarios | PR #4 | À rapprocher du guide français et du bootstrap |
@@ -25,7 +25,7 @@
 - 2026-03-25 : listings, calendar, reviews
 - 2026-06-22 : listings, calendar, reviews
 
-Les quatre dates ont été vérifiées dans le **manifeste GitHub**, pas dans les archives elles-mêmes. L'utilisateur a effectué séparément un contrôle local SHA-256 réussi sur 1 629 archives. L'écart entre la version GitHub et la version locale du manifeste **ne doit pas être résolu par un remplacement aveugle** : comparer les deux fichiers avant toute synchronisation Git.
+Une cinquième date locale (2026-09-17, trois fichiers) a été confirmée par `git diff` ; elle n'est pas encore dans le manifeste `main`. Les quatre dates de `main` ont été vérifiées dans le **manifeste GitHub**, pas dans les archives elles-mêmes. L'utilisateur a effectué séparément un contrôle local SHA-256 réussi sur 1 629 archives. L'écart entre la version GitHub et la version locale du manifeste **ne doit pas être résolu par un remplacement aveugle** : comparer les deux fichiers avant toute synchronisation Git.
 
 ### Nettoyage du dépôt — politique
 
@@ -41,7 +41,7 @@ Le workflow `verification-hors-ligne.yml` installe uniquement `country_converter
 
 ### Risques ouverts
 
-1. **Différence manifeste Git/local :** 1 627 entrées GitHub contre 1 629 archives vérifiées localement. Un outil de comparaison **en lecture seule** est ajouté : `python scripts/comparer_manifestes.py --reference origin/main` (après `git fetch origin`). Il affiche les chemins ajoutés, absents ou modifiés, sans écraser le manifeste. Les deux chemins exacts ne sont pas encore identifiés.
+1. **Différence manifeste Git/local :** 1 626 entrées GitHub contre 1 629 archives vérifiées localement. Le `git diff` fourni par l'utilisateur identifie trois ajouts, sans suppression ni modification : `data/raw/france/lyon/2026-09-17/{calendar,listings,reviews}.csv.gz`. L'outil de comparaison **en lecture seule** `python scripts/comparer_manifestes.py --reference origin/main` reste disponible. Les trois archives sont vérifiées localement par SHA-256, mais leur ingestion et leurs transformations dbt ne sont pas validées.
 2. **Dépendances Python :** absence de lock complet ; les nouvelles installations peuvent résoudre d'autres versions de `dbt-snowflake`.
 3. **Compte vierge :** absence de test réel des scripts SQL, des rôles, du warehouse et des données.
 4. **Accès du responsable :** droits de lecture des marts, Streamlit et éventuels objets BI à définir selon le besoin.
