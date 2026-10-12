@@ -4,7 +4,7 @@
 
 > **Important.** Le dépôt GitHub contient le code, les scripts et le manifeste, **pas les 1 629 archives CSV.GZ (35,16 Gio)**. Une copie indépendante des archives est nécessaire pour reconstruire RAW sur un autre compte. Un compte Snowflake expiré ne constitue pas une sauvegarde. Ne jamais committer de secrets.
 
-**Parcours documentaire :** [guide géographique A à Z](GUIDE_GEOGRAPHIE_A_Z.md) pour toutes les zones et [référence technique](REFERENCE_TECHNIQUE.md) pour l'audit, les preuves et l'historique. **Pour lancer une ville, un pays, un continent, plusieurs zones ou le monde entier, suivre également le guide géographique.** Il contient les commandes et les limites exactes du code.
+**Parcours documentaire :** [guide géographique A à Z](GUIDE_GEOGRAPHIE_A_Z.md) pour toutes les zones. **Pour lancer une ville, un pays, un continent, plusieurs zones ou le monde entier, suivre également le guide géographique.** Il contient les commandes et les limites exactes du code.
 
 ## 0. Choisir son parcours
 
