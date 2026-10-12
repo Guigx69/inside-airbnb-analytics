@@ -25,7 +25,7 @@ models:
           - not_null
 
       - name: listing_count
-        description: Number of listings represented in calendar data.
+        description: Nombre d'annonces represented in calendar data.
         data_tests:
           - not_null
 
