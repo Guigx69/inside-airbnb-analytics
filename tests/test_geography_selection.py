@@ -37,17 +37,17 @@ class GeographySelectionTests(unittest.TestCase):
 
     def test_unknown_city_fails_closed(self):
         self.write({"include": {"cities": ["Atlantis"]}})
-        with self.assertRaisesRegex(ValueError, "Unknown cities"):
+        with self.assertRaisesRegex(ValueError, "Valeur cities inconnue"):
             select_manifest_paths(self.rows, self.path)
 
     def test_empty_inclusion_rejected(self):
         self.write({"include": {}})
-        with self.assertRaisesRegex(ValueError, "At least one inclusion"):
+        with self.assertRaisesRegex(ValueError, "Au moins une inclusion"):
             select_manifest_paths(self.rows, self.path)
 
     def test_invalid_manifest_path_rejected(self):
         self.write({"include": {"countries": ["France"]}})
-        with self.assertRaisesRegex(ValueError, "Unexpected manifest path"):
+        with self.assertRaisesRegex(ValueError, "Chemin inattendu dans le manifeste"):
             select_manifest_paths([{"path": "../outside.csv.gz"}], self.path)
 
     def test_selection_does_not_require_network(self):

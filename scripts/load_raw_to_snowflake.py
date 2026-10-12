@@ -695,40 +695,40 @@ def load_file(connection, cursor, item):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Load verified Inside Airbnb RAW files into Snowflake."
+        description="Charger les archives RAW vérifiées dans Snowflake."
     )
 
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Display the ingestion plan without loading data.",
+        help="Afficher le plan d'ingestion sans charger de données.",
     )
 
     parser.add_argument(
         "--selection-file",
-        help="Geographic selection JSON applied to the local manifest.",
+        help="Sélection géographique JSON appliquée au manifeste local.",
     )
 
     parser.add_argument(
         "--country",
-        help="Only load one country, for example: france",
+        help="Limiter à un pays, par exemple : france",
     )
 
     parser.add_argument(
         "--location",
-        help="Only load one location, for example: lyon",
+        help="Limiter à une ville, par exemple : lyon",
     )
 
     parser.add_argument(
         "--snapshot",
-        help="Only load one snapshot date, for example: 2026-06-22",
+        help="Limiter à une date de snapshot, par exemple : 2026-06-22",
     )
 
     parser.add_argument(
         "--files",
         nargs="+",
         choices=("listings", "calendar", "reviews"),
-        help="Only load selected dataset types.",
+        help="Limiter aux types de données sélectionnés.",
     )
 
     return parser.parse_args()
