@@ -65,3 +65,11 @@ Sans ces contrôles, statut : **prêt pour test**, pas « déployé ».
 La commande `SHOW STAGES` confirme `AIRBNB.RAW.INSIDE_AIRBNB_STAGE` de type `INTERNAL`, sans intégration de stockage ni répertoire automatique. Le stage source appartient à `ACCOUNTADMIN` ; cela **n'implique pas** que le rôle d'ingestion dispose des droits nécessaires sur le compte cible. Le `DESCRIBE STAGE` présente les valeurs CSV par défaut. Le loader spécifie explicitement `TYPE=JSON COMPRESSION=GZIP` dans `COPY INTO` ; aucun changement du format de stage n'est requis.
 
 **À vérifier avant le pilote** : droits de création/usage de la base et du schéma, `USAGE` sur le warehouse, `READ`/`WRITE` sur le stage interne selon les opérations, `SELECT`/`INSERT`/`DELETE` sur RAW et INGESTION_LOG, ainsi que les droits de création dans le schéma dbt. Les privilèges exacts doivent être validés avec le rôle effectif dans Snowflake.
+
+## 8. Droits d'ingestion validés sur le compte source
+
+Les résultats `SHOW GRANTS TO ROLE INGESTION_ROLE` et `SHOW GRANTS ON STAGE` confirment : `USAGE` sur `DBT_WH`, `AIRBNB` et `AIRBNB.RAW` ; `READ` et `WRITE` sur le stage interne ; `SELECT`, `INSERT`, `DELETE` sur les trois tables RAW et `INGESTION_LOG`. Le propriétaire du stage source est `ACCOUNTADMIN`.
+
+Un script séparé `sql/bootstrap_manager_ingestion_grants.sql` reproduit **ces seuls droits**. À exécuter sur le compte **cible vierge**, par un administrateur autorisé, **après** création des objets et du rôle `INGESTION_ROLE` et du warehouse `DBT_WH`. Vérifier les noms avant exécution. Il ne configure pas les droits de `DBT_ROLE`, à examiner séparément.
+
+**Séquence recommandée** : bootstrap des objets -> création administrative du rôle/warehouse si absents -> grants d'ingestion -> `SHOW GRANTS` -> dry-run Lyon -> pilote Lyon -> build dbt. Aucun test de cette séquence n'a encore été effectué sur un compte vierge.
