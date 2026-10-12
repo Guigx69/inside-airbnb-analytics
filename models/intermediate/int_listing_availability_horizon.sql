@@ -122,7 +122,7 @@ aggregated as (
         ) as available_days_90d,
 
         -- ============================================================
-        -- Full 365-day horizon
+        -- Horizon complet de 365 jours
         -- ============================================================
         count_if(
             availability_day_number <= 365
