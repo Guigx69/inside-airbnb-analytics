@@ -16,7 +16,7 @@ where
     or comparable_listing_count > listings_with_previous_price
     or comparable_listing_count > listings_with_current_price
 
-    -- Every comparable listing must belong to exactly one price movement
+    -- Chaque annonce comparable doit appartenir à un seul mouvement de prix
     or (
         price_increase_count
         + price_decrease_count
@@ -40,7 +40,7 @@ where
     or comparable_price_coverage_pct < 0
     or comparable_price_coverage_pct > 100
 
-    -- When comparable listings exist, shares must reconcile to 100%
+    -- Lorsque des annonces comparables existent, les parts doivent totaliser 100 %
     or (
         comparable_listing_count > 0
         and abs(
@@ -51,8 +51,8 @@ where
         ) > 0.02
     )
 
-    -- When there is no comparable price, analytical price metrics
-    -- must remain NULL rather than represent artificial zero values
+    -- Lorsqu'aucun prix n'est comparable, les indicateurs analytiques de prix
+    -- doivent rester NULL plutôt que représenter des zéros artificiels
     or (
         comparable_listing_count = 0
         and (
@@ -70,7 +70,7 @@ where
         )
     )
 
-    -- When comparable prices exist, core price metrics must exist
+    -- Lorsque des prix comparables existent, les indicateurs principaux de prix doivent exister
     or (
         comparable_listing_count > 0
         and (
