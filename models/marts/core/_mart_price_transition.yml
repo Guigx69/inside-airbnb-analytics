@@ -27,10 +27,7 @@ models:
           - not_null
 
       - name: transition_type
-        description: >
-          Type of transition between observations. CONSECUTIVE means no
-          expected snapshot is missing; AFTER_GAP means one or more expected
-          snapshots are missing between observations.
+        description: Type de transition entre observations. CONSECUTIVE indique qu'aucun snapshot attendu ne manque ; AFTER_GAP indique qu'au moins un snapshot attendu manque entre les observations.
         data_tests:
           - not_null
           - accepted_values:
@@ -65,9 +62,7 @@ models:
           - not_null
 
       - name: comparable_listing_count
-        description: >
-          Nombre d'annonces having both previous and current prices and
-          therefore usable for price-change analysis.
+        description: Nombre d'annonces disposant d'un prix dans les deux snapshots, donc utilisables pour analyser les variations de prix.
         data_tests:
           - not_null
 
@@ -87,26 +82,18 @@ models:
           - not_null
 
       - name: comparable_price_coverage_pct
-        description: >
-          Percentage of listing observations having comparable previous and
-          current prices.
+        description: Pourcentage d'observations d'annonces disposant de prix comparables dans les snapshots précédent et actuel.
         data_tests:
           - not_null
 
       - name: price_increase_share_pct
-        description: >
-          Percentage of comparable listings whose price increased. Null when
-          no comparable listing exists.
+        description: Pourcentage d'annonces comparables dont le prix a augmenté ; nul si aucune annonce comparable n'existe.
 
       - name: price_decrease_share_pct
-        description: >
-          Percentage of comparable listings whose price decreased. Null when
-          no comparable listing exists.
+        description: Pourcentage d'annonces comparables dont le prix a diminué ; nul si aucune annonce comparable n'existe.
 
       - name: unchanged_price_share_pct
-        description: >
-          Percentage of comparable listings whose price remained unchanged.
-          Null when no comparable listing exists.
+        description: Pourcentage d'annonces comparables dont le prix est resté stable ; nul si aucune annonce comparable n'existe.
 
       - name: average_previous_price
         description: Prix moyen précédent des annonces comparables.
@@ -121,22 +108,13 @@ models:
         description: Prix médian actuel parmi les annonces comparables.
 
       - name: average_price_change
-        description: >
-          Average absolute price change at listing level among comparable
-          listings.
+        description: Variation absolue moyenne du prix par annonce parmi les annonces comparables.
 
       - name: median_price_change
-        description: >
-          Median absolute price change at listing level among comparable
-          listings.
+        description: Variation absolue médiane du prix par annonce parmi les annonces comparables.
 
       - name: average_price_change_pct
-        description: >
-          Average listing-level percentage price change. This is the average
-          of individual percentage changes and is not the percentage change
-          between the aggregate average prices.
+        description: Moyenne des variations de prix en pourcentage calculées individuellement par annonce. Elle diffère de la variation en pourcentage entre les prix moyens agrégés.
 
       - name: median_price_change_pct
-        description: >
-          Median listing-level percentage price change among comparable
-          listings.
+        description: Médiane des variations de prix en pourcentage calculées individuellement parmi les annonces comparables.
