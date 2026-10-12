@@ -95,7 +95,7 @@ def discover_catalog_url(session: requests.Session) -> str:
     through /page-data/get-the-data/page-data.json.
     """
 
-    print("[INFO] Discovering Inside Airbnb catalog")
+    print("[INFO] Découverte du catalogue Inside Airbnb")
 
     try:
         response = session.get(
@@ -153,7 +153,7 @@ def discover_catalog_url(session: requests.Session) -> str:
 
         if isinstance(datasets, list) and datasets:
 
-            print("[INFO] Dataset catalog discovered")
+            print("[INFO] Catalogue des jeux de données découvert")
             print(f"       {catalog_url}")
             print(
                 f"[INFO] Catalog records: "
@@ -181,7 +181,7 @@ def get_catalog() -> list[dict]:
 
     catalog_url = discover_catalog_url(session)
 
-    print("[INFO] Reading Inside Airbnb catalog")
+    print("[INFO] Lecture du catalogue Inside Airbnb")
     print(f"       {catalog_url}")
 
     response = session.get(
@@ -328,7 +328,7 @@ def validate_gzip(path: Path) -> None:
                 pass
     except (gzip.BadGzipFile, EOFError, OSError) as exc:
         raise RuntimeError(
-            f"Invalid gzip file: {path}"
+            f"Archive gzip invalide : {path}"
         ) from exc
 
 def load_manifest() -> dict[str, dict]:
@@ -473,7 +473,7 @@ def update_manifest(
             or existing_sha256 != sha256.lower()
         ):
             raise RuntimeError(
-                "Manifest integrity violation: "
+                "Violation d'intégrité du manifeste : "
                 f"{manifest_key} already exists with a "
                 "different size or SHA-256. "
                 "The existing manifest entry was NOT modified."
@@ -564,9 +564,9 @@ def print_summary(
 
     print()
     print("-" * 100)
-    print(f"Locations : {len(locations)}")
+    print(f"Villes    : {len(locations)}")
     print(f"Snapshots : {len(snapshots)}")
-    print(f"Files     : {len(datasets)}")
+    print(f"Fichiers  : {len(datasets)}")
 
     for status, count in counts.items():
         if count:
@@ -578,7 +578,7 @@ def print_summary(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Discover and synchronize Inside Airbnb datasets."
+            "Découvrir et synchroniser les jeux de données Inside Airbnb."
         )
     )
 
@@ -588,52 +588,52 @@ def parse_args() -> argparse.Namespace:
 
     scope.add_argument(
         "--location",
-        help="Location, for example: lyon",
+        help="Ville, par exemple : lyon",
     )
 
     scope.add_argument(
         "--country",
-        help="Country, for example: france",
+        help="Pays, par exemple : france",
     )
 
     scope.add_argument(
         "--selection-file",
-        help="JSON geographic include/exclude selection (multi-continent/country/city)",
+        help="Sélection géographique JSON : inclusions/exclusions (continents, pays, villes)",
     )
 
     scope.add_argument(
         "--all",
         action="store_true",
-        help="All locations in the Inside Airbnb catalog",
+        help="Toutes les villes du catalogue Inside Airbnb",
     )
 
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Do not download anything",
+        help="Ne rien télécharger",
     )
 
     parser.add_argument(
         "--verify",
         action="store_true",
-        help="Verify local files against data_manifest.csv",
+        help="Vérifier les fichiers locaux avec data_manifest.csv",
     )
 
     parser.add_argument(
         "--sync",
         action="store_true",
-        help="Download missing datasets and update manifest",
+        help="Télécharger les fichiers manquants et actualiser le manifeste",
     )
 
     parser.add_argument(
         "--overwrite",
         action="store_true",
-        help="Replace existing local files",
+        help="Remplacer les fichiers locaux existants",
     )
 
     parser.add_argument(
         "--snapshot",
-        help="Only one snapshot date, for example: 2026-06-22",
+        help="Une seule date de snapshot, par exemple : 2026-06-22",
     )
 
     parser.add_argument(
@@ -641,7 +641,7 @@ def parse_args() -> argparse.Namespace:
         nargs="+",
         choices=["listings", "calendar", "reviews"],
         help=(
-            "Only selected dataset types, for example: "
+            "Limiter aux types de données sélectionnés, par exemple : "
             "--files listings or --files listings reviews"
         ),
     )
@@ -677,7 +677,7 @@ def main() -> int:
         )
 
         if not selected:
-            print("[ERROR] No matching datasets.")
+            print("[ERROR] Aucun jeu de données correspondant.")
             return 1
 
         manifest = load_manifest()
@@ -690,7 +690,7 @@ def main() -> int:
 
         if args.dry_run:
             print()
-            print("[DRY-RUN] No file was downloaded.")
+            print("[DRY-RUN] Aucun fichier téléchargé.")
             return 0
 
         if not args.sync:
@@ -739,9 +739,9 @@ def main() -> int:
 
         print()
         print("=" * 100)
-        print("SYNCHRONIZATION COMPLETE")
+        print("SYNCHRONISATION TERMINÉE")
         print("=" * 100)
-        print(f"Downloaded : {downloaded}")
+        print(f"Téléchargés : {downloaded}")
 
         print_summary(
             selected,
