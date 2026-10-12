@@ -60,16 +60,16 @@ models:
           - not_null
 
       - name: net_listing_change
-        description: Current listing count minus previous listing count.
+        description: Nombre d'annonces du snapshot actuel moins celui du précédent.
         data_tests:
           - not_null
 
       - name: retention_rate_pct
-        description: Percentage of previous listings retained in the current snapshot.
+        description: Pourcentage des annonces précédentes conservées dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: disappearance_rate_pct
-        description: Percentage of previous listings absent from the current snapshot.
+        description: Pourcentage des annonces précédentes absentes du snapshot actuel.
         data_tests:
           - not_null

@@ -69,21 +69,21 @@ models:
           snapshot date. Null when no review exists up to the snapshot.
 
       - name: has_reviews_to_snapshot
-        description: Whether at least one reconstructed review exists.
+        description: Indique si au moins un avis reconstitué existe.
         data_tests:
           - not_null
 
       - name: has_review_l30d
-        description: Whether at least one reconstructed review exists in L30D.
+        description: Indique si au moins un avis reconstitué existe sur les 30 derniers jours.
         data_tests:
           - not_null
 
       - name: has_review_l90d
-        description: Whether at least one reconstructed review exists in L90D.
+        description: Indique si au moins un avis reconstitué existe sur les 90 derniers jours.
         data_tests:
           - not_null
 
       - name: has_review_l365d
-        description: Whether at least one reconstructed review exists in L365D.
+        description: Indique si au moins un avis reconstitué existe sur les 365 derniers jours.
         data_tests:
           - not_null

@@ -45,7 +45,7 @@ models:
           - not_null
 
       - name: disappeared_listing_count
-        description: Listings no longer observed in the current snapshot.
+        description: Annonces qui ne sont plus observées dans le snapshot actuel.
         data_tests:
           - not_null
 
@@ -56,7 +56,7 @@ models:
           - not_null
 
       - name: newly_observed_listing_count
-        description: Listings observed for the first time in the historical window.
+        description: Annonces observées pour la première fois dans l'historique disponible.
         data_tests:
           - not_null
 
@@ -73,7 +73,7 @@ models:
           - not_null
 
       - name: net_listing_change
-        description: Current neighbourhood listing count minus previous listing count.
+        description: Nombre d'annonces du quartier dans le snapshot actuel moins celui du précédent.
         data_tests:
           - not_null
 
@@ -84,11 +84,11 @@ models:
           - not_null
 
       - name: retention_rate_pct
-        description: Percentage of previous listings retained in the same neighbourhood.
+        description: Pourcentage des annonces précédentes conservées dans le même quartier.
         data_tests:
           - not_null
 
       - name: disappearance_rate_pct
-        description: Percentage of previous listings no longer observed.
+        description: Pourcentage des annonces précédentes qui ne sont plus observées.
         data_tests:
           - not_null
