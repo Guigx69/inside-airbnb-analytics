@@ -23,7 +23,7 @@ renamed_and_typed as (
         source_file,
         loaded_at,
 
-        -- Review
+        -- Avis
         try_to_number(raw_data:id::varchar)            as review_id,
         try_to_number(raw_data:listing_id::varchar)    as listing_id,
         try_to_date(raw_data:date::varchar)            as review_date,

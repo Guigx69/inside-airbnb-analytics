@@ -50,8 +50,8 @@ aggregated as (
             as median_beds,
 
         -- ============================================================
-        -- Price
-        -- Null prices are deliberately preserved as missing data.
+        -- Prix
+        -- Les prix NULL sont volontairement conservés comme données manquantes.
         -- ============================================================
         count_if(price is not null)
             as listings_with_price,
@@ -64,7 +64,7 @@ aggregated as (
 
         -- ============================================================
         -- Availability
-        -- Availability must not be interpreted as observed occupancy.
+        -- La disponibilité ne doit pas être interprétée comme une occupation observée.
         -- ============================================================
         round(avg(availability_rate_pct), 2)
             as average_availability_rate_pct,
@@ -76,7 +76,7 @@ aggregated as (
             as average_availability_365,
 
         -- ============================================================
-        -- Reconstructed review activity
+        -- Activité des avis reconstituée
         -- ============================================================
         sum(review_count_l30d)
             as reconstructed_review_count_l30d,
