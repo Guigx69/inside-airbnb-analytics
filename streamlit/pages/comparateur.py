@@ -48,12 +48,12 @@ def location_slug(value) -> str:
     )
 
 def is_valid(value):
-    """Return True when a scalar is available."""
+    """Renvoyer vrai lorsqu'une valeur scalaire est disponible."""
     return value is not None and bool(pd.notna(value))
 
 
 def format_value(value, suffix="", decimals=0, signed=False):
-    """Format numbers in French without converting missing data to zero."""
+    """Formater les nombres en français sans remplacer les données absentes par zéro."""
     if not is_valid(value):
         return "N/D"
 
@@ -64,7 +64,7 @@ def format_value(value, suffix="", decimals=0, signed=False):
 
 
 def calculate_change(previous, current):
-    """Return absolute and relative changes, when computable."""
+    """Renvoyer les variations absolues et relatives lorsqu'elles sont calculables."""
     if not is_valid(previous) or not is_valid(current):
         return None, None
 
@@ -88,7 +88,7 @@ def normalize_dates(frame):
 
 def render_metric(label, column, reference, comparison, reference_date,
                   comparison_date, suffix="", decimals=0, points=False):
-    """Display a compact KPI card with an unambiguous change."""
+    """Afficher une carte d'indicateur compacte avec une variation sans ambiguïté."""
     previous = reference[column]
     current = comparison[column]
     absolute, relative = calculate_change(previous, current)
@@ -116,7 +116,7 @@ def render_metric(label, column, reference, comparison, reference_date,
 
 
 def grouped_chart(frame, category, value, order=None, horizontal=False, height=350):
-    """Accessible grouped Altair chart, consistent across both comparisons."""
+    """Graphique Altair groupé et accessible, cohérent pour les deux comparaisons."""
     periods = [format_date_fr(date_a), format_date_fr(date_b)]
     colors = alt.Color(
         "Période:N",
@@ -156,7 +156,7 @@ def grouped_chart(frame, category, value, order=None, horizontal=False, height=3
 
 
 # ============================================================
-# Data access
+# Accès aux données
 # ============================================================
 
 @st.cache_data(ttl=600, show_spinner=False)
@@ -235,7 +235,7 @@ def load_data():
     )
 
 # ============================================================
-# Page header and periods
+# En-tête et périodes
 # ============================================================
 
 (
@@ -350,7 +350,7 @@ row_b = market.loc[market["SNAPSHOT_DATE"] == date_b].iloc[0]
 
 
 # ============================================================
-# Main indicators
+# Indicateurs principaux
 # ============================================================
 
 st.divider()
@@ -380,7 +380,7 @@ for start in (0, 3):
 
 
 # ============================================================
-# Price coverage
+# Couverture des prix
 # ============================================================
 
 st.divider()
@@ -421,7 +421,7 @@ else:
 
 
 # ============================================================
-# Availability horizons
+# Horizons de disponibilité
 # ============================================================
 
 st.divider()
@@ -471,7 +471,7 @@ else:
 
 
 # ============================================================
-# Neighbourhood comparison and export
+# Comparaison des quartiers et export
 # ============================================================
 
 st.divider()
@@ -537,7 +537,7 @@ else:
             previous_value = previous[indicator_column]
             current_value = current[indicator_column]
 
-        # Missing price coverage is not evidence of a zero market price.
+        # L'absence de prix n'implique pas un prix de marché nul.
         if indicator_column == "MEDIAN_PRICE":
             if previous_coverage is None or previous_coverage == 0:
                 previous_value = None
@@ -650,7 +650,7 @@ else:
 
 
 # ============================================================
-# Methodological warnings
+# Avertissements méthodologiques
 # ============================================================
 
 st.divider()
