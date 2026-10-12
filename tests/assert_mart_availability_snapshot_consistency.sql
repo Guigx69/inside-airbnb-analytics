@@ -40,7 +40,7 @@ left join source_metrics s
 where
        s.snapshot_date is null
 
-    -- Source reconciliation
+    -- Rapprochement avec la source
     or m.listing_count <> s.expected_listing_count
     or m.calendar_row_count <> s.expected_calendar_row_count
     or m.calendar_day_count <> s.expected_calendar_day_count
@@ -51,7 +51,7 @@ where
     or m.calendar_day_count
         <> m.available_day_count + m.unavailable_day_count
 
-    -- Segmentation must reconstruct the population
+    -- La segmentation doit reconstituer la population
     or m.listing_count <> (
         m.fully_unavailable_listing_count
         + m.low_availability_listing_count
@@ -69,7 +69,7 @@ where
         ) - 100
     ) > 0.01
 
-    -- Listing-level percentiles must be ordered
+    -- Les percentiles des annonces doivent être ordonnés
     or not (
         m.p10_listing_availability_rate_pct
             <= m.p25_listing_availability_rate_pct

@@ -4,7 +4,7 @@ from {{ ref('mart_host_snapshot') }}
 where
 
     -- ============================================================
-    -- Host segmentation must reconstruct the host population
+    -- La segmentation des hôtes doit reconstituer la population des hôtes
     -- ============================================================
     single_listing_host_count
         + host_count_2_to_5
@@ -18,14 +18,14 @@ where
         <> host_count
 
     -- ============================================================
-    -- Host type must reconstruct the listing population
+    -- Les types d'hôtes doivent reconstituer la population des annonces
     -- ============================================================
     or listings_controlled_by_single_listing_hosts
         + listings_controlled_by_multi_listing_hosts
         <> listing_count
 
     -- ============================================================
-    -- Concentration volumes must be monotonic
+    -- Les volumes de concentration doivent être monotones
     -- ============================================================
     or listings_controlled_by_top_1_pct_hosts
         > listings_controlled_by_top_5_pct_hosts
@@ -37,7 +37,7 @@ where
         > listing_count
 
     -- ============================================================
-    -- Concentration shares must be monotonic and bounded
+    -- Les parts de concentration doivent être monotones et bornées
     -- ============================================================
     or top_1_pct_listing_share_pct < 0
     or top_1_pct_listing_share_pct > 100
@@ -55,7 +55,7 @@ where
         > top_10_pct_listing_share_pct
 
     -- ============================================================
-    -- HHI must be valid
+    -- Le HHI doit être valide
     -- ============================================================
     or host_hhi < 0
     or host_hhi > 10000

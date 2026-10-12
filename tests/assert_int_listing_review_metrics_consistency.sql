@@ -28,7 +28,7 @@ where
     or review_count_l90d > review_count_l365d
     or review_count_l365d > review_count_to_snapshot
 
-    -- No review means no review dates or recency metric
+    -- Sans avis, aucune date d'avis ni aucun indicateur de récence
     or (
         review_count_to_snapshot = 0
         and (
@@ -38,7 +38,7 @@ where
         )
     )
 
-    -- At least one review means dates and recency must exist
+    -- Avec au moins un avis, les dates et la récence doivent être renseignées
     or (
         review_count_to_snapshot > 0
         and (
@@ -48,14 +48,14 @@ where
         )
     )
 
-    -- Review dates cannot be after the analytical snapshot
+    -- Les dates des avis ne peuvent pas dépasser celle du snapshot analytique
     or first_review_date_to_snapshot > snapshot_date
     or last_review_date_to_snapshot > snapshot_date
 
-    -- First review cannot be after last review
+    -- Le premier avis ne peut pas être postérieur au dernier
     or first_review_date_to_snapshot > last_review_date_to_snapshot
 
-    -- Boolean flags must agree with their corresponding counters
+    -- Les indicateurs booléens doivent correspondre à leurs compteurs
     or has_reviews_to_snapshot
         <> (review_count_to_snapshot > 0)
 

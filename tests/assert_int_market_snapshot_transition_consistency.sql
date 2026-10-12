@@ -19,12 +19,12 @@ select
 from {{ ref('int_market_snapshot_transition') }}
 
 where
-    -- Previous population reconciliation
+    -- Rapprochement de la population précédente
     previous_listing_count
         <> retained_listing_count
          + disappeared_listing_count
 
-    -- Current population reconciliation
+    -- Rapprochement de la population actuelle
     or current_listing_count
         <> retained_listing_count
          + newly_observed_listing_count
@@ -42,15 +42,15 @@ where
     or newly_observed_listing_count < 0
     or returned_after_gap_listing_count < 0
 
-    -- Rates must remain valid percentages
+    -- Les taux doivent rester des pourcentages valides
     or retention_rate_pct < 0
     or retention_rate_pct > 100
 
     or disappearance_rate_pct < 0
     or disappearance_rate_pct > 100
 
-    -- Retention + disappearance must represent
-    -- the complete previous population
+    -- La rétention et la disparition doivent représenter
+    -- l'intégralité de la population précédente
     or abs(
         retention_rate_pct
         + disappearance_rate_pct

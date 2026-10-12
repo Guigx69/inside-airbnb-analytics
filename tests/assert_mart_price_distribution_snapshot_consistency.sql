@@ -35,13 +35,13 @@ with invalid_rows as (
             )
         )
 
-        -- Priced bands must contain only priced listings
+        -- Les tranches tarifaires doivent contenir uniquement des annonces avec prix
         or (
             price_band <> 'NO_PRICE'
             and listings_with_price <> listing_count
         )
 
-        -- Price-band boundaries
+        -- Limites des tranches tarifaires
         or (
             price_band = '01_<50'
             and (
@@ -87,7 +87,7 @@ with invalid_rows as (
             and min_price < 300
         )
 
-        -- Review-window consistency
+        -- Cohérence des fenêtres d'avis
         or reconstructed_review_count_l30d < 0
         or reconstructed_review_count_l90d < 0
         or reconstructed_review_count_l365d < 0
