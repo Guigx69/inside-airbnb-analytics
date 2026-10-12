@@ -207,7 +207,7 @@ Pour visualiser la documentation dbt (si disponible sur le poste) :
 
 ### Orchestrateur `run_pipeline.py`
 
-**Par défaut**, l'orchestrateur prévisualise collecte, vérification archives et RAW. Son argument `--selection-file` est **obligatoirement un fichier JSON de sélection existant**, même si la valeur par défaut pointe sur `config/geography.lyon.example.json`. Le fichier Lyon fourni est un exemple explicite à contrôler avant toute exécution ; le fichier géographique générique inclut Japon/Sydney et ne doit pas servir au pilote Lyon.
+**Par défaut**, l'orchestrateur prévisualise collecte, vérification archives et RAW. Son argument `--selection-file` est **obligatoirement un fichier JSON de sélection existant**, même si la valeur par défaut pointe sur `config/geography.lyon.example.json`. Le fichier Lyon sélectionne la ville par son nom. Le moteur géographique combine les critères inclusifs par **OU** (et non par ET) : ajouter `countries: [\"France\"]` inclurait **toutes les villes françaises**. Contrôler la sélection avant toute exécution ; le fichier géographique générique inclut Japon/Sydney et ne doit pas servir au pilote Lyon.
 
 ```powershell
 # Aperçu, sans écriture RAW (connexion Snowflake néanmoins)
