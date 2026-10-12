@@ -3,10 +3,7 @@ version: 2
 models:
   - name: mart_availability_snapshot
     description: >
-      Market-level availability indicators derived from Inside Airbnb calendar
-      data. One row represents one country, city and snapshot. Availability
-      describes the state exposed by the calendar and must not be interpreted
-      as observed occupancy or confirmed bookings.
+      Indicateurs de disponibilité du marché issus des calendriers Inside Airbnb. Chaque ligne représente un pays, une ville et un snapshot. La disponibilité reflète l'état public du calendrier et ne prouve ni une occupation effective ni une réservation confirmée.
 
     columns:
       - name: source_country
@@ -25,7 +22,7 @@ models:
           - not_null
 
       - name: listing_count
-        description: Nombre d'annonces represented in calendar data.
+        description: Nombre d'annonces représentées dans le calendrier.
         data_tests:
           - not_null
 

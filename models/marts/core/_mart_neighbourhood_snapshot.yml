@@ -3,27 +3,21 @@ version: 2
 models:
   - name: mart_neighbourhood_snapshot
     description: >
-      Neighbourhood-level analytical snapshot derived from listing-level
-      observations. One row represents one country, city, snapshot and
-      neighbourhood. In the Lyon V1 dataset, neighbourhood corresponds to
-      one of the nine Lyon arrondissements. Pricing metrics remain null when
-      the source snapshot does not provide listing prices. Availability
-      represents publicly observed Airbnb availability and must not be
-      interpreted as observed vacancy or inverse occupancy.
+      Indicateurs par quartier issus des annonces observées. Chaque ligne représente un pays, une ville, un snapshot et un quartier. Pour Lyon V1, les quartiers correspondent aux neuf arrondissements. Les prix sont nuls lorsqu'ils sont absents de la source. La disponibilité publique ne représente ni une vacance constatée ni le complément d'un taux d'occupation.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
@@ -35,7 +29,7 @@ models:
           - not_null
 
       - name: listing_count
-        description: Nombre d'annonces observed in the neighbourhood.
+        description: Nombre d'annonces observées dans le quartier.
         data_tests:
           - not_null
 
@@ -60,12 +54,12 @@ models:
           - not_null
 
       - name: superhost_listing_count
-        description: Nombre d'annonces whose host is identified as a Superhost.
+        description: Nombre d'annonces dont l'hôte est identifié comme Superhost.
         data_tests:
           - not_null
 
       - name: listings_with_price
-        description: Nombre d'annonces for which a price is available.
+        description: Nombre d'annonces disposant d'un prix.
         data_tests:
           - not_null
 

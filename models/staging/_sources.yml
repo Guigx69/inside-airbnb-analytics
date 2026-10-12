@@ -3,9 +3,7 @@ version: 2
 sources:
   - name: inside_airbnb
     description: >
-      Jeux de données bruts Inside Airbnb chargés dans Snowflake.
-      Each dataset contains historical snapshots identified by country,
-      city and snapshot date.
+      Jeux de données bruts Inside Airbnb chargés dans Snowflake. Chaque jeu contient des snapshots historiques identifiés par pays, ville et date de snapshot.
 
     database: "{{ env_var('SNOWFLAKE_DATABASE', 'AIRBNB') }}"
     schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'RAW') }}"
@@ -15,7 +13,7 @@ sources:
         identifier: RAW_LISTINGS
         description: >
           Snapshots historiques des annonces Airbnb.
-          One source record represents one listing for one snapshot date.
+          Chaque enregistrement source représente une annonce pour une date de snapshot.
 
         columns:
           - name: SOURCE_COUNTRY
@@ -52,8 +50,8 @@ sources:
         identifier: RAW_CALENDAR
         description: >
           Snapshots historiques des calendriers de disponibilité des annonces Airbnb.
-          One source record represents one listing and calendar date
-          for one snapshot date.
+          Chaque enregistrement source représente une annonce et une date calendaire
+          pour une date de snapshot.
 
         columns:
           - name: SOURCE_COUNTRY
@@ -83,8 +81,8 @@ sources:
       - name: reviews
         identifier: RAW_REVIEWS
         description: >
-          Historical review snapshots from Inside Airbnb.
-          The same review may appear in several snapshots.
+          Snapshots historiques des avis Inside Airbnb.
+          Un même avis peut figurer dans plusieurs snapshots.
 
         columns:
           - name: SOURCE_COUNTRY

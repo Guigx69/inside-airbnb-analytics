@@ -3,10 +3,7 @@
 models:
   - name: mart_market_snapshot
     description: >
-      Market-level analytical mart for each Inside Airbnb snapshot.
-      The model has one row per country, city and snapshot date.
-      It aggregates the observed listing population and exposes supply,
-      pricing, availability, review, host and historical observation metrics.
+      Indicateurs analytiques du marché pour chaque snapshot Inside Airbnb. Chaque ligne représente un pays, une ville et une date de snapshot. Le modèle agrège les annonces observées et expose l'offre, les prix, la disponibilité, les avis, les hôtes et l'historique des observations.
 
     columns:
       - name: source_country

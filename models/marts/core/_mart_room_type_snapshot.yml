@@ -3,25 +3,21 @@ version: 2
 models:
   - name: mart_room_type_snapshot
     description: >
-      Business mart aggregated at country, city, snapshot date and room type
-      grain. It provides the distribution of listings by room type together
-      with pricing, availability and reconstructed review activity metrics.
-      Aggregated listing and review populations reconcile with
-      mart_market_snapshot.
+      Indicateurs agrégés par pays, ville, date de snapshot et type de logement. Le modèle présente la répartition des annonces, les prix, la disponibilité et les avis reconstitués. Les populations agrégées d'annonces et d'avis sont rapprochées avec mart_market_snapshot.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
@@ -38,7 +34,7 @@ models:
                   - "Hotel room"
 
       - name: listing_count
-        description: Nombre d'annonces observed for the room type.
+        description: Nombre d'annonces observées pour ce type de logement.
         data_tests:
           - not_null
 
@@ -51,7 +47,7 @@ models:
           - not_null
 
       - name: listings_with_price
-        description: Nombre d'annonces with a non-null price.
+        description: Nombre d'annonces dont le prix n'est pas nul.
         data_tests:
           - not_null
 
