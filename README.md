@@ -8,9 +8,8 @@ Projet Data Engineering : **Python · Snowflake · dbt Core**, basé sur les arc
 |---|---|
 | **[1. Manuel manager A à Z](docs/MANUEL_MANAGER_A_Z.md)** | Installer, configurer Snowflake, choisir le scénario compte existant/vierge, lancer, tester et dépanner |
 | **[2. Guide géographique A à Z](docs/GUIDE_GEOGRAPHIE_A_Z.md)** | Ville, pays, continent, plusieurs zones, monde, dates, types de fichiers, dry-run, ingestion |
-| **[3. Référence technique et historique](docs/REFERENCE_TECHNIQUE.md)** | Architecture détaillée, preuves V1.3, benchmark, audit, SQL de vérification et anciens guides conservés |
 
-**Ordre recommandé :** lire le manuel, puis le guide géographique si nécessaire. La référence technique est facultative pour le premier lancement. Les scripts exécutables restent dans `scripts/` et `sql/` ; les exemples géographiques dans `config/`.
+**Ordre recommandé :** lire le manuel, puis le guide géographique si nécessaire. Les anciennes versions redondantes ont été supprimées ; l'historique des modifications reste disponible dans Git. Les scripts exécutables restent dans `scripts/` et `sql/` ; les exemples géographiques dans `config/`.
 
 ## Architecture
 
