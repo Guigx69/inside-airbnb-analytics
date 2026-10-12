@@ -22,7 +22,7 @@ models:
           - not_null
 
       - name: room_type
-        description: Airbnb room type associated with the listings.
+        description: Type de logement Airbnb associé aux annonces.
         data_tests:
           - not_null
           - accepted_values:
@@ -34,55 +34,40 @@ models:
                   - "Hotel room"
 
       - name: listing_count
-        description: Nombre d'annonces observées pour ce type de logement.
+        description: Nombre d'annonces observées dans le périmètre considéré.
         data_tests:
           - not_null
 
       - name: listing_share_pct
-        description: >
-          Percentage of the market listing population represented by the
-          room type. Values are rounded individually, therefore their sum
-          can differ slightly from exactly 100 percent.
+        description: Part des annonces du marché correspondant à ce type de logement ; les arrondis peuvent empêcher une somme exactement égale à 100 %.
         data_tests:
           - not_null
 
       - name: listings_with_price
-        description: Nombre d'annonces dont le prix n'est pas nul.
+        description: Nombre d'annonces dont le prix est renseigné.
         data_tests:
           - not_null
 
       - name: average_price
-        description: >
-          Average listing price for listings with available price data.
-          Null when no listing in the room type has a price.
+        description: Prix moyen des annonces disposant d'un prix exploitable ; nul si aucun prix n'est disponible.
 
       - name: median_price
-        description: >
-          Median listing price for listings with available price data.
-          Null when no listing in the room type has a price.
+        description: Prix médian des annonces disposant d'un prix exploitable ; nul si aucun prix n'est disponible.
 
       - name: average_availability_rate_pct
-        description: >
-          Average reconstructed calendar availability rate for listings
-          belonging to the room type.
+        description: Taux moyen de disponibilité du calendrier public des annonces ; ne constitue pas un taux d'occupation.
 
       - name: reconstructed_review_count_l30d
-        description: >
-          Total number of reconstructed reviews during the 30-day window
-          ending on the snapshot date for listings in the room type.
+        description: Nombre d'avis reconstitués sur les 30 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l90d
-        description: >
-          Total number of reconstructed reviews during the 90-day window
-          ending on the snapshot date for listings in the room type.
+        description: Nombre d'avis reconstitués sur les 90 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l365d
-        description: >
-          Total number of reconstructed reviews during the 365-day window
-          ending on the snapshot date for listings in the room type.
+        description: Nombre d'avis reconstitués sur les 365 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null

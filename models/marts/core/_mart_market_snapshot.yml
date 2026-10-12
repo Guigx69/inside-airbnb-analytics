@@ -22,121 +22,95 @@ models:
           - not_null
 
       - name: listing_count
-        description: Nombre d'annonces observées dans le snapshot du marché.
+        description: Nombre d'annonces observées dans le périmètre considéré.
         data_tests:
           - not_null
 
       - name: entire_home_listing_count
-        description: Nombre d'annonces de type Entire home/apt.
+        description: Nombre d'annonces de type logement entier.
         data_tests:
           - not_null
 
       - name: private_room_listing_count
-        description: Nombre d'annonces de type Private room.
+        description: Nombre d'annonces de type chambre privée.
         data_tests:
           - not_null
 
       - name: shared_room_listing_count
-        description: Nombre d'annonces de type Shared room.
+        description: Nombre d'annonces de type chambre partagée.
         data_tests:
           - not_null
 
       - name: listings_with_price
-        description: Nombre d'annonces dont le prix n'est pas nul.
+        description: Nombre d'annonces dont le prix est renseigné.
         data_tests:
           - not_null
 
       - name: average_price
-        description: >
-          Average listing price for listings with available price data.
-          Null when no listing in the market snapshot has a price.
+        description: Prix moyen des annonces disposant d'un prix exploitable ; nul si aucun prix n'est disponible.
 
       - name: median_price
-        description: >
-          Median listing price for listings with available price data.
-          Null when no listing in the market snapshot has a price.
+        description: Prix médian des annonces disposant d'un prix exploitable ; nul si aucun prix n'est disponible.
 
       - name: average_availability_rate_pct
-        description: >
-          Average reconstructed calendar availability rate across listings
-          observed in the market snapshot.
+        description: Taux moyen de disponibilité du calendrier public des annonces ; ne constitue pas un taux d'occupation.
 
       - name: average_availability_30
-        description: >
-          Average native 30-day availability across listings observed in
-          the market snapshot.
+        description: Disponibilité native moyenne sur 30 jours, telle que fournie par Inside Airbnb.
         data_tests:
           - not_null
 
       - name: average_availability_365
-        description: >
-          Average native 365-day availability across listings observed in
-          the market snapshot.
+        description: Disponibilité native moyenne sur 365 jours, telle que fournie par Inside Airbnb.
         data_tests:
           - not_null
 
       - name: native_review_count_total
-        description: >
-          Sum of the native Inside Airbnb number_of_reviews metric across
-          listings observed in the market snapshot.
+        description: Somme des compteurs d'avis natifs fournis par Inside Airbnb.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_total
-        description: >
-          Total reconstructed review count as of the snapshot date across
-          listings observed in the market.
+        description: Nombre total d'avis reconstitués à partir des avis dédupliqués à la date du snapshot.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l30d
-        description: >
-          Total number of reconstructed reviews during the 30-day window
-          ending on the snapshot date.
+        description: Nombre d'avis reconstitués sur les 30 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l90d
-        description: >
-          Total number of reconstructed reviews during the 90-day window
-          ending on the snapshot date.
+        description: Nombre d'avis reconstitués sur les 90 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l365d
-        description: >
-          Total number of reconstructed reviews during the 365-day window
-          ending on the snapshot date.
+        description: Nombre d'avis reconstitués sur les 365 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: host_count
-        description: Number of distinct hosts observed in the market snapshot.
+        description: Nombre d'hôtes distincts observés.
         data_tests:
           - not_null
 
       - name: superhost_listing_count
-        description: Number of observed listings whose host is a superhost.
+        description: Nombre d'annonces dont l'hôte est identifié comme Superhost.
         data_tests:
           - not_null
 
       - name: first_observation_count
-        description: >
-          Number of listings for which this snapshot is the first observation
-          in the available historical dataset.
+        description: Nombre d'annonces observées pour la première fois dans l'historique disponible.
         data_tests:
           - not_null
 
       - name: last_observation_count
-        description: >
-          Number of listings for which this snapshot is the last observation
-          in the available historical dataset.
+        description: Nombre d'annonces observées pour la dernière fois dans l'historique disponible.
         data_tests:
           - not_null
 
       - name: gap_observation_count
-        description: >
-          Number of listings whose observation history contains at least one
-          gap between available market snapshots.
+        description: Nombre d'annonces présentant au moins une interruption dans l'historique des observations.
         data_tests:
           - not_null

@@ -17,7 +17,7 @@ models:
           - not_null
 
       - name: snapshot_date
-        description: Date du snapshot source Inside Airbnb.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
@@ -37,49 +37,42 @@ models:
           - not_null
 
       - name: first_seen_snapshot
-        description: >
-          First snapshot in this dataset in which the listing was observed.
+        description: Premier snapshot dans lequel l'annonce est observée.
         data_tests:
           - not_null
 
       - name: last_seen_snapshot
-        description: >
-          Most recent snapshot in this dataset in which the listing was observed.
+        description: Dernier snapshot dans lequel l'annonce est observée.
         data_tests:
           - not_null
 
       - name: snapshot_count
-        description: Nombre de snapshots dans lesquels l'annonce a été observée.
+        description: Nombre de snapshots dans lesquels l'annonce est observée.
         data_tests:
           - not_null
 
       - name: is_first_observation
-        description: Vrai pour le premier snapshot dans lequel l'annonce est observée.
+        description: Vrai pour la première observation de l'annonce.
         data_tests:
           - not_null
 
       - name: is_last_observation
-        description: Vrai pour le dernier snapshot dans lequel l'annonce est observée.
+        description: Vrai pour la dernière observation de l'annonce.
         data_tests:
           - not_null
 
       - name: has_observation_gap
-        description: >
-          Indicates whether one or more expected snapshots are missing
-          between this observation and the previous observation.
+        description: Indique si des snapshots attendus sont manquants entre l'observation actuelle et la précédente.
 
       - name: missing_snapshot_count
-        description: >
-          Number of expected snapshots missing since the previous observation.
+        description: Nombre de snapshots attendus manquants depuis l'observation précédente.
 
       - name: has_host_changed
-        description: >
-          True when the host differs from the previous observed snapshot.
+        description: Vrai si l'hôte diffère de celui du snapshot précédent observé.
         data_tests:
           - not_null
 
       - name: has_room_type_changed
-        description: >
-          True when the room type differs from the previous observed snapshot.
+        description: Vrai si le type de logement diffère de celui du snapshot précédent observé.
         data_tests:
           - not_null

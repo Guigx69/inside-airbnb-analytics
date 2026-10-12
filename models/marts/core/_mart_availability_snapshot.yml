@@ -22,132 +22,126 @@ models:
           - not_null
 
       - name: listing_count
-        description: Nombre d'annonces représentées dans le calendrier.
+        description: Nombre d'annonces observées dans le périmètre considéré.
         data_tests:
           - not_null
 
       - name: calendar_row_count
-        description: Total number of calendar rows represented.
+        description: Nombre total de lignes de calendrier représentées.
         data_tests:
           - not_null
 
       - name: calendar_day_count
-        description: Total number of represented listing-calendar days.
+        description: Nombre total de journées-annonces représentées dans le calendrier.
         data_tests:
           - not_null
 
       - name: available_day_count
-        description: Number of calendar days marked as available.
+        description: Nombre de journées-annonces indiquées comme disponibles.
         data_tests:
           - not_null
 
       - name: unavailable_day_count
-        description: >
-          Number of calendar days marked as unavailable. This must not be
-          interpreted directly as booked nights.
+        description: Nombre de journées-annonces indiquées comme indisponibles ; ne prouve pas une réservation.
         data_tests:
           - not_null
 
       - name: market_availability_rate_pct
-        description: >
-          Percentage of represented calendar days marked as available across
-          the market.
+        description: Pourcentage de journées-annonces représentées indiquées disponibles sur le marché.
         data_tests:
           - not_null
 
       - name: market_unavailability_rate_pct
-        description: >
-          Percentage of represented calendar days marked as unavailable across
-          the market.
+        description: Pourcentage de journées-annonces représentées indiquées indisponibles sur le marché.
         data_tests:
           - not_null
 
       - name: average_listing_availability_rate_pct
-        description: Average listing-level availability rate.
+        description: Moyenne des taux de disponibilité individuels des annonces.
         data_tests:
           - not_null
 
       - name: p10_listing_availability_rate_pct
-        description: 10th percentile of listing-level availability rates.
+        description: 10e percentile des taux de disponibilité individuels des annonces.
         data_tests:
           - not_null
 
       - name: p25_listing_availability_rate_pct
-        description: 25th percentile of listing-level availability rates.
+        description: 25e percentile des taux de disponibilité individuels des annonces.
         data_tests:
           - not_null
 
       - name: median_listing_availability_rate_pct
-        description: Median listing-level availability rate.
+        description: Médiane des taux de disponibilité individuels des annonces.
         data_tests:
           - not_null
 
       - name: p75_listing_availability_rate_pct
-        description: 75th percentile of listing-level availability rates.
+        description: 75e percentile des taux de disponibilité individuels des annonces.
         data_tests:
           - not_null
 
       - name: p90_listing_availability_rate_pct
-        description: 90th percentile of listing-level availability rates.
+        description: 90e percentile des taux de disponibilité individuels des annonces.
         data_tests:
           - not_null
 
       - name: fully_unavailable_listing_count
-        description: Listings with zero available calendar days.
+        description: Nombre d'annonces sans aucune journée disponible.
         data_tests:
           - not_null
 
       - name: low_availability_listing_count
-        description: Listings with availability greater than 0% and at most 25%.
+        description: Nombre d'annonces dont le taux de disponibilité est supérieur à 0 % et inférieur ou égal à 25 %.
         data_tests:
           - not_null
 
       - name: medium_low_availability_listing_count
-        description: Listings with availability greater than 25% and at most 50%.
+        description: Nombre d'annonces dont le taux de disponibilité est supérieur à 25 % et inférieur ou égal à 50 %.
         data_tests:
           - not_null
 
       - name: medium_high_availability_listing_count
-        description: Listings with availability greater than 50% and at most 75%.
+        description: Nombre d'annonces dont le taux de disponibilité est supérieur à 50 % et inférieur ou égal à 75 %.
         data_tests:
           - not_null
 
       - name: high_availability_listing_count
-        description: Listings with availability greater than 75% and below 100%.
+        description: Nombre d'annonces dont le taux de disponibilité est supérieur à 75 % et inférieur à 100 %.
         data_tests:
           - not_null
 
       - name: fully_available_listing_count
-        description: Listings with all represented calendar days available.
+        description: Nombre d'annonces dont toutes les journées représentées sont disponibles.
         data_tests:
           - not_null
 
       - name: fully_unavailable_listing_share_pct
-        description: Share of listings with zero availability.
+        description: Part des annonces sans aucune journée disponible.
         data_tests:
           - not_null
 
       - name: low_availability_listing_share_pct
-        description: Share of listings in the greater-than-0%-to-25% band.
+        description: Part des annonces dont le taux de disponibilité est supérieur à 0 % et inférieur ou égal à 25 %.
         data_tests:
           - not_null
 
       - name: medium_low_availability_listing_share_pct
-        description: Share of listings in the greater-than-25%-to-50% band.
+        description: Part des annonces dont le taux de disponibilité est supérieur à 25 % et inférieur ou égal à 50 %.
         data_tests:
           - not_null
 
       - name: medium_high_availability_listing_share_pct
-        description: Share of listings in the greater-than-50%-to-75% band.
+        description: Part des annonces dont le taux de disponibilité est supérieur à 50 % et inférieur ou égal à 75 %.
         data_tests:
           - not_null
 
       - name: high_availability_listing_share_pct
-        description: Share of listings in the greater-than-75%-to-below-100% band.
+        description: Part des annonces dont le taux de disponibilité est supérieur à 75 % et inférieur à 100 %.
         data_tests:
           - not_null
 
       - name: fully_available_listing_share_pct
-        description: Share of listings with 100% availability.
+        description: Part des annonces présentant 100 % de disponibilité.
         data_tests:
           - not_null

@@ -10,24 +10,22 @@ models:
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: price_band
-        description: >
-          Price segment assigned to the listing. NO_PRICE represents listings
-          without an exploitable price in the snapshot.
+        description: Tranche de prix de l'annonce ; NO_PRICE désigne les prix absents.
         data_tests:
           - not_null
           - accepted_values:
@@ -42,47 +40,37 @@ models:
                   - 'NO_PRICE'
 
       - name: listing_count
-        description: Nombre d'annonces dans la tranche de prix.
+        description: Nombre d'annonces observées dans le périmètre considéré.
         data_tests:
           - not_null
 
       - name: listings_with_price
-        description: Nombre d'annonces disposant d'un prix exploitable.
+        description: Nombre d'annonces dont le prix est renseigné.
         data_tests:
           - not_null
 
       - name: market_listing_share_pct
-        description: >
-          Percentage of all listings in the market represented by the price
-          segment.
+        description: Part des annonces du marché appartenant à cette tranche de prix.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l30d
-        description: >
-          Number of reconstructed reviews in the 30-day window ending on the
-          snapshot date for listings in the segment.
+        description: Nombre d'avis reconstitués sur les 30 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l90d
-        description: >
-          Number of reconstructed reviews in the 90-day window ending on the
-          snapshot date for listings in the segment.
+        description: Nombre d'avis reconstitués sur les 90 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l365d
-        description: >
-          Number of reconstructed reviews in the 365-day window ending on the
-          snapshot date for listings in the segment.
+        description: Nombre d'avis reconstitués sur les 365 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
       
       - name: price_band_order
-        description: >
-          Numeric sort order associated with price_band, from 0 for NO_PRICE
-          to 6 for the highest priced band.
+        description: Rang de tri de la tranche de prix.
         data_tests:
           - not_null
           - accepted_values:
