@@ -27,7 +27,7 @@ models:
           - not_null
 
       - name: host_count
-        description: Number of distinct hosts observed in the snapshot.
+        description: Nombre d'hôtes distincts observés dans le snapshot.
         data_tests:
           - not_null
 
@@ -37,12 +37,12 @@ models:
           - not_null
 
       - name: average_listings_per_host
-        description: Average number of observed listings per host.
+        description: Nombre moyen d'annonces observées par hôte.
         data_tests:
           - not_null
 
       - name: median_listings_per_host
-        description: Median number of observed listings per host.
+        description: Nombre médian d'annonces observées par hôte.
         data_tests:
           - not_null
 
@@ -92,17 +92,17 @@ models:
           - not_null
 
       - name: superhost_count
-        description: Number of observed hosts classified as Superhosts.
+        description: Nombre d'hôtes observés classés Superhosts.
         data_tests:
           - not_null
 
       - name: identity_verified_host_count
-        description: Number of observed hosts whose identity is marked as verified.
+        description: Nombre d'hôtes observés dont l'identité est indiquée comme vérifiée.
         data_tests:
           - not_null
 
       - name: listings_with_price
-        description: Number of observed listings for which a price is available.
+        description: Nombre d'annonces observées disposant d'un prix.
         data_tests:
           - not_null
 

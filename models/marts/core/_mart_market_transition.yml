@@ -23,32 +23,32 @@ models:
           - not_null
 
       - name: previous_snapshot_date
-        description: Previous market snapshot used for the transition.
+        description: Snapshot de marché précédent utilisé pour la transition.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Current market snapshot used for the transition.
+        description: Snapshot de marché actuel utilisé pour la transition.
         data_tests:
           - not_null
 
       - name: days_between_snapshots
-        description: Number of days between the previous and current snapshots.
+        description: Nombre de jours entre les snapshots précédent et actuel.
         data_tests:
           - not_null
 
       - name: previous_listing_count
-        description: Number of listings present in the previous snapshot.
+        description: Nombre d'annonces présentes dans le snapshot précédent.
         data_tests:
           - not_null
 
       - name: current_listing_count
-        description: Number of listings present in the current snapshot.
+        description: Nombre d'annonces présentes dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: net_listing_change
-        description: Current listing count minus previous listing count.
+        description: Nombre d'annonces actuel moins celui du snapshot précédent.
         data_tests:
           - not_null
 
@@ -84,22 +84,22 @@ models:
           - not_null
 
       - name: retention_rate_pct
-        description: Share of the previous population retained in the current snapshot.
+        description: Part des annonces du snapshot précédent conservées dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: disappearance_rate_pct
-        description: Share of the previous population absent from the current snapshot.
+        description: Part des annonces du snapshot précédent absentes du snapshot actuel.
         data_tests:
           - not_null
 
       - name: newly_observed_share_pct
-        description: Share of the current population that is newly observed.
+        description: Part des annonces nouvellement observées dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: returned_after_gap_share_pct
-        description: Share of the current population returning after an observation gap.
+        description: Part des annonces réapparues après une interruption d'observation.
         data_tests:
           - not_null
 

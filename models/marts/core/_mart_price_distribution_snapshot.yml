@@ -42,12 +42,12 @@ models:
                   - 'NO_PRICE'
 
       - name: listing_count
-        description: Number of listings in the price segment.
+        description: Nombre d'annonces dans la tranche de prix.
         data_tests:
           - not_null
 
       - name: listings_with_price
-        description: Number of listings with a usable price.
+        description: Nombre d'annonces disposant d'un prix exploitable.
         data_tests:
           - not_null
 

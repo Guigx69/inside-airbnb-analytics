@@ -21,12 +21,12 @@ models:
           - not_null
 
       - name: previous_snapshot_date
-        description: Previous observed snapshot date.
+        description: Date du snapshot précédent observé.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Current observed snapshot date.
+        description: Date du snapshot actuel observé.
         data_tests:
           - not_null
 
@@ -44,27 +44,27 @@ models:
                   - AFTER_GAP
 
       - name: missing_snapshot_count
-        description: Number of expected snapshots missing between observations.
+        description: Nombre de snapshots attendus manquants entre deux observations.
         data_tests:
           - not_null
 
       - name: days_between_observations
-        description: Number of calendar days between the two observations.
+        description: Nombre de jours calendaires entre les deux observations.
         data_tests:
           - not_null
 
       - name: listing_observation_count
-        description: Number of listing observations represented by the transition.
+        description: Nombre d'observations d'annonces représentées par la transition.
         data_tests:
           - not_null
 
       - name: listings_with_previous_price
-        description: Number of observations having a price in the previous snapshot.
+        description: Nombre d'observations disposant d'un prix dans le snapshot précédent.
         data_tests:
           - not_null
 
       - name: listings_with_current_price
-        description: Number of observations having a price in the current snapshot.
+        description: Nombre d'observations disposant d'un prix dans le snapshot actuel.
         data_tests:
           - not_null
 
@@ -76,17 +76,17 @@ models:
           - not_null
 
       - name: price_increase_count
-        description: Number of comparable listings whose price increased.
+        description: Nombre d'annonces comparables dont le prix a augmenté.
         data_tests:
           - not_null
 
       - name: price_decrease_count
-        description: Number of comparable listings whose price decreased.
+        description: Nombre d'annonces comparables dont le prix a diminué.
         data_tests:
           - not_null
 
       - name: unchanged_price_count
-        description: Number of comparable listings whose price remained unchanged.
+        description: Nombre d'annonces comparables dont le prix est resté stable.
         data_tests:
           - not_null
 
@@ -113,10 +113,10 @@ models:
           Null when no comparable listing exists.
 
       - name: average_previous_price
-        description: Average previous price among comparable listings.
+        description: Prix moyen précédent des annonces comparables.
 
       - name: average_current_price
-        description: Average current price among comparable listings.
+        description: Prix moyen actuel des annonces comparables.
 
       - name: median_previous_price
         description: Median previous price among comparable listings.
