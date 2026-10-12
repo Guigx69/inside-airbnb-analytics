@@ -32,7 +32,7 @@ models:
           - not_null
 
       - name: listing_count
-        description: Number of listings controlled by observed hosts.
+        description: Nombre d'annonces controlled by observed hosts.
         data_tests:
           - not_null
 
@@ -52,42 +52,42 @@ models:
           - not_null
 
       - name: single_listing_host_count
-        description: Number of hosts with exactly one observed listing.
+        description: Nombre d'hôtes with exactly one observed listing.
         data_tests:
           - not_null
 
       - name: host_count_2_to_5
-        description: Number of hosts with 2 to 5 observed listings.
+        description: Nombre d'hôtes with 2 to 5 observed listings.
         data_tests:
           - not_null
 
       - name: host_count_6_to_10
-        description: Number of hosts with 6 to 10 observed listings.
+        description: Nombre d'hôtes with 6 to 10 observed listings.
         data_tests:
           - not_null
 
       - name: host_count_11_to_20
-        description: Number of hosts with 11 to 20 observed listings.
+        description: Nombre d'hôtes with 11 to 20 observed listings.
         data_tests:
           - not_null
 
       - name: host_count_21_plus
-        description: Number of hosts with at least 21 observed listings.
+        description: Nombre d'hôtes with at least 21 observed listings.
         data_tests:
           - not_null
 
       - name: multi_listing_host_count
-        description: Number of hosts with more than one observed listing.
+        description: Nombre d'hôtes with more than one observed listing.
         data_tests:
           - not_null
 
       - name: listings_controlled_by_single_listing_hosts
-        description: Number of listings controlled by single-listing hosts.
+        description: Nombre d'annonces controlled by single-listing hosts.
         data_tests:
           - not_null
 
       - name: listings_controlled_by_multi_listing_hosts
-        description: Number of listings controlled by hosts with multiple observed listings.
+        description: Nombre d'annonces controlled by hosts with multiple observed listings.
         data_tests:
           - not_null
 
@@ -108,7 +108,7 @@ models:
 
       - name: listings_controlled_by_top_1_pct_hosts
         description: >
-          Number of listings controlled by the highest-ranked 1 percent
+          Nombre d'annonces controlled by the highest-ranked 1 percent
           of hosts by observed listing count. The host threshold is rounded
           upward using CEIL.
         data_tests:
@@ -116,14 +116,14 @@ models:
 
       - name: listings_controlled_by_top_5_pct_hosts
         description: >
-          Number of listings controlled by the highest-ranked 5 percent
+          Nombre d'annonces controlled by the highest-ranked 5 percent
           of hosts by observed listing count.
         data_tests:
           - not_null
 
       - name: listings_controlled_by_top_10_pct_hosts
         description: >
-          Number of listings controlled by the highest-ranked 10 percent
+          Nombre d'annonces controlled by the highest-ranked 10 percent
           of hosts by observed listing count.
         data_tests:
           - not_null
@@ -162,12 +162,12 @@ models:
           - not_null
 
       - name: single_listing_host_listing_share_pct
-        description: Percentage of listings controlled by single-listing hosts.
+        description: Pourcentage d'annonces controlled by single-listing hosts.
         data_tests:
           - not_null
 
       - name: multi_listing_host_listing_share_pct
-        description: Percentage of listings controlled by multi-listing hosts.
+        description: Pourcentage d'annonces controlled by multi-listing hosts.
         data_tests:
           - not_null
 
