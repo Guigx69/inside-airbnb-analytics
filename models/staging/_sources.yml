@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: inside_airbnb
     description: >
-      Raw Inside Airbnb datasets ingested into Snowflake.
+      Jeux de données bruts Inside Airbnb chargés dans Snowflake.
       Each dataset contains historical snapshots identified by country,
       city and snapshot date.
 
@@ -14,44 +14,44 @@ sources:
       - name: listings
         identifier: RAW_LISTINGS
         description: >
-          Historical snapshots of Airbnb listings.
+          Snapshots historiques des annonces Airbnb.
           One source record represents one listing for one snapshot date.
 
         columns:
           - name: SOURCE_COUNTRY
-            description: Country associated with the source dataset.
+            description: Pays associé au jeu de données source.
             data_tests:
               - not_null
 
           - name: SOURCE_CITY
-            description: City associated with the source dataset.
+            description: Ville associée au jeu de données source.
             data_tests:
               - not_null
 
           - name: SNAPSHOT_DATE
-            description: Date of the Inside Airbnb snapshot.
+            description: Date du snapshot Inside Airbnb.
             data_tests:
               - not_null
 
           - name: SOURCE_FILE
-            description: Original Inside Airbnb source filename.
+            description: Nom du fichier source Inside Airbnb d'origine.
             data_tests:
               - not_null
 
           - name: LOADED_AT
-            description: Timestamp at which the record was loaded into Snowflake.
+            description: Horodatage du chargement de l'enregistrement dans Snowflake.
             data_tests:
               - not_null
 
           - name: RAW_DATA
-            description: Original source record stored as a Snowflake VARIANT.
+            description: Enregistrement source d'origine conservé au format VARIANT dans Snowflake.
             data_tests:
               - not_null
 
       - name: calendar
         identifier: RAW_CALENDAR
         description: >
-          Historical availability calendar snapshots for Airbnb listings.
+          Snapshots historiques des calendriers de disponibilité des annonces Airbnb.
           One source record represents one listing and calendar date
           for one snapshot date.
 
