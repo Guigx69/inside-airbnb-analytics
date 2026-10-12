@@ -59,3 +59,9 @@ Le bootstrap ne migre pas les 1 629 archives ni ne télécharge les données dep
 - dbt build sans erreur et données des marts accessibles.
 
 Sans ces contrôles, statut : **prêt pour test**, pas « déployé ».
+
+## 7. Stage de référence vérifié (12 octobre 2026)
+
+La commande `SHOW STAGES` confirme `AIRBNB.RAW.INSIDE_AIRBNB_STAGE` de type `INTERNAL`, sans intégration de stockage ni répertoire automatique. Le stage source appartient à `ACCOUNTADMIN` ; cela **n'implique pas** que le rôle d'ingestion dispose des droits nécessaires sur le compte cible. Le `DESCRIBE STAGE` présente les valeurs CSV par défaut. Le loader spécifie explicitement `TYPE=JSON COMPRESSION=GZIP` dans `COPY INTO` ; aucun changement du format de stage n'est requis.
+
+**À vérifier avant le pilote** : droits de création/usage de la base et du schéma, `USAGE` sur le warehouse, `READ`/`WRITE` sur le stage interne selon les opérations, `SELECT`/`INSERT`/`DELETE` sur RAW et INGESTION_LOG, ainsi que les droits de création dans le schéma dbt. Les privilèges exacts doivent être validés avec le rôle effectif dans Snowflake.
