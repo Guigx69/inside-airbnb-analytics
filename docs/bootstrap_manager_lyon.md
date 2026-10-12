@@ -73,3 +73,11 @@ Les résultats `SHOW GRANTS TO ROLE INGESTION_ROLE` et `SHOW GRANTS ON STAGE` co
 Un script séparé `sql/bootstrap_manager_ingestion_grants.sql` reproduit **ces seuls droits**. À exécuter sur le compte **cible vierge**, par un administrateur autorisé, **après** création des objets et du rôle `INGESTION_ROLE` et du warehouse `DBT_WH`. Vérifier les noms avant exécution. Il ne configure pas les droits de `DBT_ROLE`, à examiner séparément.
 
 **Séquence recommandée** : bootstrap des objets -> création administrative du rôle/warehouse si absents -> grants d'ingestion -> `SHOW GRANTS` -> dry-run Lyon -> pilote Lyon -> build dbt. Aucun test de cette séquence n'a encore été effectué sur un compte vierge.
+
+## 9. Droits dbt validés sur le compte source
+
+Le relevé `SHOW GRANTS TO ROLE DBT_ROLE` confirme `USAGE` sur `DBT_WH` et `AIRBNB`, `CREATE SCHEMA` sur la base, `USAGE` sur RAW, `SELECT` sur les trois RAW et `INGESTION_LOG`, ainsi que la propriété des schémas `DBT_GGILLET_STAGING`, `DBT_GGILLET_INTERMEDIATE` et `DBT_GGILLET_MARTS`. Il comprend également des privilèges spécifiques Git/Streamlit, exclus du bootstrap dbt minimal.
+
+Le script `sql/bootstrap_manager_dbt_grants.sql` accorde les privilèges de base nécessaires à un rôle `DBT_ROLE` préexistant. Les créations de schémas sont documentées pour exécution **avec le rôle DBT_ROLE** afin d'éviter tout transfert de propriété. Les noms des schémas doivent correspondre au comportement réel de `generate_schema_name` et au profil dbt du compte cible.
+
+**Limites :** ni la création des utilisateurs/roles/warehouses ni les droits de consommation des marts par le manager ne sont automatisés. Vérifier ces éléments et tester `dbt debug` avant tout `dbt build`.
