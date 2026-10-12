@@ -35,9 +35,9 @@ print('[PASS] genuine latest-date conflict isolated; CSV fallback per destinatio
 try:
     catalog([row('evil','fake','2026-09-30',host='evil.example')])
 except RuntimeError:
-    print('[PASS] unusable catalog fails closed')
+    print('[RÉUSSI] le catalogue inutilisable entraîne un refus sécurisé')
 else:
-    raise AssertionError('unusable catalog accepted')
+    raise AssertionError('catalogue inutilisable accepté')
 print('[PASS] 3 offline V14.2 scenarios; no permanent writes')
 
 # Incremental completeness decisions (no database or HTTP calls).
@@ -45,7 +45,7 @@ assert mod.destination_complete('france', 'paris', {'A','B'}, {('france','paris'
 assert not mod.destination_complete('france', 'paris', {'A','B'}, {('france','paris','A')})
 assert not mod.destination_complete('france', 'paris', set(), set())
 assert not mod.destination_complete('france', 'paris', {'A'}, {('france','lyon','A')})
-print('[PASS] incremental completeness: complete, missing, empty and cross-city cases')
+print('[RÉUSSI] complétude incrémentale : cas complets, manquants, vides et inter-villes')
 
 # Clés de destination Unicode : les URL conservent l'orthographe source d'origine.
 result = catalog([

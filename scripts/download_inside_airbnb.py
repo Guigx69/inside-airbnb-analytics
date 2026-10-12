@@ -677,7 +677,7 @@ def main() -> int:
         )
 
         if not selected:
-            print("[ERROR] Aucun jeu de données correspondant.")
+            print("[ERREUR] Aucun jeu de données correspondant.")
             return 1
 
         manifest = load_manifest()
@@ -690,7 +690,7 @@ def main() -> int:
 
         if args.dry_run:
             print()
-            print("[DRY-RUN] Aucun fichier téléchargé.")
+            print("[SIMULATION] Aucun fichier téléchargé.")
             return 0
 
         if not args.sync:
@@ -752,11 +752,11 @@ def main() -> int:
         return 0
 
     except requests.RequestException as exc:
-        print(f"[ERROR] Erreur HTTP : {exc}")
+        print(f"[ERREUR] Erreur HTTP : {exc}")
         return 1
 
     except Exception as exc:
-        print(f"[ERROR] {exc}")
+        print(f"[ERREUR] {exc}")
         return 1
 
 
