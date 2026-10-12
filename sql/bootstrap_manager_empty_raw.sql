@@ -45,7 +45,10 @@ CREATE TABLE IF NOT EXISTS AIRBNB.RAW.INGESTION_LOG (
   SOURCE_SHA256 VARCHAR(64)
 );
 
-CREATE STAGE IF NOT EXISTS AIRBNB.RAW.INSIDE_AIRBNB_STAGE;
+-- The reference stage is INTERNAL with default CSV stage file format.
+-- The loader explicitly overrides this with JSON/GZIP during COPY INTO.
+CREATE STAGE IF NOT EXISTS AIRBNB.RAW.INSIDE_AIRBNB_STAGE
+  COMMENT = 'Internal stage for Inside Airbnb source files';
 
 -- Inspect object definitions and compare with existing source environment.
 DESCRIBE TABLE AIRBNB.RAW.RAW_LISTINGS;
