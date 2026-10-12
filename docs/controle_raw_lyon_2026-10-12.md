@@ -14,6 +14,8 @@ Résultats transmis depuis le compte Snowflake source : requête en lecture seul
 | 2026-06-22 | 3 414 575 | 9 317 | 469 378 |
 | 2026-09-17 | 3 358 365 | 9 201 | 473 321 |
 
+**Totaux vérifiés :** CALENDAR **15 478 190**, LISTINGS **42 368**, REVIEWS **2 171 671**, soit **17 692 229 lignes RAW** sur les cinq snapshots.
+
 **Point d'attention :** le volume CALENDAR du 2026-03-25 est sensiblement inférieur à celui des autres dates. Le contrôle établit sa présence, pas l'explication de cette variation.
 
 ## Critères et limites
