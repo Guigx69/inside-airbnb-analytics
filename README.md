@@ -1,584 +1,130 @@
-# Inside Airbnb Analytics Platform
+# Inside Airbnb Analytics — plateforme d'analyse historique
 
-Data engineering and analytics Proof of Concept built with **dbt**, **Snowflake** and **Inside Airbnb open data**.
+**Projet de démonstration Data Engineering | Python · Snowflake · dbt Core**
 
-The project transforms historical Airbnb snapshots into a tested and documented analytical layer designed for market, neighbourhood, host, pricing, availability and review analysis.
+Plateforme analytique fondée sur les archives publiques [Inside Airbnb](https://insideairbnb.com/). Elle conserve les observations datées, les transforme en modèles dbt contrôlés et fournit des indicateurs de marché, de quartier, d'hôtes, de prix, de disponibilité et d'avis.
 
-## Overview
+> **Statut au 12 octobre 2026 :** V1.3 validée sur l'environnement Snowflake de développement. Déploiement sur le compte du responsable **non réalisé**. Les scripts de création d'un compte vierge sont proposés dans la [PR #5](https://github.com/Guigx69/inside-airbnb-analytics/pull/5), non fusionnée et non validée sur un compte vierge.
 
-The objective of this POC is to demonstrate an end-to-end modern analytics workflow:
+## Résultats vérifiés
 
-```text
-Inside Airbnb
-      │
-      ▼
-Historical CSV snapshots
-      │
-      ▼
-Snowflake RAW
-      │
-      ▼
-dbt STAGING
-      │
-      ▼
-dbt INTERMEDIATE
-      │
-      ▼
-dbt MARTS
-      │
-      ▼
-BI / Analytics
-```
+| Indicateur | Résultat |
+|---|---:|
+| Modèles dbt | 25 : 14 tables et 11 vues |
+| Tests dbt | 456 |
+| Résultat du build V1.3 | 480 PASS · 1 WARN · 0 ERROR |
+| Durée du build V1.3 | 1 h 05 min 46 s |
+| Durée avant optimisation | 2 h 02 min 44 s |
+| Réduction de durée mesurée | 46,4 % |
+| Archives locales vérifiées par SHA-256 | 1 629 (manifeste local, incluant Lyon septembre 2026) |
+| Volume local des archives | 35,16 Gio |
+| Archives manquantes ou invalides | 0 |
 
-The first implementation focuses on **Lyon, France**, while the data model is designed to support future geographical expansion without fundamentally redesigning the transformation layer.
-
-Planned scalability:
-
-```text
-V1  Lyon
-V2  France
-V3  Europe
-V4  Global
-```
-
----
-
-## Technology Stack
-
-| Component | Technology |
-|---|---|
-| Data source | Inside Airbnb Open Data |
-| Data warehouse | Snowflake |
-| Transformation | dbt |
-| Development environment | Visual Studio Code |
-| Raw ingestion | Python |
-| Data format | CSV / CSV.GZ |
-| Version control | Git |
-| Analytics | BI layer to be added |
-
-The current development environment has been validated using dbt Fusion.
-
----
-
-## Data Source
-
-Data is sourced from **Inside Airbnb**, an independent project providing publicly available datasets derived from Airbnb listings.
-
-The POC uses three detailed datasets:
-
-- `listings.csv.gz`
-- `calendar.csv.gz`
-- `reviews.csv.gz`
-
-Each ingestion also records technical metadata:
-
-- source country
-- source city
-- snapshot date
-- source file
-- load timestamp
-
-This allows every analytical record to remain traceable to its source snapshot.
-
-### Historical snapshots
-
-The Lyon V1 currently contains four snapshots:
-
-| Snapshot |
-|---|
-| 2025-09-18 |
-| 2025-12-22 |
-| 2026-03-25 |
-| 2026-06-22 |
-
-The use of multiple snapshots enables longitudinal analysis rather than limiting the project to the latest state of the market.
-
----
+Le build a été réalisé le 9 octobre 2026 sur le compte de développement. Les chiffres ne sont **pas** une promesse de performance ou de résultats identiques chez le responsable. L'avertissement connu `assert_stg_calendar_listing_exists` signale **3 163 clés calendrier sans correspondance dans listings** ; il est conservé volontairement.
 
 ## Architecture
 
-### RAW
-
-Raw Inside Airbnb files are loaded into Snowflake with the original source row stored as `VARIANT`.
-
-Main raw tables:
-
 ```text
-AIRBNB.RAW.RAW_LISTINGS
-AIRBNB.RAW.RAW_CALENDAR
-AIRBNB.RAW.RAW_REVIEWS
+Inside Airbnb (listings / calendar / reviews)
+          │  Archives CSV.GZ datées + manifeste SHA-256
+          ▼
+Python : contrôle des archives et ingestion
+          ▼
+Snowflake AIRBNB.RAW
+  RAW_LISTINGS / RAW_CALENDAR / RAW_REVIEWS
+  INGESTION_LOG / INSIDE_AIRBNB_STAGE
+          ▼
+dbt STAGING (3 modèles)
+          ▼
+dbt INTERMEDIATE (10 modèles)
+          ▼
+dbt MARTS (12 modèles)
+          ▼
+Analyses et tableaux de bord
 ```
 
-The RAW layer intentionally performs minimal transformation and preserves source traceability.
+La couche RAW conserve les données sources dans une colonne `VARIANT` et ajoute les métadonnées de provenance (pays, ville, date du snapshot, fichier et date de chargement). Les modèles analytiques distinguent les **changements observés entre snapshots** des événements réellement survenus sur le marché.
 
-### STAGING
+**Attention :** une nuit indisponible dans `calendar` ne constitue pas une réservation ni une occupation démontrée. Les indicateurs de disponibilité ne sont pas des ventes réelles.
 
-The staging layer converts semi-structured RAW records into typed, consistently named analytical columns.
+## Démarrage rapide — Windows PowerShell
 
-Models:
-
-```text
-stg_listings
-stg_calendar
-stg_reviews
-```
-
-Responsibilities include:
-
-- data typing
-- field normalization
-- source metadata propagation
-- basic source quality validation
-- definition of stable technical grains
-
-### INTERMEDIATE
-
-The intermediate layer implements reusable analytical business logic.
-
-Models:
-
-```text
-int_reviews
-int_listing_snapshot
-int_listing_snapshot_movement
-int_market_snapshot_transition
-int_neighbourhood_snapshot_transition
-int_listing_calendar_metrics
-int_listing_availability_horizon
-int_calendar_monthly_metrics
-int_listing_review_metrics
-int_host_snapshot
-```
-
-This layer handles concepts such as:
-
-- historical listing presence
-- snapshot sequencing
-- listing entry and return
-- observation gaps
-- market transitions
-- neighbourhood transitions
-- host portfolio reconstruction
-- calendar availability
-- availability horizons
-- monthly calendar coverage
-- reconstructed historical review activity
-
-### MARTS
-
-The marts layer exposes BI-oriented analytical datasets.
-
-Models:
-
-```text
-fct_listing_snapshot
-
-mart_market_snapshot
-mart_market_transition
-
-mart_neighbourhood_snapshot
-mart_neighbourhood_transition
-
-mart_host_snapshot
-
-mart_room_type_snapshot
-
-mart_price_distribution_snapshot
-mart_price_transition
-
-mart_availability_snapshot
-mart_availability_horizon_snapshot
-mart_calendar_month_snapshot
-```
-
-The marts are designed around explicit analytical grains and are suitable for direct consumption by a BI layer.
-
----
-
-## Model Inventory
-
-The current dbt project contains:
-
-| Layer | Models |
-|---|---:|
-| Staging | 3 |
-| Intermediate | 10 |
-| Marts / Fact | 12 |
-| **Total** | **25** |
-
-All 25 models are documented in dbt YAML metadata.
-
----
-
-## Main Analytical Capabilities
-
-### Market evolution
-
-The project can measure market evolution between historical snapshots, including:
-
-- listing population
-- retained listings
-- disappeared listings
-- newly observed listings
-- listings returning after an observation gap
-- net listing change
-- retention and disappearance rates
-
-### Neighbourhood dynamics
-
-Neighbourhood models provide:
-
-- listing population by neighbourhood
-- entries and disappearances
-- movements between neighbourhoods
-- returns after observation gaps
-- neighbourhood-level net changes
-
-Geographical movement is explicitly separated from listing disappearance.
-
-### Host concentration
-
-Host-level reconstruction enables analysis of:
-
-- number of active hosts
-- listings per host
-- single-listing versus multi-listing hosts
-- host portfolio segments
-- superhost share
-- identity verification
-- top 1%, 5% and 10% listing concentration
-- Herfindahl-Hirschman Index (HHI)
-
-### Pricing
-
-Pricing models provide:
-
-- listing-level price
-- market price statistics
-- price distributions
-- price bands
-- price changes between observations
-- increases, decreases and unchanged prices
-- comparable-price coverage
-
-Source price coverage varies by snapshot and is therefore explicitly measured rather than assumed.
-
-### Availability
-
-Availability is reconstructed from the detailed calendar dataset.
-
-Analytics include:
-
-- available and unavailable listing-days
-- listing-level availability rates
-- market availability rates
-- 30-day horizon
-- 60-day horizon
-- 90-day horizon
-- 365-day horizon
-- monthly availability
-- calendar coverage
-
-Monthly models preserve partial calendar months instead of silently treating them as complete months.
-
-### Reviews
-
-Reviews are deduplicated across historical snapshots using the business grain:
-
-```text
-country + city + listing_id + review_id
-```
-
-The project reconstructs review activity as of each historical snapshot, including:
-
-- cumulative reviews
-- reviews during the previous 30 days
-- reviews during the previous 90 days
-- reviews during the previous 365 days
-- first historical review
-- latest review
-- recency of review activity
-
-Native Inside Airbnb review indicators are preserved separately from reconstructed metrics.
-
----
-
-## Historical Snapshot Semantics
-
-A central design principle of this project is the distinction between:
-
-```text
-previous snapshot
-```
-
-and:
-
-```text
-previous observed snapshot for a listing
-```
-
-A listing can disappear from one snapshot and reappear later.
-
-The model therefore explicitly tracks:
-
-- first observation
-- last observation
-- number of observed snapshots
-- observation gaps
-- missing snapshot count
-- immediately preceding market presence
-- returns after gaps
-
-This prevents a reappearing listing from being incorrectly classified as a new listing.
-
----
-
-## Calendar Semantics
-
-Inside Airbnb calendar availability represents **future calendar availability as observed at the snapshot date**.
-
-It must not be interpreted directly as observed historical occupancy.
-
-Therefore:
-
-```text
-unavailable day ≠ proven occupied day
-```
-
-A date may be unavailable for reasons other than a completed booking.
-
-The project consequently exposes **availability metrics**, not factual occupancy metrics.
-
-Similarly, any occupancy or revenue estimates originating from Inside Airbnb must be treated as estimates rather than observed commercial transactions.
-
----
-
-## Data Quality
-
-Data quality is enforced through dbt tests covering:
-
-- source metadata completeness
-- required fields
-- accepted values
-- model grains
-- historical consistency
-- transition consistency
-- population reconciliation
-- calendar reconciliation
-- availability consistency
-- review consistency
-
-Latest validated full build:
-
-```text
-25 models
-445 tests
-470 nodes processed
-
-469 success
-1 warning
-0 failures
-0 errors
-```
-
-The remaining warning is intentional.
-
-A source-level reconciliation identified **38 listing IDs in the detailed calendar for the 2026-06-22 snapshot that are not present in the corresponding listings dataset**.
-
-The relationship is therefore monitored as a warning rather than forcing the transformation layer to discard valid calendar observations.
-
----
-
-## Repository Structure
-
-```text
-inside_airbnb/
-│
-├── analyses/
-├── data/
-├── macros/
-├── models/
-│   ├── staging/
-│   ├── intermediate/
-│   └── marts/
-│       └── core/
-│
-├── scripts/
-├── seeds/
-├── snapshots/
-├── tests/
-│
-├── dbt_project.yml
-├── README.md
-└── .gitignore
-```
-
-### Python utilities
-
-The `scripts` directory contains utilities used to ingest and validate the source data:
-
-```text
-check_raw_keys.py
-load_raw_to_snowflake.py
-profile_raw_data.py
-validate_snapshots.py
-```
-
----
-
-## Snowflake Organization
-
-The development environment separates the different transformation layers into dedicated schemas.
-
-Example:
-
-```text
-AIRBNB
-│
-├── RAW
-│
-├── DBT_<DEVELOPER>_staging
-│
-├── DBT_<DEVELOPER>_intermediate
-│
-└── DBT_<DEVELOPER>_marts
-```
-
-This keeps raw source data separate from developer-specific transformation objects.
-
-Credentials are not stored in the repository.
-
-The Snowflake password is supplied to dbt through an environment variable.
-
----
-
-## Running the Project
-
-### Validate dbt configuration
+Depuis la racine du dépôt, avec Python et l'environnement virtuel déjà installés :
 
 ```powershell
-dbt debug
+.\.venv\Scripts\python.exe .\scripts\check_archives.py --hash
+.\.venv\Scripts\python.exe .\scripts\check_archives.py --country france --location lyon --hash
 ```
 
-### Parse the project
+Ces commandes sont **locales et en lecture seule**. Elles exigent que `data_manifest.csv` et les archives référencées soient présents sur le poste.
+
+Pour accéder à Snowflake, configurer le profil dbt à partir de `profiles.yml.example`, puis définir les variables d'environnement hors Git :
+
+| Variable | Usage |
+|---|---|
+| `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `DBT_SNOWFLAKE_PASSWORD` | Connexion |
+| `SNOWFLAKE_DATABASE` | Base, défaut `AIRBNB` |
+| `SNOWFLAKE_WAREHOUSE` | Warehouse, défaut `DBT_WH` |
+| `SNOWFLAKE_ROLE` | Ingestion, défaut `INGESTION_ROLE` |
+| `SNOWFLAKE_SCHEMA` | Schéma d'ingestion, défaut `RAW` |
+| `SNOWFLAKE_DBT_ROLE` | Transformations, défaut `DBT_ROLE` |
+| `DBT_SNOWFLAKE_SCHEMA` | Schéma cible dbt, obligatoire |
+
+Contrôles de connexion et de compilation :
 
 ```powershell
-dbt parse
+.\.venv\Scripts\dbt.exe debug
+.\.venv\Scripts\dbt.exe parse
 ```
 
-### Build the complete analytical layer
+**Après validation des droits, des données RAW et du budget Snowflake seulement :**
 
 ```powershell
-dbt build
+.\.venv\Scripts\dbt.exe build --threads 4
 ```
 
-`dbt build` creates the models in dependency order and executes the associated data tests.
+## Déploiement chez le responsable
 
-### Run models only
+Deux scénarios distincts :
 
-```powershell
-dbt run
-```
+1. **Compte Snowflake avec RAW déjà présent :** vérifier les objets, les droits et la cohérence du journal ; ne jamais réinitialiser RAW ; exécuter ensuite dbt.
+2. **Compte Snowflake vierge :** provisionner le warehouse et les rôles, créer les objets RAW, attribuer les privilèges, vérifier les archives, charger un snapshot pilote, puis étendre l'historique et lancer dbt.
 
-### Run tests only
+Le second scénario **n'a pas encore été testé sur un compte vierge**. Les scripts SQL sont dans la [PR #5](https://github.com/Guigx69/inside-airbnb-analytics/pull/5) ; ne pas les considérer comme disponibles sur `main` tant que cette PR n'est pas fusionnée.
 
-```powershell
-dbt test
-```
+## Documentation de référence
 
-### Run a specific model
+| Document | Contenu |
+|---|---|
+| [Guide de lecture et de livraison](docs/guide_livraison_fr.md) | Installation, exploitation, contrôles, risques et critères d'acceptation |
+| [Déploiement manager V1.3](docs/v1_3_manager_deployment.md) | Benchmark et recommandations de migration |
+| [Deux scénarios Snowflake — PR #4](https://github.com/Guigx69/inside-airbnb-analytics/pull/4) | Compte existant ou vierge |
+| [Bootstrap RAW et droits — PR #5](https://github.com/Guigx69/inside-airbnb-analytics/pull/5) | Scripts SQL et chargement Lyon |
+| [Profil Snowflake dbt](profiles.yml.example) | Exemple de configuration sans secrets |
 
-```powershell
-dbt run --select mart_market_snapshot
-```
+## Structure du dépôt
 
-### Test a specific model
+- `models/staging/` : typage et normalisation des sources.
+- `models/intermediate/` : calculs historiques réutilisables.
+- `models/marts/` : tables et vues d'analyse.
+- `scripts/` : collecte, vérification, ingestion et orchestration.
+- `tests/` : tests de qualité complémentaires.
+- `macros/` : macros dbt.
+- `config/` : sélections géographiques d'exemple.
+- `docs/` : documentation technique et livraison.
+- `data_manifest.csv` : inventaire et empreintes des archives, à préserver.
 
-```powershell
-dbt test --select mart_market_snapshot
-```
+Le manifeste GitHub `main` contient désormais **1 629 entrées** (commit `167cc5f`) : les trois ajouts correspondent à Lyon au 17 septembre 2026. Les documents décrivant la version déployée restent fondés sur les quatre snapshots antérieurs jusqu'à nouvelle ingestion et validation dbt.
 
----
+Les archives `data/raw/`, les secrets, les environnements virtuels et les résultats dbt générés ne doivent pas être versionnés. **GitHub ne constitue pas une sauvegarde des 35,16 Gio d'archives locales.**
 
-## Design Principles
+## Limites et feuille de route
 
-The project follows several explicit modelling principles:
+La V1.3 valide les transformations et la qualité des données sur l'environnement de développement. Les coûts Snowflake, le déploiement sur un nouveau compte, les droits d'accès finaux du responsable et la sauvegarde indépendante des archives restent à traiter. La feuille de route géographique est : **Lyon → France → Europe → monde**.
 
-1. Preserve source traceability.
-2. Never silently remove source anomalies.
-3. Define and test the grain of analytical models.
-4. Separate staging, reusable business logic and BI-facing marts.
-5. Preserve historical snapshot semantics.
-6. Distinguish source-native indicators from reconstructed indicators.
-7. Measure data coverage instead of assuming completeness.
-8. Preserve partial calendar periods.
-9. Avoid interpreting availability as observed occupancy.
-10. Design geographical dimensions for future expansion.
+Les anomalies sources sont documentées, jamais masquées par une suppression arbitraire de lignes.
 
----
 
-## Current Scope and Limitations
+## Reprise du projet par un responsable
 
-The current POC is intentionally limited to Lyon and four historical snapshots.
-
-Known limitations include:
-
-- source coverage varies between snapshots
-- listing prices are unavailable in some source snapshots
-- calendar and listings populations can differ slightly
-- calendar data represents availability, not observed occupancy
-- reconstructed review metrics can differ from native Inside Airbnb counters
-- source snapshot intervals are not perfectly regular
-- the current project does not infer real Airbnb bookings or actual revenue
-
-These limitations are preserved explicitly in the analytical design rather than hidden by transformations.
-
----
-
-## Roadmap
-
-### V1 — Lyon
-
-- historical ingestion
-- Snowflake RAW layer
-- dbt staging
-- historical intermediate models
-- analytical marts
-- automated data quality tests
-- project documentation
-- BI dashboard
-
-### V2 — France
-
-Extend the ingestion framework to additional French cities while preserving the existing analytical model.
-
-### V3 — Europe
-
-Generalize ingestion and reporting to European markets.
-
-### V4 — Global
-
-Support a broader multi-country analytical platform using the same source metadata and modelling principles.
-
----
-
-## Status
-
-**Data engineering and dbt modelling: validated**
-
-Current validated build:
-
-```text
-25 models
-445 tests
-469 successful nodes
-1 documented source warning
-0 failures
-0 errors
-```
-
-Next milestone:
-
-```text
-BI / Analytics layer
-```
+Le [manuel complet A à Z](docs/MANUEL_MANAGER_A_Z.md) détaille l'installation Windows, les deux scénarios Snowflake, les commandes d'ingestion et de build, les helpers, les contrôles, le diagnostic et les critères de livraison. Lire ce manuel avant toute exécution sur un nouveau compte.

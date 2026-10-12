@@ -1,0 +1,29 @@
+name: Vérifications hors ligne
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Syntaxe et tests Python sans Snowflake
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+      - name: Préparer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Installer la dépendance des tests géographiques
+        run: python -m pip install 'country_converter>=1.3'
+      - name: Vérifier la syntaxe Python
+        run: python -m compileall -q scripts tests
+      - name: Exécuter les tests unitaires hors ligne
+        run: python -m unittest discover -s tests -p 'test_*.py'

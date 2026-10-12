@@ -1,0 +1,8 @@
+{
+  "include": {
+    "cities": [
+      "Lyon"
+    ]
+  },
+  "exclude": {}
+}
