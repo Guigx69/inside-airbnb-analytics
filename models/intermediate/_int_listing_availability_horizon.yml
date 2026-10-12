@@ -3,7 +3,7 @@ version: 2
 models:
   - name: int_listing_availability_horizon
     description: >
-      Reconstructed listing-level availability metrics calculated directly
+      Indicateurs de disponibilité reconstitués par annonce, calculés directement
       from the detailed Inside Airbnb calendar. One row represents one listing
       for one country, city and snapshot. Availability horizons are anchored
       on the first calendar date actually observed for each listing rather
@@ -35,14 +35,14 @@ models:
 
       - name: availability_window_start_date
         description: >
-          First calendar date actually observed for the listing in the
+          Première date calendaire réellement observée pour l'annonce dans le
           corresponding snapshot.
         data_tests:
           - not_null
 
       - name: availability_window_end_date
         description: >
-          Last calendar date actually observed for the listing in the
+          Dernière date calendaire réellement observée pour l'annonce dans le
           corresponding snapshot.
         data_tests:
           - not_null
@@ -53,7 +53,7 @@ models:
           - not_null
 
       - name: represented_days_30d
-        description: Number of represented calendar days in the first 30-day horizon.
+        description: Nombre de jours calendaires représentés dans le premier horizon de 30 jours.
         data_tests:
           - not_null
 

@@ -3,7 +3,7 @@ version: 2
 models:
   - name: int_calendar_monthly_metrics
     description: >
-      Listing-level monthly calendar metrics derived from the detailed
+      Indicateurs mensuels de calendrier par annonce, calculés à partir du calendrier détaillé
       Inside Airbnb calendar. One row represents one country, city,
       snapshot, calendar month and listing. The model preserves partial
       months and explicitly measures their calendar coverage. Availability

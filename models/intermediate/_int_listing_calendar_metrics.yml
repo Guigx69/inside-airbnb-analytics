@@ -3,7 +3,7 @@ version: 2
 models:
   - name: int_listing_calendar_metrics
     description: >
-      Aggregated Inside Airbnb calendar metrics at listing and snapshot grain.
+      Indicateurs agrégés du calendrier Inside Airbnb par annonce et par snapshot.
       Each row represents one listing observed in one source calendar snapshot.
       Availability metrics describe public calendar availability and must not
       be interpreted as observed occupancy or bookings.
@@ -30,13 +30,13 @@ models:
           - not_null
 
       - name: calendar_row_count
-        description: Number of calendar source rows aggregated for the listing.
+        description: Nombre de lignes de calendrier source agrégées pour l'annonce.
         data_tests:
           - not_null
 
       - name: calendar_day_count
         description: >
-          Number of distinct calendar dates available for the listing.
+          Nombre de dates calendaires distinctes disponibles pour l'annonce.
           Source calendar coverage may vary across locations, snapshots,
           and individual listings.
         data_tests:
