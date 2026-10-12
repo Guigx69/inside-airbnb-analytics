@@ -17,6 +17,7 @@
 | Entrées du manifeste avant / après | 1 629 / 1 989 |
 | Entrées historiques hors catalogue courant | 330 |
 | Dernier snapshot observé | Vaud, 2026-10-05 |
+| Audit du catalogue au 12/10/2026 23:17 UTC | 0 archive nouvelle ; code retour 0 |
 
 L'audit différentiel a trouvé 120 nouveaux snapshots pour 119 zones (Vaud : deux dates). La comparaison `comparer_manifestes.py --reference origin/main` avant publication indiquait **360 ajouts, 0 suppression, 0 modification**. La publication du manifeste est contrôlée par l'historique Git et l'état de la branche distante. Le contrôle SHA-256 du catalogue courant porte sur 1 659 fichiers. Le contrôle exhaustif du manifeste a également réussi : **1 989 archives, 45,08 Gio, 0 manquante, 0 invalide**. Conserver les sorties de commande dans les rapports d'exploitation.
 
@@ -59,6 +60,8 @@ Le manifeste est **un inventaire de fichiers sources**, indépendant du compte S
 ## Audit automatique hebdomadaire (GitHub Actions)
 
 Le workflow `.github/workflows/audit-world.yml` interroge le catalogue **chaque lundi à 06 h 17 UTC** et peut aussi être lancé manuellement depuis l'onglet **Actions** de GitHub. Il utilise `scripts/audit_catalogue_world.py` et produit un artefact JSON `audit-world.json` conservé 30 jours.
+
+L'audit local a été exécuté le **12/10/2026 à 23:17 UTC** : 572 enregistrements bruts, 120 zones, 553 snapshots, 1 659 archives courantes, 1 989 références dans le manifeste, **0 nouvelle archive**, code retour **0**. Ce résultat ne valide pas à lui seul l'exécution du workflow GitHub Actions.
 
 Il compare les chemins du catalogue au manifeste **versionné sur la branche GitHub**. Il ne dispose pas des archives locales et **ne vérifie pas leur présence physique ni leurs empreintes**. Il ne télécharge rien, ne modifie pas le manifeste et ne se connecte pas à Snowflake.
 
