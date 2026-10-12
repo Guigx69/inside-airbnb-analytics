@@ -37,7 +37,7 @@ Les quatre dates ont été vérifiées dans le **manifeste GitHub**, pas dans le
 
 ### Contrôles de qualité ajoutés
 
-Le workflow `verification-hors-ligne.yml` exécute `python -m compileall` et les tests Python `unittest` dans GitHub Actions, sans accès Snowflake. Il ne valide pas l'ingestion réelle, le dbt build ou le provisionnement d'un compte vierge. Les résultats de ce workflow doivent être consultés après ouverture de la PR.
+Le workflow `verification-hors-ligne.yml` installe uniquement `country_converter` pour les tests géographiques, puis exécute `python -m compileall` et les tests Python `unittest` dans GitHub Actions, sans accès Snowflake. Il ne valide pas l'ingestion réelle, le dbt build ou le provisionnement d'un compte vierge. Les résultats de ce workflow doivent être consultés après ouverture de la PR.
 
 ### Risques ouverts
 
