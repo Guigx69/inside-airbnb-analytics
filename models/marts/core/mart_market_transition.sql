@@ -18,7 +18,7 @@ final as (
         source_city,
 
         -- ============================================================
-        -- Transition grain
+        -- Granularité de la transition
         -- ============================================================
         previous_snapshot_date,
         snapshot_date,
@@ -30,7 +30,7 @@ final as (
         ) as days_between_snapshots,
 
         -- ============================================================
-        -- Market population
+        -- Population du marché
         -- ============================================================
         previous_listing_count,
         current_listing_count,
@@ -46,7 +46,7 @@ final as (
         ) as net_listing_change_pct,
 
         -- ============================================================
-        -- Movement between consecutive snapshots
+        -- Mouvements entre snapshots consécutifs
         -- ============================================================
         retained_listing_count,
         disappeared_listing_count,
@@ -54,7 +54,7 @@ final as (
         returned_after_gap_listing_count,
 
         -- ============================================================
-        -- Movement rates
+        -- Taux de mouvement
         -- ============================================================
         retention_rate_pct,
         disappearance_rate_pct,
@@ -72,10 +72,10 @@ final as (
         ) as returned_after_gap_share_pct,
 
         -- ============================================================
-        -- Analytical warning
+        -- Avertissement analytique
         --
         -- "Disappeared" means absent from the next snapshot.
-        -- It must not be interpreted as a confirmed Airbnb exit.
+        -- Cela ne doit pas être interprété comme une sortie confirmée d'Airbnb.
         -- ============================================================
         case
             when returned_after_gap_listing_count > 0
