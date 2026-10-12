@@ -10,17 +10,17 @@ models:
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
@@ -33,24 +33,24 @@ models:
           - not_null
 
       - name: listing_id
-        description: Listing to which the review is associated.
+        description: Annonce associée à l'avis.
         data_tests:
           - not_null
 
       - name: review_date
-        description: Date on which the review was published.
+        description: Date de publication de l'avis.
         data_tests:
           - not_null
 
       - name: reviewer_id
-        description: Identifier of the reviewer.
+        description: Identifiant de l'auteur de l'avis.
         data_tests:
           - not_null
 
       - name: reviewer_name
-        description: Public reviewer name exposed by the source.
+        description: Nom public de l'auteur de l'avis fourni par la source.
 
       - name: comments
-        description: Public review text exposed by the source.
+        description: Texte public de l'avis fourni par la source.
         data_tests:
           - not_null
