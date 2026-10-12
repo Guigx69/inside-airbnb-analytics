@@ -27,7 +27,7 @@ models:
           - not_null
 
       - name: listing_count
-        description: Nombre d'annonces controlled by observed hosts.
+        description: Nombre d'annonces détenues par les hôtes observés.
         data_tests:
           - not_null
 
@@ -47,42 +47,42 @@ models:
           - not_null
 
       - name: single_listing_host_count
-        description: Nombre d'hôtes with exactly one observed listing.
+        description: Nombre d'hôtes possédant exactement une annonce observée.
         data_tests:
           - not_null
 
       - name: host_count_2_to_5
-        description: Nombre d'hôtes with 2 to 5 observed listings.
+        description: Nombre d'hôtes possédant de 2 à 5 annonces observées.
         data_tests:
           - not_null
 
       - name: host_count_6_to_10
-        description: Nombre d'hôtes with 6 to 10 observed listings.
+        description: Nombre d'hôtes possédant de 6 à 10 annonces observées.
         data_tests:
           - not_null
 
       - name: host_count_11_to_20
-        description: Nombre d'hôtes with 11 to 20 observed listings.
+        description: Nombre d'hôtes possédant de 11 à 20 annonces observées.
         data_tests:
           - not_null
 
       - name: host_count_21_plus
-        description: Nombre d'hôtes with at least 21 observed listings.
+        description: Nombre d'hôtes possédant au moins 21 annonces observées.
         data_tests:
           - not_null
 
       - name: multi_listing_host_count
-        description: Nombre d'hôtes with more than one observed listing.
+        description: Nombre d'hôtes possédant plusieurs annonces observées.
         data_tests:
           - not_null
 
       - name: listings_controlled_by_single_listing_hosts
-        description: Nombre d'annonces controlled by single-listing hosts.
+        description: Nombre d'annonces détenues par les hôtes ne possédant qu'une annonce.
         data_tests:
           - not_null
 
       - name: listings_controlled_by_multi_listing_hosts
-        description: Nombre d'annonces controlled by hosts with multiple observed listings.
+        description: Nombre d'annonces détenues par les hôtes possédant plusieurs annonces.
         data_tests:
           - not_null
 
@@ -102,32 +102,22 @@ models:
           - not_null
 
       - name: listings_controlled_by_top_1_pct_hosts
-        description: >
-          Nombre d'annonces controlled by the highest-ranked 1 percent
-          of hosts by observed listing count. The host threshold is rounded
-          upward using CEIL.
+        description: Nombre d'annonces détenues par les 1 % d'hôtes les mieux classés selon leur nombre d'annonces observées. Le seuil du nombre d'hôtes est arrondi à l'entier supérieur avec CEIL.
         data_tests:
           - not_null
 
       - name: listings_controlled_by_top_5_pct_hosts
-        description: >
-          Nombre d'annonces controlled by the highest-ranked 5 percent
-          of hosts by observed listing count.
+        description: Nombre d'annonces détenues par les 5 % d'hôtes les mieux classés selon leur nombre d'annonces observées.
         data_tests:
           - not_null
 
       - name: listings_controlled_by_top_10_pct_hosts
-        description: >
-          Nombre d'annonces controlled by the highest-ranked 10 percent
-          of hosts by observed listing count.
+        description: Nombre d'annonces détenues par les 10 % d'hôtes les mieux classés selon leur nombre d'annonces observées.
         data_tests:
           - not_null
 
       - name: host_hhi
-        description: >
-          Herfindahl-Hirschman Index calculated from each host's share of
-          observed listings. Shares are expressed from 0 to 100, therefore
-          the theoretical HHI range is 0 to 10000.
+        description: Indice de Herfindahl-Hirschman calculé à partir de la part de chaque hôte dans les annonces observées. Les parts sont exprimées de 0 à 100, donc l'indice HHI théorique varie de 0 à 10 000.
         data_tests:
           - not_null
 
@@ -157,12 +147,12 @@ models:
           - not_null
 
       - name: single_listing_host_listing_share_pct
-        description: Pourcentage d'annonces controlled by single-listing hosts.
+        description: Pourcentage d'annonces détenues par les hôtes ne possédant qu'une annonce.
         data_tests:
           - not_null
 
       - name: multi_listing_host_listing_share_pct
-        description: Pourcentage d'annonces controlled by multi-listing hosts.
+        description: Pourcentage d'annonces détenues par les hôtes possédant plusieurs annonces.
         data_tests:
           - not_null
 
