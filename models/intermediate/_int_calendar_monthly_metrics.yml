@@ -42,27 +42,27 @@ models:
           - not_null
 
       - name: first_observed_date
-        description: First calendar date observed for the listing within the month.
+        description: Première date calendaire observée pour l'annonce durant le mois.
         data_tests:
           - not_null
 
       - name: last_observed_date
-        description: Last calendar date observed for the listing within the month.
+        description: Dernière date calendaire observée pour l'annonce durant le mois.
         data_tests:
           - not_null
 
       - name: represented_day_count
-        description: Number of calendar days actually represented for the listing and month.
+        description: Nombre de jours calendaires réellement représentés pour l'annonce et le mois.
         data_tests:
           - not_null
 
       - name: available_day_count
-        description: Number of represented days marked available.
+        description: Nombre de jours représentés indiqués comme disponibles.
         data_tests:
           - not_null
 
       - name: unavailable_day_count
-        description: Number of represented days marked unavailable.
+        description: Nombre de jours représentés indiqués comme indisponibles.
         data_tests:
           - not_null
 
