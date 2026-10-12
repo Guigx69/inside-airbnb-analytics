@@ -88,7 +88,7 @@ $env:DBT_SNOWFLAKE_SCHEMA = "DBT_GGILLET"
 
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.dbt" | Out-Null
-Copy-Item .\profiles.yml.example "$HOME\.dbt\profiles.yml"
+if (-not (Test-Path "$HOME\.dbt\profiles.yml")) { Copy-Item .\profiles.yml.example "$HOME\.dbt\profiles.yml" } else { Write-Host "Profil existant : ne pas écraser ; vérifier la configuration manuellement." }
 .\.venv\Scripts\dbt.exe debug
 .\.venv\Scripts\dbt.exe parse
 ```
