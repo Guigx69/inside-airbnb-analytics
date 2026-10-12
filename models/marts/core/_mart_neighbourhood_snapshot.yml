@@ -35,7 +35,7 @@ models:
           - not_null
 
       - name: listing_count
-        description: Number of listings observed in the neighbourhood.
+        description: Nombre d'annonces observed in the neighbourhood.
         data_tests:
           - not_null
 
@@ -60,12 +60,12 @@ models:
           - not_null
 
       - name: superhost_listing_count
-        description: Number of listings whose host is identified as a Superhost.
+        description: Nombre d'annonces whose host is identified as a Superhost.
         data_tests:
           - not_null
 
       - name: listings_with_price
-        description: Number of listings for which a price is available.
+        description: Nombre d'annonces for which a price is available.
         data_tests:
           - not_null
 
