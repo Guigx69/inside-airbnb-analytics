@@ -9,7 +9,7 @@ Projet Data Engineering : **Python · Snowflake · dbt Core**, basé sur les arc
 | **[1. Manuel manager A à Z](docs/MANUEL_MANAGER_A_Z.md)** | Installer, configurer Snowflake, choisir le scénario compte existant/vierge, lancer, tester et dépanner |
 | **[2. Guide géographique A à Z](docs/GUIDE_GEOGRAPHIE_A_Z.md)** | Ville, pays, continent, plusieurs zones, monde, dates, types de fichiers, dry-run, ingestion |
 
-**Ordre recommandé :** lire le manuel, puis le guide géographique si nécessaire. Les anciennes versions redondantes ont été supprimées ; l'historique des modifications reste disponible dans Git. Les scripts exécutables restent dans `scripts/` et `sql/` ; les exemples géographiques dans `config/`.
+**Ordre recommandé :** lire le manuel, puis le guide géographique si nécessaire. Les scripts exécutables restent dans `scripts/` et `sql/` ; les exemples géographiques dans `config/`.
 
 ## Architecture
 
@@ -41,10 +41,10 @@ Le contrôle d'archives suppose que les fichiers référencés dans `data_manife
 - **456 tests** ; build du 09/10/2026 : **480 PASS, 1 WARN, 0 ERROR**, en 1 h 05 min 46 s.
 - Avertissement connu : `assert_stg_calendar_listing_exists` (3 163 clés orphelines).
 - **1 629 archives**, 35,16 Gio, vérifiées localement par SHA-256 ; le manifeste est versionné, pas les archives.
-- **Lyon :** cinq snapshots, 15 lots RAW non vides, **17 692 229 lignes** contrôlées sur le compte source le 12/10/2026.
-- **Non testé :** bootstrap et build sur un compte Snowflake vierge chez le manager. La fraîcheur des marts après le dernier snapshot n'a pas été établie.
+- **Lyon :** cinq snapshots, 15 lots RAW non vides, **17 692 229 lignes** contrôlées sur l'environnement de développement le 12/10/2026.
+- **Non testé :** bootstrap et build sur un compte Snowflake vierge sur l'environnement cible. La fraîcheur des marts après le dernier snapshot n'a pas été établie.
 
-## État opérationnel au 13/10/2026 — synchronisation World
+## État des données — octobre 2026
 
 - **120 zones** recensées dans le catalogue, **553 snapshots courants** et **1 659 archives courantes**.
 - **120 nouveaux snapshots** détectés par comparaison des chemins (119 zones, deux nouvelles dates pour Vaud) ; **360 nouvelles archives** téléchargées et ajoutées au manifeste.
