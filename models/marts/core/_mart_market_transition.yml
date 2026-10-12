@@ -52,7 +52,7 @@ models:
           - not_null
 
       - name: retained_listing_count
-        description: Listings present in both consecutive snapshots.
+        description: Annonces présentes dans les deux snapshots consécutifs.
         data_tests:
           - not_null
 

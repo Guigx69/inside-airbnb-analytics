@@ -56,8 +56,7 @@ models:
 
       - name: unavailable_day_count
         description: >
-          Number of calendar dates marked as unavailable. This does not
-          necessarily represent booked nights.
+          Nombre de dates calendaires indiquées indisponibles. Cela ne correspond pas nécessairement à des nuitées réservées.
         data_tests:
           - not_null
 

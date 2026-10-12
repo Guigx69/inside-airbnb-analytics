@@ -52,8 +52,7 @@ models:
 
       - name: available_days_30d
         description: >
-          Number of days marked available during the first 30 calendar days
-          actually observed.
+          Nombre de jours indiqués disponibles parmi les 30 premiers jours calendaires effectivement observés.
         data_tests:
           - not_null
 
@@ -64,8 +63,7 @@ models:
 
       - name: available_days_60d
         description: >
-          Number of days marked available during the first 60 calendar days
-          actually observed.
+          Nombre de jours indiqués disponibles parmi les 60 premiers jours calendaires effectivement observés.
         data_tests:
           - not_null
 
@@ -76,8 +74,7 @@ models:
 
       - name: available_days_90d
         description: >
-          Number of days marked available during the first 90 calendar days
-          actually observed.
+          Nombre de jours indiqués disponibles parmi les 90 premiers jours calendaires effectivement observés.
         data_tests:
           - not_null
 
@@ -88,8 +85,7 @@ models:
 
       - name: available_days_365d
         description: >
-          Number of days marked available during the full 365-day calendar
-          window actually observed.
+          Nombre de jours indiqués disponibles sur la fenêtre calendaire complète de 365 jours effectivement observée.
         data_tests:
           - not_null
 

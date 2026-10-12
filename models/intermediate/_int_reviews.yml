@@ -17,7 +17,7 @@ models:
           - not_null
 
       - name: listing_id
-        description: Identifier of the listing associated with the review.
+        description: Identifiant de l'annonce associée à l'avis.
         data_tests:
           - not_null
 
