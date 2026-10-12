@@ -27,7 +27,7 @@ models:
           - not_null
 
       - name: neighbourhood
-        description: Neighbourhood used as the aggregation grain.
+        description: Quartier utilisé comme granularité d'agrégation.
 
       - name: previous_listing_count
         description: Annonces du quartier dans le snapshot précédent.

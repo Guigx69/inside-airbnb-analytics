@@ -63,27 +63,24 @@ models:
 
       - name: has_full_month_coverage
         description: >
-          True when the listing is represented for every calendar day
-          of the month.
+          Vrai lorsque l'annonce est représentée pour chaque jour calendaire du mois.
         data_tests:
           - not_null
 
       - name: calendar_month_coverage_pct
         description: >
-          Percentage of calendar days in the month represented for the listing.
+          Pourcentage de jours calendaires du mois représentés pour l'annonce.
         data_tests:
           - not_null
 
       - name: availability_rate_pct
         description: >
-          Percentage of represented days marked available. This is a
-          calendar availability metric, not an occupancy rate.
+          Pourcentage des jours représentés indiqués disponibles. Cet indicateur de disponibilité du calendrier ne constitue pas un taux d'occupation.
         data_tests:
           - not_null
 
       - name: unavailability_rate_pct
         description: >
-          Percentage of represented days marked unavailable. Unavailability
-          must not be interpreted directly as a confirmed booking.
+          Pourcentage des jours représentés indiqués indisponibles. Une indisponibilité ne prouve pas une réservation.
         data_tests:
           - not_null
