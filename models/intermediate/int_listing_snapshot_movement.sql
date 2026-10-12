@@ -67,19 +67,19 @@ classified as (
             as was_present_previous_snapshot,
 
         case
-            -- First market snapshot: no transition can be inferred
+            -- Premier snapshot de marché : aucune transition ne peut être déduite
             when t.market_previous_snapshot_date is null
                 then 'baseline'
 
-            -- Present now and also present in immediately preceding snapshot
+            -- Présente dans le snapshot actuel et dans le précédent immédiat
             when previous_listing.listing_id is not null
                 then 'retained'
 
-            -- First time ever observed in our historical window
+            -- Première observation dans la fenêtre historique disponible
             when c.first_seen_snapshot = c.snapshot_date
                 then 'newly_observed'
 
-            -- Seen historically, absent from previous snapshot, present again
+            -- Déjà observée auparavant, absente du snapshot précédent, puis réapparue
             else 'returned_after_gap'
         end as movement_status
 

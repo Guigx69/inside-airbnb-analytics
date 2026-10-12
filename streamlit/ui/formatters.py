@@ -4,7 +4,7 @@ import pandas as pd
 
 
 # ============================================================
-# Internal helpers
+# Fonctions utilitaires internes
 # ============================================================
 
 def _is_missing(value) -> bool:
@@ -28,7 +28,7 @@ def _format_number_fr(value: float, decimals: int) -> str:
 
 
 # ============================================================
-# Numbers
+# Nombres
 # ============================================================
 
 def format_integer(value, na: str = "N/D") -> str:
@@ -72,7 +72,7 @@ def format_currency(
 
 
 # ============================================================
-# Signed values / temporal deltas
+# Valeurs signées et écarts temporels
 # ============================================================
 
 def format_signed_integer(
@@ -206,7 +206,7 @@ def format_date_short_fr(
 
 
 # ============================================================
-# Generic helpers
+# Fonctions utilitaires génériques
 # ============================================================
 
 def safe_ratio(

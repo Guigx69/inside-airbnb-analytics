@@ -80,7 +80,7 @@ BORDEAUX_QUARTIERS_URL = (
 
 
 def normalize(value: object) -> str:
-    """Normalize a geographic label for deterministic matching."""
+    """Normaliser un libellé géographique pour assurer un rapprochement déterministe."""
 
     if value is None:
         return ""
@@ -133,7 +133,7 @@ def repair_mojibake(value: object) -> str:
 
 
 def geographic_key(value: object) -> str:
-    """Canonical key used for geographic matching."""
+    """Clé canonique utilisée pour le rapprochement géographique."""
 
     return normalize(
         repair_mojibake(value)
@@ -152,7 +152,7 @@ def paris_name(value: object) -> str:
 
 
 # ============================================================
-# Files / GeoJSON
+# Fichiers et GeoJSON
 # ============================================================
 
 
@@ -172,7 +172,7 @@ def download(
         print(f"[CACHE] {target.name}")
         return target
 
-    print(f"[DOWNLOAD] {url}")
+    print(f"[TÉLÉCHARGEMENT] {url}")
 
     request = urllib.request.Request(
         url,
@@ -314,7 +314,7 @@ def load_neighbourhoods(connection):
 
 
 # ============================================================
-# Geographic records
+# Enregistrements géographiques
 # ============================================================
 
 
@@ -475,7 +475,7 @@ def build_bordeaux_quarters(data):
 
 
 # ============================================================
-# Matching
+# Rapprochement
 # ============================================================
 
 
@@ -718,7 +718,7 @@ def build_bordeaux_hybrid(
         )
 
         # ----------------------------------------------------
-        # Explicit contextual rules
+        # Règles contextuelles explicites
         # ----------------------------------------------------
 
         context_rule = (
@@ -791,7 +791,7 @@ def build_bordeaux_hybrid(
             continue
 
         # ----------------------------------------------------
-        # Standard aliases
+        # Alias standards
         # ----------------------------------------------------
 
         key = BORDEAUX_ALIASES.get(
@@ -813,7 +813,7 @@ def build_bordeaux_hybrid(
             )
         )
 
-        # Prefer the finer geographic grain.
+        # Privilégier la granularité géographique la plus fine.
         if len(quarter_candidates) == 1:
 
             source = quarter_candidates[0]
@@ -894,7 +894,7 @@ def extract_matched_rows(matches):
     ]
 
 # ============================================================
-# Reporting
+# Compte rendu
 # ============================================================
 
 

@@ -3,57 +3,50 @@ version: 2
 models:
   - name: int_listing_availability_horizon
     description: >
-      Reconstructed listing-level availability metrics calculated directly
-      from the detailed Inside Airbnb calendar. One row represents one listing
-      for one country, city and snapshot. Availability horizons are anchored
-      on the first calendar date actually observed for each listing rather
-      than directly on snapshot_date, because the calendar window may start
-      several days after the snapshot date. These metrics represent calendar
-      availability and must not be interpreted as observed occupancy or
-      confirmed bookings.
+      Indicateurs de disponibilité reconstitués par annonce à partir du calendrier détaillé Inside Airbnb. Chaque ligne correspond à une annonce, un pays, une ville et un snapshot. Les horizons commencent à la première date calendaire effectivement observée pour l'annonce, et non nécessairement à snapshot_date, car la fenêtre du calendrier peut débuter plusieurs jours après le snapshot. Ces mesures ne prouvent ni une occupation réelle ni des réservations confirmées.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Inside Airbnb snapshot date.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Inside Airbnb listing identifier.
+        description: Inside Identifiant de l'annonce Airbnb.
         data_tests:
           - not_null
 
       - name: availability_window_start_date
         description: >
-          First calendar date actually observed for the listing in the
+          Première date calendaire réellement observée pour l'annonce dans le
           corresponding snapshot.
         data_tests:
           - not_null
 
       - name: availability_window_end_date
         description: >
-          Last calendar date actually observed for the listing in the
+          Dernière date calendaire réellement observée pour l'annonce dans le
           corresponding snapshot.
         data_tests:
           - not_null
 
       - name: calendar_day_count
-        description: Number of calendar days represented for the listing.
+        description: Nombre de jours calendaires représentés pour l'annonce.
         data_tests:
           - not_null
 
       - name: represented_days_30d
-        description: Number of represented calendar days in the first 30-day horizon.
+        description: Nombre de jours calendaires représentés dans le premier horizon de 30 jours.
         data_tests:
           - not_null
 
@@ -65,7 +58,7 @@ models:
           - not_null
 
       - name: represented_days_60d
-        description: Number of represented calendar days in the first 60-day horizon.
+        description: Nombre de jours calendaires représentés sur les 60 premiers jours.
         data_tests:
           - not_null
 
@@ -77,7 +70,7 @@ models:
           - not_null
 
       - name: represented_days_90d
-        description: Number of represented calendar days in the first 90-day horizon.
+        description: Nombre de jours calendaires représentés sur les 90 premiers jours.
         data_tests:
           - not_null
 
@@ -89,7 +82,7 @@ models:
           - not_null
 
       - name: represented_days_365d
-        description: Number of represented calendar days in the full 365-day horizon.
+        description: Nombre de jours calendaires représentés sur l'horizon complet de 365 jours.
         data_tests:
           - not_null
 

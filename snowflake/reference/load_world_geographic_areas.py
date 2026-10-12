@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-"""V14.2: Validate and insert Inside Airbnb World neighbourhood polygons without overwriting existing keys.
+"""V14.2 : valider et insérer les polygones mondiaux des quartiers Inside Airbnb sans écraser les clés existantes.
 
 
 
-Run from project root:
+Exécuter depuis la racine du projet :
 
   python snowflake/reference/load_world_geographic_areas.py --validate
 
@@ -13,7 +13,7 @@ Run from project root:
 
 
 
-Optional fallback geojson_world_matching.csv; pip install requests shapely snowflake-connector-python.
+Correspondances facultatives geojson_world_matching.csv ; installer requests, shapely et snowflake-connector-python.
 
 """
 

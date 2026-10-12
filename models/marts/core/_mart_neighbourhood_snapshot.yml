@@ -3,132 +3,114 @@ version: 2
 models:
   - name: mart_neighbourhood_snapshot
     description: >
-      Neighbourhood-level analytical snapshot derived from listing-level
-      observations. One row represents one country, city, snapshot and
-      neighbourhood. In the Lyon V1 dataset, neighbourhood corresponds to
-      one of the nine Lyon arrondissements. Pricing metrics remain null when
-      the source snapshot does not provide listing prices. Availability
-      represents publicly observed Airbnb availability and must not be
-      interpreted as observed vacancy or inverse occupancy.
+      Indicateurs par quartier issus des annonces observées. Chaque ligne représente un pays, une ville, un snapshot et un quartier. Pour Lyon V1, les quartiers correspondent aux neuf arrondissements. Les prix sont nuls lorsqu'ils sont absents de la source. La disponibilité publique ne représente ni une vacance constatée ni le complément d'un taux d'occupation.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: neighbourhood
-        description: >
-          Neighbourhood associated with the listing. For Lyon V1, values
-          correspond to the nine Lyon arrondissements.
+        description: Quartier associé à l'annonce ; pour Lyon V1, il s'agit de l'un des neuf arrondissements.
         data_tests:
           - not_null
 
       - name: listing_count
-        description: Number of listings observed in the neighbourhood.
+        description: Nombre d'annonces observées dans le périmètre considéré.
         data_tests:
           - not_null
 
       - name: entire_home_listing_count
-        description: Number of Entire home/apt listings.
+        description: Nombre d'annonces de type logement entier.
         data_tests:
           - not_null
 
       - name: private_room_listing_count
-        description: Number of Private room listings.
+        description: Nombre d'annonces de type chambre privée.
         data_tests:
           - not_null
 
       - name: shared_room_listing_count
-        description: Number of Shared room listings.
+        description: Nombre d'annonces de type chambre partagée.
         data_tests:
           - not_null
 
       - name: host_count
-        description: Number of distinct hosts represented.
+        description: Nombre d'hôtes distincts observés.
         data_tests:
           - not_null
 
       - name: superhost_listing_count
-        description: Number of listings whose host is identified as a Superhost.
+        description: Nombre d'annonces dont l'hôte est identifié comme Superhost.
         data_tests:
           - not_null
 
       - name: listings_with_price
-        description: Number of listings for which a price is available.
+        description: Nombre d'annonces dont le prix est renseigné.
         data_tests:
           - not_null
 
       - name: average_price
-        description: >
-          Average listing price when price data is available. Null when the
-          source snapshot contains no usable price.
+        description: Prix moyen des annonces disposant d'un prix exploitable ; nul si aucun prix n'est disponible.
 
       - name: median_price
-        description: >
-          Median listing price when price data is available. Null when the
-          source snapshot contains no usable price.
+        description: Prix médian des annonces disposant d'un prix exploitable ; nul si aucun prix n'est disponible.
 
       - name: average_availability_rate_pct
-        description: >
-          Average share of calendar days publicly available across listings.
-          This is not an observed occupancy or vacancy rate.
+        description: Taux moyen de disponibilité du calendrier public des annonces ; ne constitue pas un taux d'occupation.
 
       - name: average_availability_30
-        description: Average native Inside Airbnb availability_30 value.
+        description: Disponibilité native moyenne sur 30 jours, telle que fournie par Inside Airbnb.
         data_tests:
           - not_null
 
       - name: average_availability_365
-        description: Average native Inside Airbnb availability_365 value.
+        description: Disponibilité native moyenne sur 365 jours, telle que fournie par Inside Airbnb.
         data_tests:
           - not_null
 
       - name: native_review_count_total
-        description: Sum of Inside Airbnb native review counters.
+        description: Somme des compteurs d'avis natifs fournis par Inside Airbnb.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_total
-        description: Sum of review counts reconstructed from deduplicated review-level data.
+        description: Nombre total d'avis reconstitués à partir des avis dédupliqués à la date du snapshot.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l30d
-        description: Reconstructed review count over the 30-day window ending at the snapshot.
+        description: Nombre d'avis reconstitués sur les 30 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l90d
-        description: Reconstructed review count over the 90-day window ending at the snapshot.
+        description: Nombre d'avis reconstitués sur les 90 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: reconstructed_review_count_l365d
-        description: Reconstructed review count over the 365-day window ending at the snapshot.
+        description: Nombre d'avis reconstitués sur les 365 jours précédant la date du snapshot, inclusivement.
         data_tests:
           - not_null
 
       - name: average_listing_latitude
-        description: >
-          Average latitude of observed listings. This is not the official
-          geographical centroid of the neighbourhood.
+        description: Latitude moyenne des annonces observées ; ne représente pas le centroïde géographique officiel du quartier.
         data_tests:
           - not_null
 
       - name: average_listing_longitude
-        description: >
-          Average longitude of observed listings. This is not the official
-          geographical centroid of the neighbourhood.
+        description: Longitude moyenne des annonces observées ; ne représente pas le centroïde géographique officiel du quartier.
         data_tests:
           - not_null

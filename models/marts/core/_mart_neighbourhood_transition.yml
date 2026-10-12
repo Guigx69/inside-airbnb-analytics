@@ -3,13 +3,7 @@ version: 2
 models:
   - name: mart_neighbourhood_transition
     description: >
-      Neighbourhood-level market movements between consecutive Inside Airbnb
-      snapshots. One row represents one country, city, neighbourhood and pair
-      of consecutive snapshots. Geographic movements are recorded only when a
-      listing is observed in both consecutive snapshots and changes
-      neighbourhood. Listings returning after an observation gap remain
-      classified as returned_after_gap because the timing of any geographic
-      movement during the unobserved period cannot be determined.
+      Mouvements du marché par quartier entre snapshots Inside Airbnb consécutifs. Chaque ligne représente un pays, une ville, un quartier et une paire de snapshots. Un déplacement géographique n'est constaté que lorsque l'annonce est observée dans les deux snapshots et change de quartier. Une réapparition après interruption reste classée returned_after_gap : le moment d'un éventuel déplacement pendant la période non observée est inconnu.
 
     columns:
       - name: source_country

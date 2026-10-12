@@ -25,13 +25,13 @@ from ui.styles import apply_global_styles
 apply_global_styles()
 
 # ============================================================
-# Snowflake connection
+# Connexion Snowflake
 # ============================================================
 
 session = get_session()
 
 # ============================================================
-# Data loading
+# Chargement des données
 # ============================================================
 
 @st.cache_data(ttl=3600)
@@ -69,7 +69,7 @@ def load_market_data():
 market, transitions = load_market_data()
 
 # ============================================================
-# Geographic context and snapshot selection
+# Contexte géographique et sélection du snapshot
 # ============================================================
 
 selected_country, selected_city, selected_snapshot = render_sidebar()
@@ -80,7 +80,7 @@ selected_snapshot = pd.to_datetime(
 
 
 # ============================================================
-# Geographic filtering
+# Filtrage géographique
 # ============================================================
 
 market = market[
@@ -111,7 +111,7 @@ snapshot_dates = sorted(
 
 
 # ============================================================
-# Selected observation
+# Observation sélectionnée
 # ============================================================
 
 current_market_df = market[
@@ -139,7 +139,7 @@ current_transition = (
 )
 
 # ============================================================
-# Current metrics
+# Indicateurs actuels
 # ============================================================
 
 listing_count = int(
@@ -177,7 +177,7 @@ shared_room_share = (
 )
 
 # ============================================================
-# Header
+# En-tête
 # ============================================================
 
 page_header(
@@ -199,7 +199,7 @@ page_header(
 )
 
 # ============================================================
-# Current market
+# Marché actuel
 # ============================================================
 
 section_header(
@@ -250,7 +250,7 @@ kpi_grid(
 )
 
 # ============================================================
-# Historical supply
+# Historique de l'offre
 # ============================================================
 
 st.divider()
@@ -317,7 +317,7 @@ note(
 )
 
 # ============================================================
-# Selected transition
+# Transition sélectionnée
 # ============================================================
 
 st.divider()
@@ -390,7 +390,7 @@ else:
     )
 
     # --------------------------------------------------------
-    # Analytical summary
+    # Synthèse analytique
     # --------------------------------------------------------
 
     if returned_count > newly_observed_count:
@@ -426,7 +426,7 @@ else:
     )
 
     # --------------------------------------------------------
-    # Movement decomposition
+    # Décomposition des mouvements
     # --------------------------------------------------------
 
     
@@ -473,7 +473,7 @@ else:
     st.divider() 
       
     # --------------------------------------------------------
-    # Reconciliation
+    # Rapprochement
     # --------------------------------------------------------
 
     st.write("")
@@ -511,7 +511,7 @@ else:
     )
 
 # ============================================================
-# Transition history
+# Historique des transitions
 # ============================================================
 
 st.divider()

@@ -22,7 +22,7 @@ FILES = [
 
 def profile_csv_gz(file_path: Path) -> None:
     print("\n" + "=" * 100)
-    print(f"FILE : {file_path.name}")
+    print(f"FICHIER : {file_path.name}")
     print("=" * 100)
 
     compressed_size_mb = file_path.stat().st_size / (1024 * 1024)
@@ -55,7 +55,7 @@ def profile_csv_gz(file_path: Path) -> None:
             if len(sample_rows) < 3:
                 sample_rows.append(row)
 
-    print(f"Taille compressee : {compressed_size_mb:,.2f} MB")
+    print(f"Taille compressée : {compressed_size_mb:,.2f} MB")
     print(f"Nombre de lignes  : {row_count:,}")
     print(f"Nombre de colonnes: {len(header)}")
     print(f"Lignes invalides  : {invalid_column_count:,}")

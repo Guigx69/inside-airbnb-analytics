@@ -1,39 +1,24 @@
-# Geographic selection (collector, archive preflight and RAW loader)
+# Sélection géographique — collecte, vérification des archives et chargement RAW
 
-The geographic selector accepts an explicit JSON file. Inclusion and exclusion
-sets are unions across continents, countries and cities. Exclusions are applied
-last. Overlapping inclusions never duplicate catalog datasets.
+Le sélecteur géographique prend un fichier JSON explicite. Les inclusions sont réunies par **OU** entre continents, pays et villes. Les exclusions sont appliquées ensuite. Une inclusion répétée ne duplique pas les fichiers du catalogue.
 
-Example `config/geography.example.json`:
+Exemple `config/geography.example.json` :
+
 ```json
-{
-  "include": {
-    "continents": ["Europe"],
-    "countries": ["Japan"],
-    "cities": ["Sydney"]
-  },
-  "exclude": {
-    "cities": ["Paris"]
-  }
-}
+{"include":{"continents":["Europe"],"countries":["Japan"],"cities":["Sydney"]},"exclude":{"cities":["Paris"]}}
 ```
 
-After `git pull` and `./scripts/setup.ps1`, preview the selection in PowerShell:
+Après `git pull` et `./scripts/setup.ps1`, prévisualiser dans PowerShell :
+
 ```powershell
 .\.venv\Scripts\python.exe scripts\download_inside_airbnb.py --selection-file config/geography.example.json --dry-run
 ```
 
-To download, explicitly replace `--dry-run` with `--sync --verify`.
-Never run an unreviewed multi-continent download: inspect the printed inventory
-and anticipated storage/network requirements first.
+Pour télécharger, remplacer explicitement `--dry-run` par `--sync --verify`. **Ne pas lancer une collecte multirégionale sans examiner l'inventaire et estimer les besoins réseau et disque.**
 
-Continents are derived from catalog country names using `country_converter`.
-Unknown names cause an error instead of silently broadening the selection.
-City names are matched globally: if a city name occurs in multiple countries,
-all matches are selected. Use an exclusion carefully for the same reason.
-Only datasets in the **currently published** Inside Airbnb catalog are selectable.
+Les continents sont déduits des pays du catalogue via `country_converter`. Un nom inconnu provoque une erreur. Les villes sont recherchées mondialement : un nom présent dans plusieurs pays sélectionne toutes les occurrences. Les exclusions de ville sont également globales. Seuls les jeux de données du catalogue Inside Airbnb **actuellement publié** sont sélectionnables.
 
-The same selection file can be applied to local manifest entries:
+Le même fichier sert au manifeste local :
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\check_archives.py --selection-file config/geography.example.json --hash
@@ -41,15 +26,8 @@ The same selection file can be applied to local manifest entries:
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_geography_selection.py" -v
 ```
 
-Validated on Windows (2026-10-08): 864 manifest archives passed SHA-256;
-RAW dry-run classified 864 already loaded and 0 pending; all six offline
-selection regression tests passed.
+**Contrôles historiques du 08/10/2026 sous Windows :** 864 archives du manifeste validées par SHA-256 ; simulation RAW : 864 fichiers déjà chargés et aucun en attente ; six tests de régression géographique réussis. Ces chiffres ne représentent pas l'état actuel du catalogue.
 
-**Inventory semantics:** the collector selects snapshots from the live Inside
-Airbnb catalog; archive preflight and RAW loader select only existing local
-manifest entries. The observed live preview (870 files, including 159 NEW)
-and local manifest (864 files) therefore are not directly interchangeable.
-Path-level reconciliation on Windows confirmed 711 shared files, 159 live-only files, and 153 manifest-only files (870 = 711 + 159; 864 = 711 + 153). Examples show September 2026 snapshots in the live catalog and September 2025 snapshots retained only in the local manifest. Preserve historical manifest entries; do not delete them when catalog entries rotate.
+**Différence entre les inventaires :** le collecteur lit le catalogue en ligne ; le contrôle d'archives et le chargeur RAW lisent uniquement le manifeste local. Lors du contrôle historique : 870 fichiers visibles en ligne (159 nouveaux) et 864 dans le manifeste ; 711 communs, 159 uniquement en ligne et 153 uniquement dans le manifeste. Les snapshots historiques sortis du catalogue doivent être conservés, jamais supprimés automatiquement.
 
-**Limit:** full collector-to-dbt orchestration is not implemented yet.
-
+**Limite :** `run_pipeline.py` orchestre une sélection JSON explicite ; il n'offre pas d'option `--all` pour le monde en une seule commande. Voir [Guide géographique A à Z](GUIDE_GEOGRAPHIE_A_Z.md).

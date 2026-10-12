@@ -1,4 +1,4 @@
-"""Central configuration for Inside Airbnb Analytics."""
+"""Configuration centralisée de l'application Inside Airbnb Analytics."""
 
 import os
 
@@ -6,7 +6,7 @@ import streamlit as st
 
 
 def get_session():
-    """Return the Snowflake session used by the Streamlit application."""
+    """Renvoyer la session Snowflake utilisée par l'application Streamlit."""
     connection = st.connection(
         "snowflake",
         ttl=os.getenv("SNOWFLAKE_CONNECTION_TTL"),
@@ -16,7 +16,7 @@ def get_session():
 
 @st.cache_resource
 def get_app_context():
-    """Return the database and schema hosting the Streamlit application."""
+    """Renvoyer la base et le schéma hébergeant l'application Streamlit."""
     session = get_session()
 
     row = session.sql(

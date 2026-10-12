@@ -1,44 +1,58 @@
-# Manager quickstart (Windows / Snowflake)
+# Démarrage rapide manager — Windows et Snowflake
 
-## Prerequisites
-- Git, Python (compatible with dbt-core 1.12), PowerShell and access to a Snowflake account.
-- Snowflake database/RAW tables, roles, warehouse and privileges must be provisioned separately.
-- Never share personal passwords or commit credentials.
+Ce document est un résumé. Le guide de référence est le [Manuel manager A à Z](MANUEL_MANAGER_A_Z.md), complété par le [Guide géographique A à Z](GUIDE_GEOGRAPHIE_A_Z.md).
 
-## Clone and prepare
+## Prérequis
+
+Git, Python compatible avec dbt-core 1.12, PowerShell et un compte Snowflake. Les rôles, droits, entrepôts et tables RAW doivent être préparés selon le scénario du manuel. Ne jamais transmettre de mot de passe personnel ni versionner de secret.
+
+## Cloner et préparer
+
 ```powershell
 git clone https://github.com/Guigx69/inside-airbnb-analytics.git
 cd inside-airbnb-analytics
 .\scripts\setup.ps1
 ```
 
-## Configure
-- Copy `.env.example` to a local `.env` for reference; `.env` is intentionally ignored by Git and **not loaded automatically**.
-- Create `$HOME\.dbt\profiles.yml` using your own Snowflake account, role, warehouse, database and schema.
-- The dbt project expects a profile named `inside_airbnb`. Use environment variables or a secure authenticator; do not commit secrets.
-- RAW ingestion uses `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `DBT_SNOWFLAKE_PASSWORD`, `SNOWFLAKE_ROLE`, `SNOWFLAKE_WAREHOUSE`, `SNOWFLAKE_DATABASE`, `SNOWFLAKE_SCHEMA`.
+Créer le profil `$HOME\.dbt\profiles.yml` avec **son propre compte**, rôle, entrepôt, base et schéma Snowflake. Le profil dbt se nomme `inside_airbnb`. Le fichier `.env` local n'est **pas chargé automatiquement**.
 
-## Validate (no data modifications)
+Pour l'ingestion RAW, définir les variables `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `DBT_SNOWFLAKE_PASSWORD`, `SNOWFLAKE_ROLE`, `SNOWFLAKE_WAREHOUSE`, `SNOWFLAKE_DATABASE` et `SNOWFLAKE_SCHEMA`.
+
+## Vérifications sans écriture
+
 ```powershell
 .\scripts\check_environment.ps1
+.\.venv\Scripts\python.exe -m unittest discover -s tests
 ```
 
-## Mode A: existing Snowflake RAW data
-Confirm your own Snowflake role can read `AIRBNB.RAW` and write to your dbt target schema.
-Review the target configuration before running:
+## Scénario A — RAW Snowflake déjà disponible
+
+Vérifier les droits de lecture sur RAW et les droits de création des objets dbt. Contrôler la cible avant :
+
 ```powershell
 .\.venv\Scripts\dbt.exe build
 ```
-This command **writes** dbt objects and runs tests.
 
-## Mode B: rebuild from source (not yet one-click)
-The repository excludes `data/raw/`. The collector `scripts/download_inside_airbnb.py` can retrieve snapshots currently available in the public catalog; historical snapshots missing from that catalog require an authorized archive transfer. The ingestion loader filters the manifest before validating archives, so only files in the selected city/snapshot scope are required. A Lyon 2026-09-17 collection, SHA-256 check, RAW ingestion, dbt run and targeted dbt tests succeeded on the development account.
-For a small-city pilot, use `python scripts/download_inside_airbnb.py --location lyon --dry-run --verify`, then an explicitly approved scoped `--sync --verify`, `python scripts/check_archives.py --country france --location lyon --hash`, and `python scripts/load_raw_to_snowflake.py --dry-run --country france --location lyon` before authorizing a real ingestion. Snowflake RAW tables, `INGESTION_LOG` and `INSIDE_AIRBNB_STAGE` must already exist. Do not run ingestion until the target environment and expected data volumes have been reviewed.
+**Attention :** cette commande crée ou actualise des objets et lance les tests.
 
-## Streamlit in Snowflake
-The deployment manifest is `streamlit/snowflake.yml`. It currently contains development-specific Snowflake identifiers, so deploying in another account requires adapting the identifiers and privileges. Do not deploy it unchanged to a production environment.
+## Scénario B — Compte neuf
 
-## Current limits
-- This quickstart provides a reproducible local toolchain and a read-only connection check, not a full Snowflake infrastructure bootstrap.
-- The current catalog download path is validated for Lyon; replay of the entire historical manifest remains unverified.
-- There is no demonstrated scheduled end-to-end orchestration in this repository.
+Le dépôt ne contient pas les archives physiques `data/raw/`. Le collecteur télécharge les snapshots encore publiés ; les archives historiques absentes du catalogue exigent une copie autorisée. Utiliser le bootstrap et l'ordre d'exécution du manuel ; vérifier les archives, les coûts et les droits avant ingestion.
+
+Pilote Lyon, en lecture seule :
+
+```powershell
+.\.venv\Scripts\python.exe scripts\download_inside_airbnb.py --location lyon --dry-run --verify
+.\.venv\Scripts\python.exe scripts\check_archives.py --country france --location lyon --hash
+.\.venv\Scripts\python.exe scripts\load_raw_to_snowflake.py --dry-run --country france --location lyon
+```
+
+Le pilote Lyon du 17/09/2026 a été contrôlé sur le compte de développement, **pas sur un compte vierge**.
+
+## Streamlit dans Snowflake
+
+Le manifeste `streamlit/snowflake.yml` peut contenir des identifiants propres au développement. Adapter les objets, rôles et privilèges avant tout déploiement.
+
+## Limites
+
+Aucune reconstruction historique intégrale ni installation de bout en bout sur compte Snowflake neuf n'est certifiée. Il n'existe pas d'orchestration planifiée de production démontrée dans ce dépôt.

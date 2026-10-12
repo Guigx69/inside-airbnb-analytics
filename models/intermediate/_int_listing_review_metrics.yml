@@ -3,31 +3,26 @@ version: 2
 models:
   - name: int_listing_review_metrics
     description: >
-      Review metrics reconstructed from deduplicated review-level data for each
-      listing snapshot. The model has one row per country, city, snapshot and
-      listing. Metrics are calculated using reviews whose review_date is less
-      than or equal to the snapshot date. These reconstructed metrics are kept
-      distinct from the review counters published directly in the Inside Airbnb
-      listings dataset and are not expected to match them exactly.
+      Indicateurs d'avis reconstitués à partir des avis dédupliqués pour chaque snapshot d'annonces. Chaque ligne représente un pays, une ville, un snapshot et une annonce. Seuls les avis dont review_date est antérieure ou égale à la date du snapshot sont pris en compte. Ces indicateurs restent distincts des compteurs publiés par Inside Airbnb et ne sont pas censés leur correspondre exactement.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb listing snapshot.
+        description: Date du snapshot des annonces Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Identifier of the Airbnb listing.
+        description: Identifiant de l'annonce Airbnb.
         data_tests:
           - not_null
 
@@ -61,7 +56,7 @@ models:
 
       - name: first_review_date_to_snapshot
         description: >
-          Earliest review date observed for the listing up to the snapshot date.
+          Date du plus ancien avis observé pour l'annonce jusqu'à la date du snapshot.
 
       - name: last_review_date_to_snapshot
         description: >
@@ -74,21 +69,21 @@ models:
           snapshot date. Null when no review exists up to the snapshot.
 
       - name: has_reviews_to_snapshot
-        description: Whether at least one reconstructed review exists.
+        description: Indique si au moins un avis reconstitué existe.
         data_tests:
           - not_null
 
       - name: has_review_l30d
-        description: Whether at least one reconstructed review exists in L30D.
+        description: Indique si au moins un avis reconstitué existe sur les 30 derniers jours.
         data_tests:
           - not_null
 
       - name: has_review_l90d
-        description: Whether at least one reconstructed review exists in L90D.
+        description: Indique si au moins un avis reconstitué existe sur les 90 derniers jours.
         data_tests:
           - not_null
 
       - name: has_review_l365d
-        description: Whether at least one reconstructed review exists in L365D.
+        description: Indique si au moins un avis reconstitué existe sur les 365 derniers jours.
         data_tests:
           - not_null

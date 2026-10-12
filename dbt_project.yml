@@ -1,12 +1,12 @@
 # =============================================================================
-# Inside Airbnb Analytics Platform
+# Plateforme analytique Inside Airbnb
 # dbt Core + Snowflake
 #
-# Roadmap:
+# Feuille de route :
 #   V1 - Lyon
 #   V2 - France
 #   V3 - Europe
-#   V4 - World
+#   V4 - Monde
 # =============================================================================
 
 name: 'inside_airbnb'
@@ -16,7 +16,7 @@ config-version: 2
 profile: 'inside_airbnb'
 
 # -----------------------------------------------------------------------------
-# Project paths
+# Chemins du projet
 # -----------------------------------------------------------------------------
 
 model-paths: ["models"]

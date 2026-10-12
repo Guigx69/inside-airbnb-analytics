@@ -3,19 +3,16 @@ version: 2
 models:
   - name: int_reviews
     description: >
-      Deduplicated business-level Airbnb reviews across historical Inside Airbnb
-      snapshots. The model contains one row per country, city, listing and review.
-      Snapshot metadata records when each review was first and last observed in
-      the source datasets.
+      Avis Airbnb dédupliqués à l'échelle métier à partir des snapshots historiques Inside Airbnb. Chaque ligne représente un pays, une ville, une annonce et un avis. Les métadonnées de snapshot indiquent les premières et dernières observations de chaque avis dans les jeux de données source.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
@@ -26,42 +23,38 @@ models:
 
       - name: review_id
         description: >
-          Review identifier provided by Inside Airbnb. It is not assumed to be
-          globally unique independently of listing_id.
+          Identifiant de l'avis fourni par Inside Airbnb ; son unicité globale n'est pas garantie indépendamment de listing_id.
         data_tests:
           - not_null
 
       - name: review_date
-        description: Date on which the review was published.
+        description: Date de publication de l'avis.
         data_tests:
           - not_null
 
       - name: reviewer_id
-        description: Identifier of the reviewer.
+        description: Identifiant de l'auteur de l'avis.
         data_tests:
           - not_null
 
       - name: reviewer_name
         description: >
-          Most recently observed public reviewer name across the available
-          snapshots.
+          Nom public de l'auteur de l'avis le plus récemment observé parmi les snapshots disponibles.
 
       - name: comments
-        description: Public review text.
+        description: Texte public de l'avis.
         data_tests:
           - not_null
 
       - name: first_seen_snapshot
         description: >
-          First Inside Airbnb snapshot in this dataset in which the review
-          was observed. This is not necessarily the creation date of the review.
+          Premier snapshot Inside Airbnb dans lequel l'avis a été observé ; ce n'est pas nécessairement sa date de création.
         data_tests:
           - not_null
 
       - name: last_seen_snapshot
         description: >
-          Most recent Inside Airbnb snapshot in this dataset in which the review
-          was observed.
+          Dernier snapshot Inside Airbnb dans lequel l'avis a été observé.
         data_tests:
           - not_null
 

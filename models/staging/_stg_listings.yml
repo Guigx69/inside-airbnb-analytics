@@ -9,56 +9,50 @@ models:
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Airbnb listing identifier.
+        description: Identifiant de l'annonce Airbnb.
         data_tests:
           - not_null
 
       - name: host_id
-        description: Airbnb host identifier.
+        description: Identifiant de l'hôte Airbnb.
         data_tests:
           - not_null
 
       - name: latitude
-        description: Listing latitude.
+        description: Latitude de l'annonce.
 
       - name: longitude
-        description: Listing longitude.
+        description: Longitude de l'annonce.
 
       - name: price
-        description: >
-          Listing price exposed by Inside Airbnb when available.
-          Availability of this field varies materially between snapshots.
+        description: Prix de l'annonce lorsque la source le fournit.
 
       - name: is_superhost
-        description: Indicates whether the host is identified as a superhost.
+        description: Indique si l'hôte est identifié comme Superhost.
 
       - name: has_availability
-        description: Indicates whether availability information is exposed.
+        description: Indique si des informations de disponibilité sont publiées.
 
       - name: is_instant_bookable
-        description: Indicates whether the listing can be booked instantly.
+        description: Indique si l'annonce permet la réservation instantanée.
 
       - name: estimated_occupancy_l365d
-        description: >
-          Inside Airbnb estimate of occupancy over the last 365 days.
-          This is an estimate and must not be interpreted as observed occupancy.
+        description: Estimation de l'occupation sur les 365 derniers jours fournie par la source ; ne représente pas une occupation vérifiée.
 
       - name: estimated_revenue_l365d
-        description: >
-          Inside Airbnb estimate of revenue over the last 365 days.
-          This is an estimate and must not be interpreted as observed revenue.
+        description: Estimation du revenu sur les 365 derniers jours fournie par la source ; ne représente pas un revenu vérifié.

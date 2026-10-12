@@ -3,35 +3,32 @@ version: 2
 models:
   - name: int_listing_snapshot
     description: >
-      Historical listing observations across Inside Airbnb snapshots.
-      The model preserves one row per country, city, snapshot and listing,
-      and enriches each observation with listing-level history, previous
-      observations, snapshot continuity and attribute changes.
+      Observations historiques des annonces issues des snapshots Inside Airbnb. Chaque ligne correspond à une annonce pour un pays, une ville et un snapshot. Le modèle enrichit chaque observation avec l'historique de l'annonce, les observations précédentes, la continuité des snapshots et les changements d'attributs.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb source snapshot.
+        description: Date du snapshot source Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Airbnb listing identifier.
+        description: Identifiant de l'annonce Airbnb.
         data_tests:
           - not_null
 
       - name: snapshot_sequence
         description: >
-          Chronological position of the snapshot within the available
+          Position chronologique du snapshot dans l'historique disponible
           snapshot history for the city.
         data_tests:
           - not_null
@@ -50,7 +47,7 @@ models:
           - not_null
 
       - name: snapshot_count
-        description: Number of source snapshots in which the listing was observed.
+        description: Nombre de snapshots source dans lesquels l'annonce a été observée.
         data_tests:
           - not_null
 

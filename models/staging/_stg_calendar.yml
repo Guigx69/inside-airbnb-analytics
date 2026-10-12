@@ -3,56 +3,53 @@ version: 2
 models:
   - name: stg_calendar
     description: >
-      Cleaned and typed historical availability calendar snapshots from
-      Inside Airbnb. Each record represents the public availability state
-      of one listing for one calendar date at a given snapshot date.
-      Unavailability must not be interpreted as confirmed occupancy.
+      Snapshots historiques des calendriers de disponibilité Inside Airbnb, nettoyés et typés. Chaque ligne représente la disponibilité publique d'une annonce à une date calendaire pour un snapshot donné. Une indisponibilité ne prouve pas une occupation.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Airbnb listing identifier.
+        description: Identifiant de l'annonce Airbnb.
         data_tests:
           - not_null
 
       - name: calendar_date
-        description: Calendar date whose public availability is represented.
+        description: Date du calendrier dont la disponibilité publique est représentée.
         data_tests:
           - not_null
 
       - name: is_available
         description: >
-          Public availability status reported by Inside Airbnb.
-          False does not necessarily mean that the property was booked.
+          Statut de disponibilité publique indiqué par Inside Airbnb.
+          La valeur False ne signifie pas nécessairement que le logement était réservé.
         data_tests:
           - not_null
 
       - name: price
         description: >
-          Calendar price when provided by the source.
-          This field is currently null across the four Lyon V1 snapshots.
+          Prix du calendrier lorsqu'il est fourni par la source.
+          Ce champ est actuellement nul pour les quatre snapshots Lyon V1.
 
       - name: adjusted_price
         description: >
-          Adjusted calendar price when provided by the source.
-          This field is currently null across the four Lyon V1 snapshots.
+          Prix ajusté du calendrier lorsqu'il est fourni par la source.
+          Ce champ est actuellement nul pour les quatre snapshots Lyon V1.
 
       - name: minimum_nights
-        description: Minimum stay requirement applicable to the calendar date.
+        description: Durée minimale de séjour applicable à la date calendaire.
 
       - name: maximum_nights
-        description: Maximum stay requirement applicable to the calendar date.
+        description: Durée maximale de séjour applicable à la date calendaire.

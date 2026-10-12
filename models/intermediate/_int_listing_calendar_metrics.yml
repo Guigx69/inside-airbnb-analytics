@@ -3,57 +3,54 @@ version: 2
 models:
   - name: int_listing_calendar_metrics
     description: >
-      Aggregated Inside Airbnb calendar metrics at listing and snapshot grain.
-      Each row represents one listing observed in one source calendar snapshot.
-      Availability metrics describe public calendar availability and must not
-      be interpreted as observed occupancy or bookings.
+      Indicateurs agrégés du calendrier Inside Airbnb par annonce et par snapshot. Chaque ligne représente une annonce observée dans un snapshot du calendrier source. Les mesures décrivent la disponibilité publique affichée dans le calendrier et ne constituent pas une preuve d'occupation ou de réservation.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb source snapshot.
+        description: Date du snapshot source Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Airbnb listing identifier.
+        description: Identifiant de l'annonce Airbnb.
         data_tests:
           - not_null
 
       - name: calendar_row_count
-        description: Number of calendar source rows aggregated for the listing.
+        description: Nombre de lignes de calendrier source agrégées pour l'annonce.
         data_tests:
           - not_null
 
       - name: calendar_day_count
         description: >
-          Number of distinct calendar dates available for the listing.
+          Nombre de dates calendaires distinctes disponibles pour l'annonce.
           Source calendar coverage may vary across locations, snapshots,
           and individual listings.
         data_tests:
           - not_null
 
       - name: first_calendar_date
-        description: First calendar date available in the source snapshot.
+        description: Première date du calendrier disponible dans le snapshot source.
         data_tests:
           - not_null
 
       - name: last_calendar_date
-        description: Last calendar date available in the source snapshot.
+        description: Dernière date du calendrier disponible dans le snapshot source.
         data_tests:
           - not_null
 
       - name: available_day_count
-        description: Number of calendar dates marked as available.
+        description: Nombre de dates calendaires indiquées comme disponibles.
         data_tests:
           - not_null
 
@@ -65,11 +62,11 @@ models:
           - not_null
 
       - name: availability_rate_pct
-        description: Percentage of calendar rows marked as available.
+        description: Pourcentage de lignes calendaires indiquées comme disponibles.
         data_tests:
           - not_null
 
       - name: unavailability_rate_pct
-        description: Percentage of calendar rows marked as unavailable.
+        description: Pourcentage de lignes calendaires indiquées comme indisponibles.
         data_tests:
           - not_null

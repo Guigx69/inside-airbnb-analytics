@@ -21,14 +21,14 @@ from ui.styles import apply_global_styles
 
 
 # ============================================================
-# Global styles
+# Styles généraux
 # ============================================================
 
 apply_global_styles()
 
 
 # ============================================================
-# Snowflake connection
+# Connexion Snowflake
 # ============================================================
 
 session = get_session()
@@ -54,13 +54,13 @@ CHART_GREY = "#8A94A6"
 
 
 # ============================================================
-# Helpers
+# Fonctions utilitaires
 # ============================================================
 
 def normalize_dataframe(
     dataframe: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Normalize Snowflake column names and date columns."""
+    """Normaliser les noms de colonnes Snowflake et les colonnes de dates."""
 
     if dataframe.empty:
         return dataframe
@@ -85,7 +85,7 @@ def safe_divide(
     denominator,
     multiplier=1.0,
 ):
-    """Return a safe division result."""
+    """Renvoyer le résultat d'une division sécurisée."""
 
     if (
         denominator is None
@@ -105,7 +105,7 @@ def safe_divide(
 
 
 def format_optional_currency(value):
-    """Format an optional monetary value."""
+    """Formater une valeur monétaire facultative."""
 
     if value is None or pd.isna(value):
         return "N/D"
@@ -114,7 +114,7 @@ def format_optional_currency(value):
 
 
 def format_optional_percent(value):
-    """Format an optional percentage value."""
+    """Formater un pourcentage facultatif."""
 
     if value is None or pd.isna(value):
         return "N/D"
@@ -123,7 +123,7 @@ def format_optional_percent(value):
 
 
 def format_neighbourhood(value):
-    """Return a readable neighbourhood label."""
+    """Renvoyer un libellé de quartier lisible."""
 
     if value is None or pd.isna(value):
         return "Non renseigné"
@@ -137,12 +137,12 @@ def format_neighbourhood(value):
 
 
 # ============================================================
-# Data loading
+# Chargement des données
 # ============================================================
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_neighbourhood_data():
-    """Load neighbourhood snapshots and transitions."""
+    """Charger les snapshots et les transitions des quartiers."""
 
     snapshots = session.sql(
         f"""
@@ -245,7 +245,7 @@ snapshots, transitions = load_neighbourhood_data()
 
 
 # ============================================================
-# Geographic context
+# Contexte géographique
 # ============================================================
 
 (
@@ -260,7 +260,7 @@ selected_snapshot = pd.Timestamp(
 
 
 # ============================================================
-# Geographic filtering
+# Filtrage géographique
 # ============================================================
 
 snapshots = snapshots[
@@ -303,7 +303,7 @@ snapshot_dates = sorted(
 
 
 # ============================================================
-# Selected observation
+# Observation sélectionnée
 # ============================================================
 
 current = snapshots[
@@ -335,7 +335,7 @@ current = current.sort_values(
 
 
 # ============================================================
-# Derived indicators
+# Indicateurs dérivés
 # ============================================================
 
 neighbourhood_count = int(
@@ -448,7 +448,7 @@ largest_neighbourhood_share = float(
 
 
 # ============================================================
-# Header
+# En-tête
 # ============================================================
 
 page_header(
@@ -479,7 +479,7 @@ page_header(
 
 
 # ============================================================
-# Market structure
+# Structure du marché
 # ============================================================
 
 section_header(
@@ -553,7 +553,7 @@ insight_box(
 
 
 # ============================================================
-# Supply distribution
+# Répartition de l'offre
 # ============================================================
 
 st.divider()
@@ -665,7 +665,7 @@ st.altair_chart(
 
 
 # ============================================================
-# Price analysis
+# Analyse des prix
 # ============================================================
 
 st.divider()
@@ -809,7 +809,7 @@ else:
 
 
 # ============================================================
-# Room type structure
+# Structure des types de logement
 # ============================================================
 
 st.divider()
@@ -927,7 +927,7 @@ st.altair_chart(
 
 
 # ============================================================
-# Availability
+# Disponibilité
 # ============================================================
 
 st.divider()
@@ -1054,7 +1054,7 @@ note(
 
 
 # ============================================================
-# Review activity
+# Activité des avis
 # ============================================================
 
 st.divider()
@@ -1156,7 +1156,7 @@ note(
 
 
 # ============================================================
-# Neighbourhood transitions
+# Transitions des quartiers
 # ============================================================
 
 st.divider()
@@ -1585,7 +1585,7 @@ else:
 
 
 # ============================================================
-# Detailed table
+# Tableau détaillé
 # ============================================================
 
 st.divider()
@@ -1698,7 +1698,7 @@ st.dataframe(
 
 
 # ============================================================
-# Methodological note
+# Note méthodologique
 # ============================================================
 
 st.write("")

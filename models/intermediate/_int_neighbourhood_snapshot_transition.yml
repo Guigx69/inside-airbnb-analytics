@@ -3,31 +3,26 @@ version: 2
 models:
   - name: int_neighbourhood_snapshot_transition
     description: >
-      Neighbourhood-level transition metrics between consecutive Inside
-      Airbnb snapshots. The model distinguishes retained listings,
-      disappearances, movements between neighbourhoods, newly observed
-      listings and listings returning after an observation gap.
-      Only neighbourhoods represented in both sides of a transition are
-      returned by the final inner join.
+      Indicateurs de transition par quartier entre snapshots Inside Airbnb consécutifs. Le modèle distingue les annonces conservées, disparues, déplacées entre quartiers, nouvellement observées ou réapparues après une interruption. La jointure interne finale ne conserve que les quartiers représentés des deux côtés de la transition.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: previous_snapshot_date
-        description: Immediately preceding market snapshot date.
+        description: Date du snapshot de marché immédiatement précédent.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Current market snapshot date.
+        description: Date du snapshot de marché actuel.
         data_tests:
           - not_null
 
@@ -35,69 +30,65 @@ models:
         description: Neighbourhood used as the aggregation grain.
 
       - name: previous_listing_count
-        description: Listings in the neighbourhood in the previous snapshot.
+        description: Annonces du quartier dans le snapshot précédent.
         data_tests:
           - not_null
 
       - name: current_listing_count
-        description: Listings in the neighbourhood in the current snapshot.
+        description: Annonces du quartier dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: retained_listing_count
-        description: Listings remaining in the same neighbourhood.
+        description: Annonces restant dans le même quartier.
         data_tests:
           - not_null
 
       - name: disappeared_listing_count
-        description: Listings no longer observed in the current snapshot.
+        description: Annonces qui ne sont plus observées dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: moved_out_listing_count
         description: >
-          Listings still observed in the current snapshot but assigned
-          to another neighbourhood.
+          Annonces toujours observées dans le snapshot actuel, mais affectées à un autre quartier.
         data_tests:
           - not_null
 
       - name: newly_observed_listing_count
-        description: Listings observed for the first time in the historical window.
+        description: Annonces observées pour la première fois dans l'historique disponible.
         data_tests:
           - not_null
 
       - name: returned_after_gap_listing_count
         description: >
-          Listings absent from the previous snapshot but observed in an
-          earlier historical snapshot.
+          Annonces absentes du snapshot précédent mais observées dans un snapshot historique antérieur.
         data_tests:
           - not_null
 
       - name: moved_in_listing_count
         description: >
-          Listings already present in the previous snapshot but assigned
-          to another neighbourhood at that time.
+          Annonces déjà présentes dans le snapshot précédent, mais affectées alors à un autre quartier.
         data_tests:
           - not_null
 
       - name: net_listing_change
-        description: Current neighbourhood listing count minus previous listing count.
+        description: Nombre d'annonces du quartier dans le snapshot actuel moins celui du précédent.
         data_tests:
           - not_null
 
       - name: net_listing_change_pct
         description: >
-          Net listing change expressed as a percentage of the previous
-          neighbourhood population.
+          Variation nette du nombre d'annonces, exprimée en pourcentage de la population du quartier au snapshot précédent.
         data_tests:
           - not_null
 
       - name: retention_rate_pct
-        description: Percentage of previous listings retained in the same neighbourhood.
+        description: Pourcentage des annonces précédentes conservées dans le même quartier.
         data_tests:
           - not_null
 
       - name: disappearance_rate_pct
-        description: Percentage of previous listings no longer observed.
+        description: Pourcentage des annonces précédentes qui ne sont plus observées.
         data_tests:
           - not_null

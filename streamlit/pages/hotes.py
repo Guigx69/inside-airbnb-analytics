@@ -22,14 +22,14 @@ from ui.styles import apply_global_styles
 
 
 # ============================================================
-# Global styles
+# Styles généraux
 # ============================================================
 
 apply_global_styles()
 
 
 # ============================================================
-# Snowflake connection
+# Connexion Snowflake
 # ============================================================
 
 session = get_session()
@@ -67,7 +67,7 @@ CONCENTRATION_ORDER = [
 
 
 # ============================================================
-# Helpers
+# Fonctions utilitaires
 # ============================================================
 
 def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
@@ -148,7 +148,7 @@ def load_hosts() -> pd.DataFrame:
 hosts = load_hosts()
 
 # ============================================================
-# Global context
+# Contexte global
 # ============================================================
 
 (
@@ -226,7 +226,7 @@ if current_rows.empty:
 current = current_rows.iloc[0]
 
 # ============================================================
-# Header
+# En-tête
 # ============================================================
 
 page_header(
@@ -248,7 +248,7 @@ page_header(
 )
 
 # ============================================================
-# Market structure
+# Structure du marché
 # ============================================================
 
 section_header(
@@ -321,7 +321,7 @@ st.divider()
 
 
 # ============================================================
-# Portfolio structure
+# Structure des portefeuilles
 # ============================================================
 
 section_header(
@@ -425,7 +425,7 @@ note(
 
 
 # ============================================================
-# Single vs multi-listing hosts
+# Hôtes à une ou plusieurs annonces
 # ============================================================
 
 section_header(
@@ -635,7 +635,7 @@ note(
 st.divider()
 
 # ============================================================
-# Host profile
+# Profil des hôtes
 # ============================================================
 
 section_header(
@@ -698,7 +698,7 @@ st.divider()
 
 
 # ============================================================
-# Historical hosts / listings
+# Historique des hôtes et annonces
 # ============================================================
 
 section_header(
@@ -829,7 +829,7 @@ note(
 
 
 # ============================================================
-# Multi-listing evolution
+# Évolution des hôtes multiannonces
 # ============================================================
 
 section_header(
@@ -951,7 +951,7 @@ st.altair_chart(
 
 
 # ============================================================
-# Concentration evolution
+# Évolution de la concentration
 # ============================================================
 
 section_header(
@@ -1068,7 +1068,7 @@ st.altair_chart(
 
 
 # ============================================================
-# Historical table
+# Tableau historique
 # ============================================================
 
 section_header(
@@ -1171,7 +1171,7 @@ st.dataframe(
 
 
 # ============================================================
-# Methodology
+# Méthodologie
 # ============================================================
 
 st.divider()

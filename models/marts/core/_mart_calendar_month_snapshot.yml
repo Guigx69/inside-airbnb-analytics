@@ -3,76 +3,71 @@ version: 2
 models:
   - name: mart_calendar_month_snapshot
     description: >
-      Market-level monthly calendar availability mart derived from the
-      detailed Inside Airbnb calendar. One row represents one country,
-      city, snapshot and calendar month. Partial months are intentionally
-      preserved and accompanied by explicit coverage indicators.
-      Availability describes dates marked available in the source calendar
-      and must not be interpreted as observed occupancy or confirmed bookings.
+      Indicateurs mensuels de disponibilité du marché calculés à partir du calendrier détaillé Inside Airbnb. Chaque ligne correspond à un pays, une ville, un snapshot et un mois calendaire. Les mois incomplets sont conservés avec des indicateurs explicites de couverture. La disponibilité correspond aux dates indiquées disponibles dans le calendrier source ; elle ne prouve ni une occupation ni une réservation confirmée.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Inside Airbnb snapshot date from which the calendar was extracted.
+        description: Date du snapshot Inside Airbnb dont le calendrier est extrait.
         data_tests:
           - not_null
 
       - name: calendar_month
-        description: First day of the calendar month represented by the row.
+        description: Premier jour du mois calendaire représenté par la ligne.
         data_tests:
           - not_null
 
       - name: days_in_calendar_month
-        description: Total number of calendar days in the corresponding month.
+        description: Nombre total de jours calendaires du mois correspondant.
         data_tests:
           - not_null
 
       - name: listing_count
-        description: Number of listings represented at least once during the month.
+        description: Nombre d'annonces représentées au moins une fois durant le mois.
         data_tests:
           - not_null
 
       - name: first_observed_date
-        description: Earliest calendar date represented in the month across all listings.
+        description: Date calendaire représentée la plus ancienne du mois, toutes annonces confondues.
         data_tests:
           - not_null
 
       - name: last_observed_date
-        description: Latest calendar date represented in the month across all listings.
+        description: Date calendaire représentée la plus récente du mois, toutes annonces confondues.
         data_tests:
           - not_null
 
       - name: min_days_per_listing
-        description: Minimum number of represented days for an individual listing during the month.
+        description: Nombre minimal de jours représentés pour une annonce durant le mois.
         data_tests:
           - not_null
 
       - name: max_days_per_listing
-        description: Maximum number of represented days for an individual listing during the month.
+        description: Nombre maximal de jours représentés pour une annonce durant le mois.
         data_tests:
           - not_null
 
       - name: full_month_listing_count
-        description: Number of listings represented on every calendar day of the month.
+        description: Nombre d'annonces représentées chaque jour calendaire du mois.
         data_tests:
           - not_null
 
       - name: partial_month_listing_count
-        description: Number of listings represented for only part of the calendar month.
+        description: Nombre d'annonces représentées sur une partie seulement du mois.
         data_tests:
           - not_null
 
       - name: represented_listing_days
-        description: Total number of listing-days actually represented in the source calendar.
+        description: Nombre total de journées-annonces effectivement représentées dans le calendrier source.
         data_tests:
           - not_null
 
@@ -84,12 +79,12 @@ models:
           - not_null
 
       - name: available_day_count
-        description: Total represented listing-days marked available.
+        description: Nombre total de journées-annonces représentées et indiquées disponibles.
         data_tests:
           - not_null
 
       - name: unavailable_day_count
-        description: Total represented listing-days marked unavailable.
+        description: Nombre total de journées-annonces représentées et indiquées indisponibles.
         data_tests:
           - not_null
 
@@ -102,7 +97,7 @@ models:
           - not_null
 
       - name: median_listing_availability_rate_pct
-        description: Median individual listing availability rate for the month.
+        description: Taux médian de disponibilité des annonces sur le mois.
         data_tests:
           - not_null
 
@@ -114,7 +109,7 @@ models:
           - not_null
 
       - name: full_month_listing_share_pct
-        description: Percentage of represented listings having complete monthly coverage.
+        description: Pourcentage d'annonces représentées bénéficiant d'une couverture mensuelle complète.
         data_tests:
           - not_null
 

@@ -8,7 +8,7 @@ def page_header(
     icon: str | None = None,
     badges: list[str] | None = None,
 ) -> None:
-    """Render the common page header."""
+    """Afficher l'en-tête commun des pages."""
 
     icon_html = f"{escape(icon)} " if icon else ""
 
@@ -51,7 +51,7 @@ def section_header(
     title: str,
     description: str | None = None,
 ) -> None:
-    """Render a consistent section title and optional description."""
+    """Afficher un titre de section uniforme et sa description facultative."""
 
     description_html = ""
 
@@ -80,7 +80,7 @@ def kpi_card(
     value: str,
     detail: str | None = None,
 ) -> None:
-    """Render a primary KPI card."""
+    """Afficher une carte d'indicateur principal."""
 
     detail_html = ""
 
@@ -112,7 +112,7 @@ def transition_card(
     value: str,
     detail: str | None = None,
 ) -> None:
-    """Render a compact market-transition card."""
+    """Afficher une carte compacte de transition du marché."""
 
     detail_html = ""
 
@@ -143,7 +143,7 @@ def insight_box(
     title: str,
     text: str,
 ) -> None:
-    """Render an analytical interpretation box."""
+    """Afficher un encadré d'interprétation analytique."""
 
     st.markdown(
         f"""
@@ -161,7 +161,7 @@ def insight_box(
 
 
 def note(text: str) -> None:
-    """Render a discreet methodological note."""
+    """Afficher une note méthodologique discrète."""
 
     st.markdown(
         f"""
@@ -176,7 +176,7 @@ def kpi_grid(
     items: list[dict],
     columns: int = 2,
 ) -> None:
-    """Render KPI cards in a robust responsive-friendly grid."""
+    """Afficher les cartes d'indicateurs dans une grille adaptative."""
 
     for start in range(0, len(items), columns):
         row_items = items[start:start + columns]
@@ -198,7 +198,7 @@ def transition_grid(
     items: list[dict],
     columns: int = 2,
 ) -> None:
-    """Render transition cards in a robust responsive-friendly grid."""
+    """Afficher les cartes de transition dans une grille adaptative."""
 
     for start in range(0, len(items), columns):
         row_items = items[start:start + columns]

@@ -22,14 +22,14 @@ from ui.styles import apply_global_styles
 
 
 # ============================================================
-# Global styles
+# Styles généraux
 # ============================================================
 
 apply_global_styles()
 
 
 # ============================================================
-# Snowflake connection
+# Connexion Snowflake
 # ============================================================
 
 session = get_session()
@@ -61,11 +61,11 @@ HORIZON_ORDER = [
 
 
 # ============================================================
-# Helpers
+# Fonctions utilitaires
 # ============================================================
 
 def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """Normalize Snowflake column names."""
+    """Normaliser les noms de colonnes Snowflake."""
 
     if df.empty:
         return df
@@ -158,7 +158,7 @@ monthly = load_monthly()
 
 
 # ============================================================
-# Global context
+# Contexte global
 # ============================================================
 
 (
@@ -256,7 +256,7 @@ if current_rows.empty:
 current = current_rows.iloc[0]
 
 # ============================================================
-# Header
+# En-tête
 # ============================================================
 
 page_header(
@@ -509,7 +509,7 @@ note(
 st.divider()
 
 # ============================================================
-# Horizon detail
+# Détail des horizons
 # ============================================================
 
 section_header(
@@ -607,7 +607,7 @@ st.dataframe(
 st.divider()
 
 # ============================================================
-# Historical availability
+# Historique de la disponibilité
 # ============================================================
 
 section_header(
@@ -741,7 +741,7 @@ note(
 st.divider()
 
 # ============================================================
-# Seasonality
+# Saisonnalité
 # ============================================================
 
 section_header(
@@ -902,7 +902,7 @@ else:
     st.divider()
 
     # ========================================================
-    # Monthly coverage
+    # Couverture mensuelle
     # ========================================================
 
     section_header(
@@ -981,7 +981,7 @@ else:
         )
 
 # ============================================================
-# Methodology
+# Méthodologie
 # ============================================================
 
 st.divider()

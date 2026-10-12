@@ -3,57 +3,51 @@ version: 2
 models:
   - name: mart_market_transition
     description: >
-      Market-level transition metrics between consecutive Inside Airbnb
-      snapshots. One row represents one country, city and pair of consecutive
-      snapshots. A disappeared listing is a listing present in the previous
-      snapshot but absent from the current snapshot; this must not be
-      interpreted as a confirmed permanent exit from Airbnb. A returned listing
-      is a listing observed historically, absent from the immediately preceding
-      snapshot and present again in the current snapshot.
+      Indicateurs de transition du marché entre deux snapshots Inside Airbnb consécutifs. Chaque ligne correspond à un pays, une ville et une paire de snapshots. Une annonce disparue est présente dans le snapshot précédent mais absente de l'actuel : cela ne prouve pas une sortie définitive d'Airbnb. Une annonce réapparue a déjà été observée historiquement, était absente du snapshot immédiatement précédent et revient dans l'actuel.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: previous_snapshot_date
-        description: Previous market snapshot used for the transition.
+        description: Snapshot de marché précédent utilisé pour la transition.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Current market snapshot used for the transition.
+        description: Snapshot de marché actuel utilisé pour la transition.
         data_tests:
           - not_null
 
       - name: days_between_snapshots
-        description: Number of days between the previous and current snapshots.
+        description: Nombre de jours entre les snapshots précédent et actuel.
         data_tests:
           - not_null
 
       - name: previous_listing_count
-        description: Number of listings present in the previous snapshot.
+        description: Nombre d'annonces présentes dans le snapshot précédent.
         data_tests:
           - not_null
 
       - name: current_listing_count
-        description: Number of listings present in the current snapshot.
+        description: Nombre d'annonces présentes dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: net_listing_change
-        description: Current listing count minus previous listing count.
+        description: Nombre d'annonces actuel moins celui du snapshot précédent.
         data_tests:
           - not_null
 
       - name: net_listing_change_pct
-        description: Percentage change in listing count relative to the previous snapshot.
+        description: Variation en pourcentage du nombre d'annonces par rapport au snapshot précédent.
         data_tests:
           - not_null
 
@@ -84,26 +78,26 @@ models:
           - not_null
 
       - name: retention_rate_pct
-        description: Share of the previous population retained in the current snapshot.
+        description: Part des annonces du snapshot précédent conservées dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: disappearance_rate_pct
-        description: Share of the previous population absent from the current snapshot.
+        description: Part des annonces du snapshot précédent absentes du snapshot actuel.
         data_tests:
           - not_null
 
       - name: newly_observed_share_pct
-        description: Share of the current population that is newly observed.
+        description: Part des annonces nouvellement observées dans le snapshot actuel.
         data_tests:
           - not_null
 
       - name: returned_after_gap_share_pct
-        description: Share of the current population returning after an observation gap.
+        description: Part des annonces réapparues après une interruption d'observation.
         data_tests:
           - not_null
 
       - name: has_returned_listings
-        description: Whether the transition contains at least one returned-after-gap listing.
+        description: Indique si la transition comprend au moins une annonce réapparue après interruption.
         data_tests:
           - not_null

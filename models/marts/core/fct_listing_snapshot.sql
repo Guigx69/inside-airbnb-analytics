@@ -86,7 +86,7 @@ final as (
         maximum_nights,
 
         -- ============================================================
-        -- Availability
+        -- Disponibilité
         -- ============================================================
         has_availability,
         availability_30,

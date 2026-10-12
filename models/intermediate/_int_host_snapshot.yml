@@ -3,11 +3,7 @@ version: 2
 models:
   - name: int_host_snapshot
     description: >
-      Host-level snapshot derived from listing observations. One row represents
-      one host for one country, city and Inside Airbnb snapshot. The observed
-      listing portfolio is reconstructed directly from listing-level data.
-      Inside Airbnb's calculated_host_listings_count is retained separately
-      for lineage and reconciliation.
+      Snapshot par hôte calculé à partir des annonces observées. Chaque ligne représente un hôte, un pays, une ville et un snapshot Inside Airbnb. Le portefeuille observé est reconstitué à partir des annonces ; calculated_host_listings_count, fourni par Inside Airbnb, est conservé séparément pour la traçabilité et le rapprochement.
 
     columns:
       - name: source_country
@@ -51,7 +47,7 @@ models:
 
       - name: observed_host_segment
         description: >
-          Host portfolio segment derived from observed_listing_count:
+          Segment du portefeuille de l'hôte calculé à partir de observed_listing_count :
           1, 2-5, 6-10, 11-20 or 21+.
         data_tests:
           - not_null

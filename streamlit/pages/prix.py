@@ -24,13 +24,13 @@ from ui.styles import apply_global_styles
 
 
 # ============================================================
-# Global styles
+# Styles généraux
 # ============================================================
 
 apply_global_styles()
 
 # ============================================================
-# Snowflake connection
+# Connexion Snowflake
 # ============================================================
 
 session = get_session()
@@ -66,11 +66,11 @@ PRICE_BAND_LABELS = {
 }
 
 # =============================================================================
-# Helpers
+# Fonctions utilitaires
 # =============================================================================
 
 def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """Normalize Snowflake column names and snapshot dates."""
+    """Normaliser les noms de colonnes Snowflake et les dates des snapshots."""
 
     if df.empty:
         return df
@@ -251,7 +251,7 @@ selected_snapshot = pd.Timestamp(
 
 
 # =============================================================================
-# Geographic filtering
+# Filtrage géographique
 # =============================================================================
 
 market = market[
@@ -315,7 +315,7 @@ average_price = current["average_price"]
 median_price = current["median_price"]
 
 # ============================================================
-# Header
+# En-tête
 # ============================================================
 
 page_header(

@@ -1,49 +1,25 @@
-# Provisioning a new Snowflake RAW environment
+# Initialiser un environnement RAW Snowflake neuf
 
-The SQL file `sql/bootstrap_raw.sql` creates the minimum RAW schema,
-three VARIANT-backed source tables, ingestion log and internal stage
-required by `scripts/load_raw_to_snowflake.py`.
+Le fichier `sql/bootstrap_raw.sql` prépare le schéma RAW minimal, les trois tables sources contenant des données `VARIANT`, le journal d'ingestion et le stage interne requis par `scripts/load_raw_to_snowflake.py`.
 
-**Not an automatic installer.** It assumes an existing database `AIRBNB`,
-an appropriately sized warehouse, and provisioned roles. Change the
-database/schema identifiers before running against another account.
-Run only on a dedicated new environment with authorized DDL privileges.
-It uses `IF NOT EXISTS` and does not delete existing objects, but existing
-objects with incompatible structures are not repaired.
+**Ce n'est pas un installateur automatique.** Il suppose une base `AIRBNB` existante, un entrepôt dimensionné et des rôles déjà configurés. Adapter les identifiants avant exécution dans un autre compte. Exécuter uniquement dans un environnement neuf dédié avec les droits DDL autorisés. `IF NOT EXISTS` évite la suppression d'objets existants, mais ne répare pas une structure incompatible.
 
-The ingestion role needs USAGE on database/schema/warehouse, DML on
-the RAW tables and log, and appropriate stage permissions. The dbt role
-needs USAGE and SELECT on RAW and privileges to create its output schemas
-and models. Privilege grants are environment-specific and are **not**
-performed by this script.
+Le rôle d'ingestion doit disposer de `USAGE` sur base, schéma et entrepôt, des droits DML sur RAW et le journal, et des autorisations sur le stage. Le rôle dbt doit lire RAW et pouvoir créer ses schémas et modèles. **Les droits dépendent de l'environnement et ne sont pas accordés par ce script.**
 
-## Data dependency
+## Dépendance aux archives
 
-The Git repository does not include `data/raw`. All selected
-`data_manifest.csv` archive paths must exist locally with the recorded
-size and SHA-256 before ingestion. The collector `scripts/download_inside_airbnb.py` can discover currently
-published snapshots and download a selected city/snapshot, validating gzip
-and recording SHA-256 in the manifest. Previously published snapshots may
-no longer be in the live catalog; preserve historical archives separately.
+Le dépôt Git ne contient pas `data/raw`. Les chemins d'archives sélectionnés dans `data_manifest.csv` doivent exister localement avec la taille et l'empreinte SHA-256 attendues. Le collecteur `scripts/download_inside_airbnb.py` découvre les snapshots encore publiés, télécharge une sélection et met à jour le manifeste. Les archives historiques sorties du catalogue doivent être conservées séparément.
 
-The loader filters the manifest **before validating archives**. A scoped
-city/snapshot ingestion only requires the corresponding local files.
-This was validated for Lyon 2026-09-17 on the existing development account;
-full historical recovery and fresh-account deployment remain unverified.
+Le chargeur filtre le manifeste **avant** la validation des archives : un chargement limité à une ville et une date n'exige que les fichiers correspondants. Le pilote Lyon du 17/09/2026 a été vérifié sur le compte de développement ; la restauration historique intégrale et le déploiement sur compte vierge restent non validés.
 
-## Controlled execution order
+## Ordre d'exécution contrôlé
 
-1. Review identifiers, roles, warehouse sizing and estimated data volume.
-2. Execute `sql/bootstrap_raw.sql` on a new Snowflake database.
-3. Grant the necessary privileges and inspect object definitions.
-4. Restore and verify source archives in `data/raw`.
-5. Export ingestion environment variables securely; a local `.env`
-   file is **not** automatically loaded.
-6. Run `python scripts/load_raw_to_snowflake.py --dry-run`, review the
-   plan, then run without `--dry-run` only after explicit approval.
-7. Configure `~/.dbt/profiles.yml` and dbt RAW source variables, run
-   `dbt debug`, `dbt parse`, `dbt compile`, then an authorized build.
+1. Vérifier les identifiants, rôles, coûts de calcul et volumes attendus.
+2. Exécuter `sql/bootstrap_raw.sql` sur une nouvelle base Snowflake adaptée.
+3. Accorder les droits nécessaires et contrôler les objets créés.
+4. Restaurer puis vérifier les archives dans `data/raw`.
+5. Exporter les variables d'environnement d'ingestion de manière sécurisée ; `.env` n'est pas chargé automatiquement.
+6. Lancer `python scripts/load_raw_to_snowflake.py --dry-run`, examiner le plan, puis n'autoriser le chargement réel qu'après validation.
+7. Configurer `~/.dbt/profiles.yml` et les variables sources RAW ; exécuter `dbt debug`, `dbt parse`, `dbt compile`, puis un build autorisé.
 
-The RAW bootstrap SQL and ingestion procedure have **not yet been
-validated on a fresh Snowflake account**. Do not describe them as a
-proven one-click deployment.
+**Le bootstrap RAW et la procédure d'ingestion ne sont pas encore validés sur un compte Snowflake vierge.** Ne pas les présenter comme un déploiement opérationnel en un clic.

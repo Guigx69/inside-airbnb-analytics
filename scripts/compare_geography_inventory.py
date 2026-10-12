@@ -1,6 +1,6 @@
-"""Compare selected live Inside Airbnb catalog paths with local manifest paths.
+"""Comparer les chemins du catalogue Inside Airbnb sélectionnés à ceux du manifeste local.
 
-Read-only: fetches catalog metadata, never downloads archives or connects to Snowflake.
+Lecture seule : récupère les métadonnées du catalogue, sans téléchargement d'archives ni connexion Snowflake.
 """
 import argparse
 import csv
@@ -19,7 +19,7 @@ def main():
     parser.add_argument("--limit", type=int, default=30)
     args = parser.parse_args()
     if args.limit < 0:
-        parser.error("--limit must be >= 0")
+        parser.error("--limit doit être supérieur ou égal à 0")
 
     live = select_datasets(build_inventory(get_catalog()), args.selection_file)
     live_paths = {item.manifest_path for item in live}
@@ -30,12 +30,12 @@ def main():
 
     only_live = sorted(live_paths - manifest_paths)
     only_manifest = sorted(manifest_paths - live_paths)
-    print(f"Live catalog:        {len(live_paths)} unique paths ({len(live)} records)")
-    print(f"Selected manifest:   {len(manifest_paths)} unique paths")
-    print(f"Shared paths:        {len(live_paths & manifest_paths)}")
-    print(f"Only in live:        {len(only_live)}")
-    print(f"Only in manifest:    {len(only_manifest)}")
-    for title, paths in (("LIVE ONLY", only_live), ("MANIFEST ONLY", only_manifest)):
+    print(f"Catalogue en ligne :        {len(live_paths)} unique paths ({len(live)} records)")
+    print(f"Manifeste sélectionné :   {len(manifest_paths)} unique paths")
+    print(f"Chemins communs :        {len(live_paths & manifest_paths)}")
+    print(f"Uniquement en ligne :        {len(only_live)}")
+    print(f"Uniquement dans le manifeste :    {len(only_manifest)}")
+    for title, paths in (("EN LIGNE UNIQUEMENT", only_live), ("MANIFESTE UNIQUEMENT", only_manifest)):
         print(f"\\n{title} (first {args.limit}):")
         for path in paths[:args.limit]:
             print("  " + path)

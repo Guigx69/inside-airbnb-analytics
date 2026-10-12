@@ -1,8 +1,8 @@
--- Inside Airbnb manager bootstrap: execute ONLY on a confirmed EMPTY target.
--- Required: database/schema creation privileges, and an existing warehouse/role.
--- Select the correct account/role/warehouse in the Snowflake worksheet first.
--- CREATE IF NOT EXISTS never repairs incompatible existing objects.
--- No DROP, TRUNCATE, DELETE or INSERT against existing RAW data.
+-- Initialisation manager Inside Airbnb : exécuter UNIQUEMENT sur une cible confirmée VIDE.
+-- Prérequis : droits de création base/schéma et entrepôt/rôle existants.
+-- Sélectionner d'abord le bon compte, rôle et entrepôt dans Snowflake.
+-- CREATE IF NOT EXISTS ne répare pas les objets existants incompatibles.
+-- Aucun DROP, TRUNCATE, DELETE ou INSERT sur les données RAW existantes.
 
 CREATE DATABASE IF NOT EXISTS AIRBNB;
 CREATE SCHEMA IF NOT EXISTS AIRBNB.RAW;
@@ -45,16 +45,16 @@ CREATE TABLE IF NOT EXISTS AIRBNB.RAW.INGESTION_LOG (
   SOURCE_SHA256 VARCHAR(64)
 );
 
--- The reference stage is INTERNAL with default CSV stage file format.
--- The loader explicitly overrides this with JSON/GZIP during COPY INTO.
+-- Le stage de référence est INTERNE, avec un format CSV par défaut.
+-- Le chargeur remplace explicitement ce format par JSON/GZIP lors du COPY INTO.
 CREATE STAGE IF NOT EXISTS AIRBNB.RAW.INSIDE_AIRBNB_STAGE
   COMMENT = 'Internal stage for Inside Airbnb source files';
 
--- Inspect object definitions and compare with existing source environment.
+-- Inspecter les définitions d'objets et les comparer à l'environnement source.
 DESCRIBE TABLE AIRBNB.RAW.RAW_LISTINGS;
 DESCRIBE TABLE AIRBNB.RAW.RAW_CALENDAR;
 DESCRIBE TABLE AIRBNB.RAW.RAW_REVIEWS;
 DESCRIBE TABLE AIRBNB.RAW.INGESTION_LOG;
 SHOW STAGES LIKE 'INSIDE_AIRBNB_STAGE' IN SCHEMA AIRBNB.RAW;
--- Optionally inspect the stage's properties:
+-- Examiner éventuellement les propriétés du stage :
 DESCRIBE STAGE AIRBNB.RAW.INSIDE_AIRBNB_STAGE;

@@ -3,86 +3,76 @@ version: 2
 models:
   - name: fct_listing_snapshot
     description: >
-      Core analytical fact table containing one row per Airbnb listing
-      observation and Inside Airbnb snapshot. It exposes listing, host,
-      geography, property, pricing, availability and review attributes,
-      together with historical observation and change indicators.
+      Table de faits analytique contenant une ligne par annonce Airbnb observée et par snapshot Inside Airbnb. Elle expose les attributs des annonces, hôtes, localisations, biens, prix, disponibilités et avis, ainsi que les indicateurs historiques d'observation et de changement.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb source snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_id
-        description: Airbnb listing identifier.
+        description: Identifiant de l'annonce Airbnb.
         data_tests:
           - not_null
 
       - name: host_id
-        description: Airbnb host identifier.
+        description: Identifiant de l'hôte Airbnb.
         data_tests:
           - not_null
 
       - name: snapshot_sequence
-        description: Chronological sequence of the source snapshot for the city.
+        description: Rang chronologique du snapshot source pour cette ville.
         data_tests:
           - not_null
 
       - name: first_seen_snapshot
-        description: >
-          First snapshot in this dataset in which the listing was observed.
+        description: Premier snapshot dans lequel l'annonce est observée.
         data_tests:
           - not_null
 
       - name: last_seen_snapshot
-        description: >
-          Most recent snapshot in this dataset in which the listing was observed.
+        description: Dernier snapshot dans lequel l'annonce est observée.
         data_tests:
           - not_null
 
       - name: snapshot_count
-        description: Number of snapshots in which the listing was observed.
+        description: Nombre de snapshots dans lesquels l'annonce est observée.
         data_tests:
           - not_null
 
       - name: is_first_observation
-        description: True for the first observed snapshot of the listing.
+        description: Vrai pour la première observation de l'annonce.
         data_tests:
           - not_null
 
       - name: is_last_observation
-        description: True for the most recent observed snapshot of the listing.
+        description: Vrai pour la dernière observation de l'annonce.
         data_tests:
           - not_null
 
       - name: has_observation_gap
-        description: >
-          Indicates whether one or more expected snapshots are missing
-          between this observation and the previous observation.
+        description: Indique si des snapshots attendus sont manquants entre l'observation actuelle et la précédente.
 
       - name: missing_snapshot_count
-        description: >
-          Number of expected snapshots missing since the previous observation.
+        description: Nombre de snapshots attendus manquants depuis l'observation précédente.
 
       - name: has_host_changed
-        description: >
-          True when the host differs from the previous observed snapshot.
+        description: Vrai si l'hôte diffère de celui du snapshot précédent observé.
         data_tests:
           - not_null
 
       - name: has_room_type_changed
-        description: >
-          True when the room type differs from the previous observed snapshot.
+        description: Vrai si le type de logement diffère de celui du snapshot précédent observé.
         data_tests:
           - not_null
