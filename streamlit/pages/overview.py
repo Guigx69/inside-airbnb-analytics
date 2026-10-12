@@ -27,19 +27,19 @@ from ui.formatters import (
 from ui.styles import apply_global_styles
 
 # ============================================================
-# Global styles
+# Styles généraux
 # ============================================================
 
 apply_global_styles()
 
 # ============================================================
-# Snowflake connection
+# Connexion Snowflake
 # ============================================================
 
 session = get_session()
 
 # ============================================================
-# Data loading
+# Chargement des données
 # ============================================================
 
 @st.cache_data(ttl=3600)
@@ -82,7 +82,7 @@ def load_data():
 market, availability, hosts, transitions = load_data()
 
 # ============================================================
-# Data preparation
+# Préparation des données
 # ============================================================
 
 for dataframe in [
