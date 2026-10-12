@@ -8,16 +8,16 @@ models:
       city, snapshot and calendar month. Partial months are intentionally
       preserved and accompanied by explicit coverage indicators.
       Availability describes dates marked available in the source calendar
-      and must not be interpreted as observed occupancy or confirmed bookings.
+      and must not be interprétés comme une occupation observée ou des réservations confirmées.
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
