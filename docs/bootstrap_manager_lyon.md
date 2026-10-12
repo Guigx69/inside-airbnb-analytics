@@ -48,7 +48,7 @@ Le benchmark de développement complet de la V1.3 était de 1 h 05 min 46 s (480
 
 Le loader utilise `SNOWFLAKE_ROLE` (défaut `INGESTION_ROLE`) et `SNOWFLAKE_SCHEMA` (défaut `RAW`), tandis que le profil dbt utilise `SNOWFLAKE_DBT_ROLE` et `DBT_SNOWFLAKE_SCHEMA`. Vérifier séparément les deux rôles et schémas. Ne jamais committer les identifiants.
 
-Le bootstrap ne migre pas les 1 629 archives ni ne télécharge les données depuis GitHub. Le compte vierge doit avoir accès aux fichiers CSV.GZ vérifiés et à leur manifeste. Le script ne modifie pas les tables RAW existantes mais crée des objets persistants : **ne pas exécuter sur le compte actuel sans nécessité**.
+Le bootstrap ne migre pas les 1 629 archives ni ne télécharge les données depuis GitHub. Le compte vierge doit avoir accès aux fichiers CSV.GZ vérifiés et à leur manifeste. Le fichier `sql/bootstrap_manager_admin_prerequisites.sql` prépare désormais les rôles et un warehouse XSMALL, suspendu par défaut et **sans reprise automatique**. Il ne crée aucun utilisateur, ne donne pas les rôles aux utilisateurs et ne définit pas de budget. Un administrateur doit contrôler la facturation et reprendre manuellement le warehouse avant le pilote. Le script ne modifie pas les tables RAW existantes mais crée des objets persistants : **ne pas exécuter sur le compte actuel sans nécessité**.
 
 ## 6. Critères GO
 
@@ -72,7 +72,7 @@ Les résultats `SHOW GRANTS TO ROLE INGESTION_ROLE` et `SHOW GRANTS ON STAGE` co
 
 Un script séparé `sql/bootstrap_manager_ingestion_grants.sql` reproduit **ces seuls droits**. À exécuter sur le compte **cible vierge**, par un administrateur autorisé, **après** création des objets et du rôle `INGESTION_ROLE` et du warehouse `DBT_WH`. Vérifier les noms avant exécution. Il ne configure pas les droits de `DBT_ROLE`, à examiner séparément.
 
-**Séquence recommandée** : bootstrap des objets -> création administrative du rôle/warehouse si absents -> grants d'ingestion -> `SHOW GRANTS` -> dry-run Lyon -> pilote Lyon -> build dbt. Aucun test de cette séquence n'a encore été effectué sur un compte vierge.
+**Séquence recommandée sur un compte vierge** : création administrative des rôles et du warehouse (`sql/bootstrap_manager_admin_prerequisites.sql`) -> attribution contrôlée des rôles aux utilisateurs -> bootstrap des objets -> grants d'ingestion -> `SHOW GRANTS` -> dry-run Lyon -> pilote Lyon -> build dbt. Aucun test de cette séquence n'a encore été effectué sur un compte vierge.
 
 ## 9. Droits dbt validés sur le compte source
 
