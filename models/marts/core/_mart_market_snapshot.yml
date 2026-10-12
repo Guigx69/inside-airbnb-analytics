@@ -10,42 +10,42 @@ models:
 
     columns:
       - name: source_country
-        description: Country associated with the source dataset.
+        description: Pays associé au jeu de données source.
         data_tests:
           - not_null
 
       - name: source_city
-        description: City associated with the source dataset.
+        description: Ville associée au jeu de données source.
         data_tests:
           - not_null
 
       - name: snapshot_date
-        description: Date of the Inside Airbnb snapshot.
+        description: Date du snapshot Inside Airbnb.
         data_tests:
           - not_null
 
       - name: listing_count
-        description: Number of listings observed in the market snapshot.
+        description: Nombre d'annonces observées dans le snapshot du marché.
         data_tests:
           - not_null
 
       - name: entire_home_listing_count
-        description: Number of listings with room type Entire home/apt.
+        description: Nombre d'annonces de type Entire home/apt.
         data_tests:
           - not_null
 
       - name: private_room_listing_count
-        description: Number of listings with room type Private room.
+        description: Nombre d'annonces de type Private room.
         data_tests:
           - not_null
 
       - name: shared_room_listing_count
-        description: Number of listings with room type Shared room.
+        description: Nombre d'annonces de type Shared room.
         data_tests:
           - not_null
 
       - name: listings_with_price
-        description: Number of listings with a non-null price.
+        description: Nombre d'annonces dont le prix n'est pas nul.
         data_tests:
           - not_null
 
