@@ -37,8 +37,7 @@ models:
 
       - name: market_previous_snapshot_date
         description: >
-          Date du snapshot de marché immédiatement précédent. Null for the first
-          snapshot because no transition can be inferred.
+          Date du snapshot de marché immédiatement précédent ; valeur nulle pour le premier snapshot, sans transition calculable.
 
       - name: first_seen_snapshot
         description: First snapshot in which the listing is observed.
@@ -52,21 +51,17 @@ models:
 
       - name: has_observation_gap
         description: >
-          Indicates whether the current listing observation follows a gap
-          in its observed snapshot history. Null may occur on the first
-          observation according to the upstream historical model.
+          Indique si l'annonce réapparaît après une interruption de son historique d'observation. La première observation peut être nulle selon le modèle historique amont.
 
       - name: was_present_previous_snapshot
         description: >
-          True when the listing was also observed in the immediately
-          preceding market snapshot.
+          Vrai si l'annonce était également observée dans le snapshot de marché immédiatement précédent.
         data_tests:
           - not_null
 
       - name: movement_status
         description: >
-          Listing movement classification: baseline, retained,
-          newly_observed or returned_after_gap.
+          Classification du mouvement de l'annonce : baseline, retained, newly_observed ou returned_after_gap.
         data_tests:
           - not_null
           - accepted_values:

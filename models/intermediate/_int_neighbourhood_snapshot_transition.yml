@@ -56,8 +56,7 @@ models:
 
       - name: moved_out_listing_count
         description: >
-          Listings still observed in the current snapshot but assigned
-          to another neighbourhood.
+          Annonces toujours observées dans le snapshot actuel, mais affectées à un autre quartier.
         data_tests:
           - not_null
 
@@ -68,15 +67,13 @@ models:
 
       - name: returned_after_gap_listing_count
         description: >
-          Listings absent from the previous snapshot but observed in an
-          earlier historical snapshot.
+          Annonces absentes du snapshot précédent mais observées dans un snapshot historique antérieur.
         data_tests:
           - not_null
 
       - name: moved_in_listing_count
         description: >
-          Listings already present in the previous snapshot but assigned
-          to another neighbourhood at that time.
+          Annonces déjà présentes dans le snapshot précédent, mais affectées alors à un autre quartier.
         data_tests:
           - not_null
 
@@ -87,8 +84,7 @@ models:
 
       - name: net_listing_change_pct
         description: >
-          Net listing change expressed as a percentage of the previous
-          neighbourhood population.
+          Variation nette du nombre d'annonces, exprimée en pourcentage de la population du quartier au snapshot précédent.
         data_tests:
           - not_null
 

@@ -26,8 +26,7 @@ models:
 
       - name: review_id
         description: >
-          Review identifier provided by Inside Airbnb. It is not assumed to be
-          globally unique independently of listing_id.
+          Identifiant de l'avis fourni par Inside Airbnb ; son unicité globale n'est pas garantie indépendamment de listing_id.
         data_tests:
           - not_null
 
@@ -43,8 +42,7 @@ models:
 
       - name: reviewer_name
         description: >
-          Most recently observed public reviewer name across the available
-          snapshots.
+          Nom public de l'auteur de l'avis le plus récemment observé parmi les snapshots disponibles.
 
       - name: comments
         description: Texte public de l'avis.
@@ -53,15 +51,13 @@ models:
 
       - name: first_seen_snapshot
         description: >
-          First Inside Airbnb snapshot in this dataset in which the review
-          was observed. This is not necessarily the creation date of the review.
+          Premier snapshot Inside Airbnb dans lequel l'avis a été observé ; ce n'est pas nécessairement sa date de création.
         data_tests:
           - not_null
 
       - name: last_seen_snapshot
         description: >
-          Most recent Inside Airbnb snapshot in this dataset in which the review
-          was observed.
+          Dernier snapshot Inside Airbnb dans lequel l'avis a été observé.
         data_tests:
           - not_null
 

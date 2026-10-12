@@ -46,22 +46,19 @@ models:
 
       - name: disappeared_listing_count
         description: >
-          Listings observed in the previous snapshot but absent from
-          the current snapshot.
+          Annonces observées dans le snapshot précédent mais absentes du snapshot actuel.
         data_tests:
           - not_null
 
       - name: newly_observed_listing_count
         description: >
-          Listings observed for the first time in the historical window
-          in the current snapshot.
+          Annonces observées pour la première fois dans la fenêtre historique lors du snapshot actuel.
         data_tests:
           - not_null
 
       - name: returned_after_gap_listing_count
         description: >
-          Listings present in the current snapshot, absent from the
-          immediately preceding snapshot, but observed in an earlier snapshot.
+          Annonces présentes dans le snapshot actuel, absentes du précédent immédiat, mais observées dans un snapshot antérieur.
         data_tests:
           - not_null
 
