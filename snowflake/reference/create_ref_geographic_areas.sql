@@ -1,6 +1,6 @@
--- Geographic reference boundaries - initial dataset: Lyon's 9 arrondissements
--- Source: Métropole de Lyon - IRIS géographique
--- Re-runnable: MERGE prevents duplicate geographic areas.
+-- Limites géographiques de référence : jeu initial des 9 arrondissements de Lyon
+-- Source : Métropole de Lyon - IRIS géographique
+-- Réexécutable : MERGE évite les doublons de zones géographiques.
 
 CREATE TABLE IF NOT EXISTS REF_GEOGRAPHIC_AREAS (
     SOURCE_COUNTRY VARCHAR(100) NOT NULL,
@@ -61,7 +61,7 @@ VALUES (
     src.SOURCE
 );
 
--- Validation: expected 9 Lyon arrondissement rows.
+-- Validation : 9 lignes attendues pour les arrondissements de Lyon.
 SELECT SOURCE_COUNTRY, SOURCE_CITY, AREA_CODE, AREA_NAME, AREA_LEVEL, SOURCE
 FROM REF_GEOGRAPHIC_AREAS
 WHERE SOURCE_COUNTRY = 'france'
