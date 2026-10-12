@@ -80,10 +80,10 @@ $env:SNOWFLAKE_WAREHOUSE = "DBT_WH"
 $env:SNOWFLAKE_ROLE = "INGESTION_ROLE"
 $env:SNOWFLAKE_SCHEMA = "RAW"
 $env:SNOWFLAKE_DBT_ROLE = "DBT_ROLE"
-$env:DBT_SNOWFLAKE_SCHEMA = "DBT_GGILLET"
+$env:DBT_SNOWFLAKE_SCHEMA = "DBT_XXX"
 ```
 
-**Adapter `DBT_SNOWFLAKE_SCHEMA` à l'environnement cible** : la valeur ci-dessus illustre la convention source, elle ne doit pas écraser les schémas d'un autre utilisateur. Les schémas générés peuvent porter les suffixes `_STAGING`, `_INTERMEDIATE`, `_MARTS`.
+**Adapter `DBT_SNOWFLAKE_SCHEMA` à l'environnement cible** : `DBT_XXX` est un placeholder à remplacer avant exécution, elle ne doit pas écraser les schémas d'un autre utilisateur. Les schémas générés peuvent porter les suffixes `_STAGING`, `_INTERMEDIATE`, `_MARTS`.
 
 ### 3.3 Profil dbt
 
