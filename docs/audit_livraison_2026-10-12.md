@@ -41,7 +41,7 @@ Le workflow `verification-hors-ligne.yml` installe uniquement `country_converter
 
 ### Risques ouverts
 
-1. **Différence manifeste Git/local :** 1 627 entrées GitHub contre 1 629 archives vérifiées localement ; identifier les entrées ajoutées ou supprimées localement avant commit.
+1. **Différence manifeste Git/local :** 1 627 entrées GitHub contre 1 629 archives vérifiées localement. Un outil de comparaison **en lecture seule** est ajouté : `python scripts/comparer_manifestes.py --reference origin/main` (après `git fetch origin`). Il affiche les chemins ajoutés, absents ou modifiés, sans écraser le manifeste. Les deux chemins exacts ne sont pas encore identifiés.
 2. **Dépendances Python :** absence de lock complet ; les nouvelles installations peuvent résoudre d'autres versions de `dbt-snowflake`.
 3. **Compte vierge :** absence de test réel des scripts SQL, des rôles, du warehouse et des données.
 4. **Accès du responsable :** droits de lecture des marts, Streamlit et éventuels objets BI à définir selon le besoin.
