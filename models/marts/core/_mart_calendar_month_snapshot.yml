@@ -17,7 +17,7 @@ models:
           - not_null
 
       - name: snapshot_date
-        description: Inside Airbnb snapshot date from which the calendar was extracted.
+        description: Date du snapshot Inside Airbnb dont le calendrier est extrait.
         data_tests:
           - not_null
 

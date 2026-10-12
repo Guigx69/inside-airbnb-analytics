@@ -40,13 +40,13 @@ models:
 
       - name: price
         description: >
-          Calendar price when provided by the source.
-          This field is currently null across the four Lyon V1 snapshots.
+          Prix du calendrier lorsqu'il est fourni par la source.
+          Ce champ est actuellement nul pour les quatre snapshots Lyon V1.
 
       - name: adjusted_price
         description: >
-          Adjusted calendar price when provided by the source.
-          This field is currently null across the four Lyon V1 snapshots.
+          Prix ajusté du calendrier lorsqu'il est fourni par la source.
+          Ce champ est actuellement nul pour les quatre snapshots Lyon V1.
 
       - name: minimum_nights
         description: Durée minimale de séjour applicable à la date calendaire.
