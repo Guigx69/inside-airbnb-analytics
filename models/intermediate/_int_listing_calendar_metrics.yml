@@ -3,10 +3,7 @@ version: 2
 models:
   - name: int_listing_calendar_metrics
     description: >
-      Indicateurs agrégés du calendrier Inside Airbnb par annonce et par snapshot.
-      Each row represents one listing observed in one source calendar snapshot.
-      Availability metrics describe public calendar availability and must not
-      be interpreted as observed occupancy or bookings.
+      Indicateurs agrégés du calendrier Inside Airbnb par annonce et par snapshot. Chaque ligne représente une annonce observée dans un snapshot du calendrier source. Les mesures décrivent la disponibilité publique affichée dans le calendrier et ne constituent pas une preuve d'occupation ou de réservation.
 
     columns:
       - name: source_country

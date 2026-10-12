@@ -3,11 +3,7 @@ version: 2
 models:
   - name: int_listing_snapshot_movement
     description: >
-      Classifies each observed listing at each market snapshot according
-      to its presence in the immediately preceding market snapshot.
-      One row represents one country, city, snapshot and listing.
-      The first market snapshot is classified as baseline because no
-      previous market snapshot exists.
+      Classe chaque annonce observée dans un snapshot de marché selon sa présence dans le snapshot immédiatement précédent. Chaque ligne représente un pays, une ville, un snapshot et une annonce. Le premier snapshot du marché est classé baseline, car aucun snapshot précédent n'existe.
 
     columns:
       - name: source_country

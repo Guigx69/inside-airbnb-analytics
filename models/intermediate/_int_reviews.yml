@@ -3,10 +3,7 @@ version: 2
 models:
   - name: int_reviews
     description: >
-      Deduplicated business-level Airbnb reviews across historical Inside Airbnb
-      snapshots. The model contains one row per country, city, listing and review.
-      Snapshot metadata records when each review was first and last observed in
-      the source datasets.
+      Avis Airbnb dédupliqués à l'échelle métier à partir des snapshots historiques Inside Airbnb. Chaque ligne représente un pays, une ville, une annonce et un avis. Les métadonnées de snapshot indiquent les premières et dernières observations de chaque avis dans les jeux de données source.
 
     columns:
       - name: source_country

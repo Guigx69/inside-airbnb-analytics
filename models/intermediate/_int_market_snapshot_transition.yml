@@ -3,10 +3,7 @@ version: 2
 models:
   - name: int_market_snapshot_transition
     description: >
-      Market-level transition metrics between consecutive Inside Airbnb
-      snapshots. Baseline snapshots are excluded because no previous
-      snapshot exists. One row represents one country, city, previous
-      snapshot and current snapshot transition.
+      Indicateurs de transition du marché entre snapshots Inside Airbnb consécutifs. Les snapshots initiaux sont exclus faute de snapshot précédent. Chaque ligne représente un pays, une ville et une transition entre un snapshot précédent et un snapshot actuel.
 
     columns:
       - name: source_country

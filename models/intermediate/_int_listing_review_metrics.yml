@@ -3,12 +3,7 @@ version: 2
 models:
   - name: int_listing_review_metrics
     description: >
-      Review metrics reconstructed from deduplicated review-level data for each
-      listing snapshot. The model has one row per country, city, snapshot and
-      listing. Metrics are calculated using reviews whose review_date is less
-      than or equal to the snapshot date. These reconstructed metrics are kept
-      distinct from the review counters published directly in the Inside Airbnb
-      listings dataset and are not expected to match them exactly.
+      Indicateurs d'avis reconstitués à partir des avis dédupliqués pour chaque snapshot d'annonces. Chaque ligne représente un pays, une ville, un snapshot et une annonce. Seuls les avis dont review_date est antérieure ou égale à la date du snapshot sont pris en compte. Ces indicateurs restent distincts des compteurs publiés par Inside Airbnb et ne sont pas censés leur correspondre exactement.
 
     columns:
       - name: source_country

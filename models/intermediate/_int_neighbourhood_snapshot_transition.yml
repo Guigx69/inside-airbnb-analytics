@@ -3,12 +3,7 @@ version: 2
 models:
   - name: int_neighbourhood_snapshot_transition
     description: >
-      Neighbourhood-level transition metrics between consecutive Inside
-      Airbnb snapshots. The model distinguishes retained listings,
-      disappearances, movements between neighbourhoods, newly observed
-      listings and listings returning after an observation gap.
-      Only neighbourhoods represented in both sides of a transition are
-      returned by the final inner join.
+      Indicateurs de transition par quartier entre snapshots Inside Airbnb consécutifs. Le modèle distingue les annonces conservées, disparues, déplacées entre quartiers, nouvellement observées ou réapparues après une interruption. La jointure interne finale ne conserve que les quartiers représentés des deux côtés de la transition.
 
     columns:
       - name: source_country
