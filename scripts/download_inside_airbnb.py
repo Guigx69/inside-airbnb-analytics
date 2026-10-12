@@ -752,7 +752,7 @@ def main() -> int:
         return 0
 
     except requests.RequestException as exc:
-        print(f"[ERROR] HTTP error: {exc}")
+        print(f"[ERROR] Erreur HTTP : {exc}")
         return 1
 
     except Exception as exc:

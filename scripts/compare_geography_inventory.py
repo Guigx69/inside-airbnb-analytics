@@ -39,7 +39,7 @@ def main():
         print(f"\\n{title} (first {args.limit}):")
         for path in paths[:args.limit]:
             print("  " + path)
-    print("\\n[READ-ONLY] No archives downloaded; no manifest or Snowflake changes.")
+    print("\\n[LECTURE SEULE] Aucune archive téléchargée ; manifeste et Snowflake inchangés.")
 
 
 if __name__ == "__main__":

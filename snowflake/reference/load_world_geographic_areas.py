@@ -128,7 +128,7 @@ def identifier(value, label):
 
     if not value or not (value[0].isalpha() or value[0] == "_") or not all(c.isalnum() or c == "_" for c in value):
 
-        raise ValueError(f"Invalid Snowflake identifier {label}: {value!r}")
+        raise ValueError(f"Identifiant Snowflake invalide {label}: {value!r}")
 
     return value.upper()
 
@@ -146,7 +146,7 @@ def connect():
 
     if missing:
 
-        raise RuntimeError("Missing environment variables: " + ", ".join(missing))
+        raise RuntimeError("Variables d'environnement manquantes : " + ", ".join(missing))
 
     return snowflake.connector.connect(
 
@@ -182,7 +182,7 @@ def inventory(path):
 
     if not rows or not {"source_country", "source_city", "in_fct", "url"}.issubset(rows[0]):
 
-        raise ValueError(f"Invalid inventory: {path}")
+        raise ValueError(f"Inventaire invalide : {path}")
 
     result = {}
 
@@ -373,7 +373,7 @@ def repair_polygon(geom, max_area_change):
 
     if fixed is None or not fixed.is_valid or fixed.is_empty:
 
-        raise ValueError("Invalid geometry after repair")
+        raise ValueError("Géométrie invalide après réparation")
 
     after = fixed.area
 
@@ -492,7 +492,7 @@ def local_ring_variants(part):
 
 
 def geographic_component_diagnostic(cur, part, index):
-    """Snowflake geodesic diagnostics; no invalid geography is inserted."""
+    """Diagnostic géodésique Snowflake ; aucune géographie invalide n'est insérée."""
     coords = list(part.exterior.coords)
     edges = [((a[0]-b[0])**2 + (a[1]-b[1])**2)**0.5
              for a, b in zip(coords, coords[1:])]
@@ -795,11 +795,11 @@ def triangle_partition_diagnostic(cur, original, index, label):
 
 
 def generic_exact_partition_repair(cur, original, label):
-    """Repair a single invalid quadrilateral component with exact-cover triangles.
+    """Réparer un seul composant quadrilatéral invalide à l'aide de triangles couvrant exactement la surface.
 
-    Shapely considers edge-sharing MultiPolygons invalid, but Snowflake's
-    GEOGRAPHY parser can accept this representation. Never relax source
-    coverage checks or use allow_invalid=TRUE.
+    Shapely considère les MultiPolygons partageant une arête comme invalides, mais le parseur
+    GEOGRAPHY de Snowflake peut accepter cette représentation. Ne jamais assouplir les contrôles
+    de couverture de la source ni utiliser allow_invalid=TRUE.
     """
     from shapely import force_2d
     from shapely.ops import unary_union, triangulate
@@ -866,7 +866,7 @@ def generic_exact_partition_repair(cur, original, label):
 
 
 def targeted_repair(cur, original, label, max_delta=0.001):
-    """Diagnose every invalid component; attempt local variants, then validate assembled shape."""
+    """Diagnostiquer chaque composant invalide, essayer des variantes locales puis valider la forme assemblée."""
     from itertools import product
     parts = list(original.geoms) if isinstance(original, MultiPolygon) else [original]
     bad = [i for i, part in enumerate(parts) if not snowflake_valid(cur, part)]
@@ -949,13 +949,13 @@ def diagnose_components(conn, session, sources, names, report_path, max_area_cha
                 "TARGET VARCHAR, COMPONENT_INDEX NUMBER, GEOJSON VARCHAR)")
     for (country, city), area_name in DIAGNOSTIC_TARGETS.items():
         if area_name not in names[(country, city)]:
-            raise RuntimeError(f"Missing FCT neighbourhood: {country}/{city}/{area_name}")
+            raise RuntimeError(f"Quartier FCT manquant : {country}/{city}/{area_name}")
         url = sources[(country, city)]
         response = session.get(url, timeout=(20, 120))
         response.raise_for_status()
         payload = response.json()
         if payload.get("type") != "FeatureCollection":
-            raise ValueError(f"Invalid GeoJSON for {country}/{city}")
+            raise ValueError(f"GeoJSON invalide pour {country}/{city}")
         polys = []
         rejected = []
         for index, feature in enumerate(payload.get("features", [])):
@@ -973,7 +973,7 @@ def diagnose_components(conn, session, sources, names, report_path, max_area_cha
             combined = make_valid(combined)
         combined = polygon_only(combined)
         if combined is None or combined.is_empty or not combined.is_valid:
-            raise RuntimeError(f"Invalid combined polygon: {country}/{city}/{area_name}")
+            raise RuntimeError(f"Polygone combiné invalide : {country}/{city}/{area_name}")
         parts = list(combined.geoms) if isinstance(combined, MultiPolygon) else [combined]
         target = f"{country}/{city}/{area_name}"
         cur.execute("DELETE FROM WORLD_GEO_DIAG")
@@ -1012,7 +1012,7 @@ def diagnose_components(conn, session, sources, names, report_path, max_area_cha
               ("source_country", "source_city", "area_name", "component_index",
                "snowflake_status", "geojson_length", "geometry_details"), rows)
     print(f"[DIAG REPORT] {report_path} ({len(rows)} components)")
-    print("[READ-ONLY] Permanent reference table unchanged; no repair applied.")
+    print("[LECTURE SEULE] Table de référence permanente inchangée ; aucune réparation appliquée.")
     return 0
 
 
@@ -1165,7 +1165,7 @@ def main():
 
                 if payload.get("type") != "FeatureCollection" or not isinstance(payload.get("features"), list):
 
-                    raise ValueError("Expected FeatureCollection")
+                    raise ValueError("FeatureCollection attendue")
 
                 for feature_index, feature in enumerate(payload["features"]):
 
@@ -1229,7 +1229,7 @@ def main():
 
                         if combined is None or not combined.is_valid or combined.is_empty:
 
-                            raise ValueError("Invalid polygon after union")
+                            raise ValueError("Polygone invalide après union")
 
                         geojson = json.dumps(mapping(combined), ensure_ascii=False, separators=(",", ":"))
 
@@ -1342,7 +1342,7 @@ def main():
             write_csv(args.quarantine_report,
                       ("source_country", "source_city", "area_name", "status", "detail"),
                       sorted(set(quarantine)))
-            print("[BLOCKED] --fail-on-quarantine: no permanent changes.", file=sys.stderr)
+            print("[BLOQUÉ] --fail-on-quarantine : aucune modification permanente.", file=sys.stderr)
             return 2
 
 
@@ -1391,8 +1391,8 @@ def main():
                 )
             cur.execute("SELECT COUNT(*) FROM WORLD_GEO_STAGE WHERE TRY_TO_GEOGRAPHY(GEOJSON) IS NULL")
             if cur.fetchone()[0]:
-                raise RuntimeError("Invalid geography remained after targeted repair")
-            print("[REPAIR] All repaired neighbourhoods valid in Snowflake.")
+                raise RuntimeError("Une géographie invalide subsiste après la réparation ciblée")
+            print("[RÉPARATION] Tous les quartiers réparés sont valides dans Snowflake.")
         cur.execute(f"SELECT COUNT(*) FROM WORLD_GEO_STAGE s JOIN {ref} r "
 
                     "ON s.SOURCE_COUNTRY=r.SOURCE_COUNTRY AND s.SOURCE_CITY=r.SOURCE_CITY "
@@ -1434,14 +1434,14 @@ def main():
               f"existing_reference_keys={len(existing)}")
         print(f"[QUARANTINE REPORT] {args.quarantine_report}")
         if args.fail_on_quarantine and quarantine:
-            print("[BLOCKED] --fail-on-quarantine: no permanent changes.", file=sys.stderr)
+            print("[BLOQUÉ] --fail-on-quarantine : aucune modification permanente.", file=sys.stderr)
             return 2
 
         print(f"[REPORT] {args.report} | {args.issues_report}")
 
         if args.validate:
             args.run_summary.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-            print("[READ-ONLY] Reference table unchanged.")
+            print("[LECTURE SEULE] Table de référence inchangée.")
 
             return 0
 
