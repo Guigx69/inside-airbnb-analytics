@@ -2,7 +2,7 @@
 
 **Dernière mise à jour : 13 octobre 2026.** Exécuter toutes les commandes dans **PowerShell VS Code**, depuis `C:\Projects\inside_airbnb`. Le dépôt peut être installé ailleurs : adapter uniquement le chemin racine. Ce guide distingue explicitement inventaire, téléchargement, ingestion et transformation.
 
-## 1. État de référence et preuves
+## 1. État de référence et contrôles
 
 | Indicateur | État observé |
 |---|---:|
@@ -15,9 +15,9 @@
 | Entrées historiques hors catalogue courant | 330 |
 | Dernier snapshot observé | Vaud, 2026-10-05 |
 
-L'audit différentiel a trouvé 120 nouveaux snapshots pour 119 zones (Vaud : deux dates). La comparaison `comparer_manifestes.py --reference origin/main` avant publication indiquait **360 ajouts, 0 suppression, 0 modification**. L'opérateur a ensuite indiqué avoir publié le manifeste. **Le contrôle SHA-256 exhaustif des 1 989 archives n'est pas attesté par la sortie transmise**, contrairement au contrôle des 1 659 archives courantes.
+L'audit différentiel a trouvé 120 nouveaux snapshots pour 119 zones (Vaud : deux dates). La comparaison `comparer_manifestes.py --reference origin/main` avant publication indiquait **360 ajouts, 0 suppression, 0 modification**. La publication du manifeste est contrôlée par l'historique Git et l'état de la branche distante. Le contrôle SHA-256 du catalogue courant porte sur 1 659 fichiers ; le contrôle exhaustif du manifeste (1 989 fichiers) doit être exécuté et son résultat conservé séparément.
 
-Les 25 modèles dbt et 456 tests du build précédent concernent **l'état antérieur** aux nouveaux snapshots. Les neuf pages Streamlit ont été parcourues sur le compte source avant la synchronisation. **Aucune ingestion World ni reconstruction dbt post-synchronisation n'est établie.**
+Les 25 modèles dbt et 456 tests du build précédent concernent **l'état antérieur** aux nouveaux snapshots. Les neuf pages Streamlit ont été contrôlées avant la synchronisation. **Aucune ingestion World ni reconstruction dbt post-synchronisation n'est établie.**
 
 ## 2. Prévol (lecture seule)
 
