@@ -1,6 +1,6 @@
 # Manuel d'installation et d'exploitation A à Z — Inside Airbnb Analytics
 
-**Public :** responsable / ingénieur repreneur. **Plateforme :** Windows PowerShell, Python, Snowflake, dbt, Git. **Version de référence :** V1.3 sur `main` ; les scripts de bootstrap et la documentation sont intégrés. Le bootstrap reste non validé sur un compte Snowflake vierge.
+**Public :** responsable / ingénieur repreneur. **Plateforme :** Windows PowerShell, Python, Snowflake, dbt, Git. **Version de livraison :** V4 World sur `main` ; les scripts de bootstrap et la documentation sont intégrés. Le bootstrap reste non validé sur un compte Snowflake vierge.
 
 > **Important.** Le dépôt GitHub contient le code, les scripts et le manifeste, **pas les archives CSV.GZ (1 989 entrées référencées après synchronisation ; 35,16 Gio était la taille des 1 629 entrées précédentes)**. Une copie indépendante des archives est nécessaire pour reconstruire RAW sur un autre compte. Un compte Snowflake expiré ne constitue pas une sauvegarde. Ne jamais committer de secrets.
 
@@ -258,4 +258,4 @@ Pour visualiser la documentation dbt (si disponible sur le poste) :
 4. N'utiliser `--execute`, `--sync`, le loader sans `--dry-run` ou `dbt build` qu'après accord explicite du propriétaire du compte cible.
 5. Ne pas considérer une commande `dbt parse` réussie comme preuve que les données et les droits de création sont valides ; `dbt debug` teste la connexion, `dbt build` écrit des objets.
 
-**État au 12/10/2026 :** RAW Lyon du compte source contrôlé (5 dates, 15 lots, 17 692 229 lignes) ; build V1.3 antérieur validé ; **pas de preuve de build sur environnement cible ni de bootstrap sur compte vierge**. La livraison doit conserver cette distinction.
+**État de livraison au 14/10/2026 :** RAW Lyon du compte source contrôlé (5 dates, 15 lots, 17 692 229 lignes) ; dry-run global du loader : 1 989 lots reconnus comme déjà chargés ; dernier snapshot RAW_LISTINGS et FCT_LISTING_SNAPSHOT identique (17/09/2026) ; neuf pages Streamlit testées ; audit GitHub Actions #2 réussi. Build dbt complet antérieur validé, **sans nouveau build complet post-synchronisation**. Aucun bootstrap ni build sur un compte Snowflake vierge démontré. Le rapprochement exhaustif RAW/marts reste hors de cette recette.
