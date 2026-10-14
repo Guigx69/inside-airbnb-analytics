@@ -1,6 +1,6 @@
 # Manuel d'installation et d'exploitation A à Z — Inside Airbnb Analytics
 
-**Public :** responsable / ingénieur repreneur. **Plateforme :** Windows PowerShell, Python, Snowflake, dbt, Git. **Version de livraison :** V4 World sur `main` ; les scripts de bootstrap et la documentation sont intégrés. Le bootstrap reste non validé sur un compte Snowflake vierge.
+**Public :** responsable / ingénieur repreneur. **Plateforme :** Windows PowerShell, Python, Snowflake, dbt, Git. **Référence de livraison :** branche `main` ; les scripts de bootstrap et la documentation sont intégrés. Le bootstrap reste non validé sur un compte Snowflake vierge.
 
 > **Important.** Le dépôt GitHub contient le code, les scripts et le manifeste, **pas les archives CSV.GZ (1 989 entrées référencées après synchronisation ; 35,16 Gio était la taille des 1 629 entrées précédentes)**. Une copie indépendante des archives est nécessaire pour reconstruire RAW sur un autre compte. Un compte Snowflake expiré ne constitue pas une sauvegarde. Ne jamais committer de secrets.
 
@@ -48,7 +48,7 @@ Inside Airbnb (listings / calendar / reviews CSV.GZ)
   -> dbt MARTS (tables/vues analytiques)
 ```
 
-**25 modèles dbt :** 3 staging, 10 intermediate, 12 marts/fact. La V1.3 a été testée sur l'environnement de développement le 09/10/2026 : 14 tables, 11 vues, 456 tests, `PASS=480 WARN=1 ERROR=0`, durée 1 h 05 min 46 s. Le WARN `assert_stg_calendar_listing_exists` (3 163 clés orphelines) est connu ; ne pas le masquer en supprimant les données. **Ce benchmark ne prouve pas la validation d'un compte cible ni d'un build postérieur au snapshot septembre.**
+**25 modèles dbt :** 3 staging, 10 intermediate, 12 marts/fact. Un build complet a été testé sur l'environnement de développement le 09/10/2026 : 14 tables, 11 vues, 456 tests, `PASS=480 WARN=1 ERROR=0`, durée 1 h 05 min 46 s. Le WARN `assert_stg_calendar_listing_exists` (3 163 clés orphelines) est connu ; ne pas le masquer en supprimant les données. **Ce benchmark ne prouve pas la validation d'un compte cible ni d'un build postérieur au snapshot septembre.**
 
 **Prudence métier :** une journée indisponible dans Calendar ne prouve pas qu'elle a été louée ; ne pas présenter l'indisponibilité comme une occupation réelle.
 
