@@ -1,4 +1,4 @@
-# Inside Airbnb Analytics — V1.3
+# Inside Airbnb Analytics — V4 World
 
 Projet Data Engineering : **Python · Snowflake · dbt Core**, basé sur les archives publiques [Inside Airbnb](https://insideairbnb.com/).
 
@@ -40,9 +40,9 @@ Le contrôle d'archives suppose que les fichiers référencés dans `data_manife
 - **25 modèles dbt**, dont 14 tables et 11 vues.
 - **456 tests** ; build du 09/10/2026 : **480 PASS, 1 WARN, 0 ERROR**, en 1 h 05 min 46 s.
 - Avertissement connu : `assert_stg_calendar_listing_exists` (3 163 clés orphelines).
-- **1 629 archives**, 35,16 Gio, vérifiées localement par SHA-256 ; le manifeste est versionné, pas les archives.
+- **État historique avant synchronisation :** 1 629 archives, 35,16 Gio. **État actuel :** 1 989 archives, 45,08 Gio, toutes vérifiées localement par SHA-256 ; seul le manifeste est versionné.
 - **Lyon :** cinq snapshots, 15 lots RAW non vides, **17 692 229 lignes** contrôlées sur l'environnement de développement le 12/10/2026.
-- **Non testé :** bootstrap et build sur un compte Snowflake vierge sur l'environnement cible. La fraîcheur des marts après le dernier snapshot n'a pas été établie.
+- **Non testé :** bootstrap et build sur un compte Snowflake vierge sur l'environnement cible. La correspondance de la date maximale `SNAPSHOT_DATE` entre `RAW_LISTINGS` et `FCT_LISTING_SNAPSHOT` a été vérifiée (17/09/2026), sans démonstration d'exhaustivité ligne à ligne.
 
 ## État des données — octobre 2026
 
@@ -51,7 +51,7 @@ Le contrôle d'archives suppose que les fichiers référencés dans `data_manife
 - **1 989 entrées** dans `data_manifest.csv` après synchronisation, contre 1 629 avant ; aucune suppression ni modification des entrées historiques lors de la comparaison.
 - **1 659/1 659 archives du catalogue courant vérifiées** avec `--verify` (taille et SHA-256). Les **1 989/1 989 archives du manifeste** (dont 330 historiques) ont ensuite été vérifiées par `check_archives.py --hash` : 0 manquante, 0 invalide, 45,08 Gio.
 - Dernière date du catalogue observée : **05/10/2026 (Vaud)**. Ce constat est daté, pas une garantie de fraîcheur future.
-- **Non encore validé pour ces nouvelles données :** ingestion RAW World, exécution dbt après synchronisation, fraîcheur des marts et validation sur un compte Snowflake vierge.
+- **Contrôles post-synchronisation :** le dry-run global du loader reconnaît les 1 989 lots comme déjà chargés ; le dernier snapshot du mart principal correspond à RAW (17/09/2026) ; les neuf pages Streamlit ont été testées ; l'audit GitHub Actions #2 a réussi. **Limites :** aucun nouveau `dbt build` complet post-synchronisation, aucun rapprochement exhaustif RAW/marts, aucun bootstrap sur un compte Snowflake vierge.
 
 > **Attention aux chiffres historiques ci-dessous :** la référence de 1 629 archives / 35,16 Gio décrit l'état **avant** la synchronisation d'octobre ; elle ne représente plus le manifeste actuel. Recalculer la volumétrie depuis `data_manifest.csv` plutôt que réutiliser cette taille.
 
