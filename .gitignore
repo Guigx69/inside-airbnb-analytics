@@ -58,3 +58,7 @@ snowflake/reference/.geo_cache/
 
 # Rapports temporaires des chargements geographiques
 /geojson_world_*.json
+
+# Rapports locaux d'audit du catalogue (artefacts générés)
+/audit-world.json
+/audit_world_*.txt
