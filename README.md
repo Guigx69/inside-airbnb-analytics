@@ -1,4 +1,4 @@
-# Inside Airbnb Analytics — V4 World
+# Inside Airbnb Analytics — Documentation finale
 
 Projet Data Engineering : **Python · Snowflake · dbt Core**, basé sur les archives publiques [Inside Airbnb](https://insideairbnb.com/).
 
