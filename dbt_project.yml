@@ -2,11 +2,7 @@
 # Plateforme analytique Inside Airbnb
 # dbt Core + Snowflake
 #
-# Feuille de route :
-#   V1 - Lyon
-#   V2 - France
-#   V3 - Europe
-#   V4 - Monde
+# Périmètre : analyses géographiques et temporelles mondiales
 # =============================================================================
 
 name: 'inside_airbnb'
