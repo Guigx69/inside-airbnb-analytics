@@ -14,9 +14,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Installer Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
       - name: Installer les dépendances du collecteur
@@ -27,7 +27,7 @@ jobs:
         run: python scripts/audit_catalogue_world.py --rapport audit-world.json
       - name: Publier le rapport
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: rapport-audit-world
           path: audit-world.json
