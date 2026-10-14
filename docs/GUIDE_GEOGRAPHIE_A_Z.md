@@ -124,7 +124,7 @@ L'ingestion réelle reprend **la même commande sans `--dry-run`**, après contr
 .\.venv\Scripts\python.exe .\scripts\load_raw_to_snowflake.py --location lyon --snapshot 2026-09-17
 ```
 
-Le loader écrit dans RAW et le journal. Ne pas l'utiliser comme vérification neutre. Sur le compte source V1.3, les cinq snapshots Lyon sont déjà présents en RAW : **ne pas les recharger**.
+Le loader écrit dans RAW et le journal. Ne pas l'utiliser comme vérification neutre. Sur l'environnement source contrôlé, les cinq snapshots Lyon sont déjà présents en RAW : **ne pas les recharger**.
 
 ## 7. Orchestrateur : ce qu'il automatise réellement
 
